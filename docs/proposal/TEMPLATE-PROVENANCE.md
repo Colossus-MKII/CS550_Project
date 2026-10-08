@@ -6,7 +6,7 @@ The proposal uses the supplied `Formatting_Instructions_For_NeurIPS_2026.zip`. A
 
 The assignment screenshot says NeurIPS 2024, while its linked Overleaf template and the supplied archive identify themselves as NeurIPS 2026. This revision follows the supplied archive. The [current Overleaf template](https://www.overleaf.com/latex/templates/neurips-2024/tpsbbrdqcmsh) credits the NeurIPS 2026 Program Chairs and lists CC BY 4.0 licensing; the original attribution and style headers are preserved.
 
-The proposal uses `preprint` mode to display named authors without review line numbers or a conference acceptance notice. The first-page notice identifies the course and proposal rather than a conference submission. It retains the template's standard single-column US-letter layout and typography. Author-year citations use the standard `plainnat` bibliography style. No template examples, conference checklist, or technical appendix are included in this course proposal; the supplied originals remain in the template directory.
+The proposal uses `preprint` mode to display named authors without review line numbers or a conference acceptance notice. The first-page notice is the supplied style's original `Preprint.` text. The style intentionally suppresses the printed number on page 1; subsequent pages display their normal numbers. It retains the template's standard single-column US-letter layout and typography. Author-year citations use the standard `plainnat` bibliography style. No template examples, conference checklist, or technical appendix are included in this course proposal; the supplied originals remain in the template directory.
 
 | File | SHA-256 |
 | --- | --- |

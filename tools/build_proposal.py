@@ -79,10 +79,6 @@ def build_latex(source: Path, output: Path) -> None:
 \usepackage{xcolor}
 \hypersetup{hidelinks}
 \setcitestyle{authoryear,round}
-% Course metadata in the notice; template geometry and typography are unchanged.
-\makeatletter
-\renewcommand{\@noticestring}{CS550 Massive Data Mining, Fall 2026. Project proposal.}
-\makeatother
 % Named course proposal.
 \title{TITLE}
 \author{NAMES}
