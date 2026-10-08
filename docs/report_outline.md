@@ -1,6 +1,6 @@
 # Eight-Page Final Report Plan
 
-The chapter 1 slides require an eight-page final report excluding references. Use the official ACML conference-track class preserved in [templates/acml](../templates/acml/README.md), as selected for this project. Start from [paper/proposal.tex](../paper/proposal.tex) and preserve its single-column typography and geometry. The allocation below is a writing plan; adjust it once the actual results show which findings need space.
+The chapter 1 slides require an eight-page final report excluding references. Use the ACL style and bibliography files preserved in [templates/acl](../templates/acl/README.md), extracted from the exact user-supplied local `Association_for_Computational_Linguistics__ACL__conference.zip`. Start from [paper/proposal.tex](../paper/proposal.tex) and preserve its standard two-column ACL layout. The [source ZIP](../output/latex/proposal_acl_source.zip) packages that source and the supplied style files for Overleaf. The Word proposal is an editable companion; the compiled ACL PDF is the layout reference. Do not add invented publication metadata. The allocation below is a writing plan; adjust it once the actual results show which findings need space. The course's two-page proposal and eight-page final-report limits take precedence over any conference submission length.
 
 | Pages | Content | Evidence to prepare |
 | --- | --- | --- |

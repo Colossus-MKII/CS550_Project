@@ -2,13 +2,12 @@
 
 **Jingdi Wu, Yupu Guo, Christina Ross**  
 Rutgers University · CS550 Massive Data Mining · Fall 2026  
-Project proposal · October 7 2026 · ACML conference-track template
+Project proposal · October 7 2026 · ACL conference template
 
 ## Abstract
 
 We compare automatic segmentation and tracking across people, animals, and vehicles using SAM 3 and YOLO with ByteTrack or BoT-SORT. We test whether adaptation improves mask accuracy, identity continuity, and robustness on annotated, sequence-disjoint videos. SAM 3 image-stage fine-tuning requires a GPU and mask-training pilot; YOLO adaptation provides a fallback. Deliverables are reproducible code, an eight-page report excluding references, and a presentation.
 
-**Keywords:** video instance segmentation; multi-object tracking; fine-tuning; robustness
 
 ## 1 Introduction
 
@@ -38,14 +37,14 @@ Weeks 1-2 establish data, baselines, and evaluation; weeks 3-4 cover the pilot a
 
 ## References
 
-Aharon, Orfaig, and Bobrovsky. BoT-SORT: Robust Associations Multi-Pedestrian Tracking. 2022. [Paper](https://arxiv.org/abs/2206.14651).
+Nir Aharon, Roy Orfaig, and Ben-Zion Bobrovsky. 2022. [BoT-SORT: Robust associations multi-pedestrian tracking](https://arxiv.org/abs/2206.14651). arXiv:2206.14651.
 
-Luiten et al. HOTA: A Higher Order Metric for Evaluating Multi-Object Tracking. IJCV, 2020. [Paper](https://arxiv.org/abs/2009.07736); [implementation](https://github.com/JonathonLuiten/TrackEval).
+Jonathon Luiten, Aljosa Osep, Patrick Dendorfer, Philip Torr, Andreas Geiger, Laura Leal-Taixe, and Bastian Leibe. 2020. [HOTA: A higher order metric for evaluating multi-object tracking](https://arxiv.org/abs/2009.07736). International Journal of Computer Vision.
 
-Meta AI. SAM 3 model and training documentation. 2026. [Repository](https://github.com/facebookresearch/sam3); [training guide](https://github.com/facebookresearch/sam3/blob/main/README_TRAIN.md).
+Meta AI. 2026. [SAM 3: Model and training documentation](https://github.com/facebookresearch/sam3). Online documentation, accessed October 7, 2026.
 
-Ultralytics. Segmentation and tracking documentation. 2026. [Segmentation](https://docs.ultralytics.com/tasks/segment/); [tracking](https://docs.ultralytics.com/modes/track/).
+Ultralytics. 2026. [Instance segmentation and multi-object tracking documentation](https://docs.ultralytics.com/modes/track/). Online documentation, accessed October 7, 2026.
 
-Yang, Fan, and Xu. Video Instance Segmentation. ICCV, 2019. [YouTube-VIS dataset](https://youtube-vos.org/dataset/vis/).
+Linjie Yang, Yuchen Fan, and Ning Xu. 2019. [Video instance segmentation](https://arxiv.org/abs/1905.04804). In Proceedings of the IEEE/CVF International Conference on Computer Vision.
 
-Zhang et al. ByteTrack: Multi-Object Tracking by Associating Every Detection Box. ECCV, 2022. [Paper](https://arxiv.org/abs/2110.06864).
+Yifu Zhang, Peize Sun, Yi Jiang, Dongdong Yu, Fucheng Weng, Zehuan Yuan, Ping Luo, Wenyu Liu, and Xinggang Wang. 2022. [ByteTrack: Multi-object tracking by associating every detection box](https://arxiv.org/abs/2110.06864). In European Conference on Computer Vision.
