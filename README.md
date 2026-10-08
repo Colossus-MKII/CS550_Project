@@ -13,7 +13,7 @@ The project compares YOLO segmentation with ByteTrack/BoT-SORT, SAM 2.1, SAM-Tra
 
 The proposal and its LaTeX support files remain together in [docs/proposal](docs/proposal). It now uses the supplied NeurIPS 2026 template with its standard single-column layout. The supplied archive is fully unpacked in [templates/neurips](templates/neurips). The earlier ACL files remain available in [templates/acl](templates/acl) and as inactive support files in the proposal folder.
 
-The assignment requires two proposal pages excluding references, an abstract, related work, a proposed method, and all authors' names and student IDs. References begin on a separate page. Student IDs are marked `pending` until supplied; update each author's metadata near the top of `proposal.md` before submission. Each student submits the same PDF individually. The final report limit is eight pages excluding references.
+The proposal has two content pages excluding references and includes an abstract, related work, a proposed method, and all three authors' names. References begin on a separate page. Student ID lines are omitted at the team's request. Each student submits the same PDF individually. The final report limit is eight pages excluding references.
 
 ## Build
 

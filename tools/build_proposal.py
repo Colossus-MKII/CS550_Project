@@ -60,11 +60,7 @@ def build_latex(source: Path, output: Path) -> None:
     author = next(line for line in lines if line.startswith("**")).strip(" *")
     author_blocks = []
     for name in author.split(", "):
-        prefix = f"{name} - Student ID: "
-        student_id = next((line.removeprefix(prefix).strip()
-                           for line in lines if line.startswith(prefix)), "pending")
         author_blocks.append(tex_escape(name) + r"\\" + "\n" +
-                             r"{\normalfont Student ID: " + tex_escape(student_id) + r"}\\" + "\n" +
                              r"{\normalfont Rutgers University}")
     names = "\n\\And\n".join(author_blocks)
     preamble = r"""% CS550 project proposal.

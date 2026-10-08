@@ -2,12 +2,6 @@
 
 **Jingdi Wu, Yupu Guo, Christina Ross**  
 
-Jingdi Wu - Student ID: pending
-
-Yupu Guo - Student ID: pending
-
-Christina Ross - Student ID: pending
-
 Rutgers University · CS550 Massive Data Mining · Fall 2026  
 Project proposal · October 8 2026
 

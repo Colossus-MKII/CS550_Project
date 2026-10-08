@@ -29,4 +29,4 @@ The bibliography style includes an LPPL notice; `LICENSE-LPPL-1.3c.txt` supplies
 
 ## Editing and submission
 
-Edit `proposal.md`, then run `python tools/build_proposal.py` from the repository root to update `proposal.tex`. The bibliography metadata stays in `references.bib`. Compile `proposal.tex` with Tectonic or upload the three active LaTeX files listed in the repository README to Overleaf. The proposal's body limit is two pages excluding references; references start on a separate page. The final report limit is eight pages excluding references. The assignment also requires all three student IDs; each remains explicitly pending until supplied.
+Edit `proposal.md`, then run `python tools/build_proposal.py` from the repository root to update `proposal.tex`. The bibliography metadata stays in `references.bib`. Compile `proposal.tex` with Tectonic or upload the three active LaTeX files listed in the repository README to Overleaf. The proposal's body limit is two pages excluding references; references start on a separate page. The final report limit is eight pages excluding references. Student ID lines are omitted at the team's request.
