@@ -181,7 +181,7 @@ def build(source: Path, output: Path) -> None:
     document.core_properties.title = title
     document.core_properties.author = author
     document.core_properties.subject = "CS550 Fall 2026 final project proposal"
-    document.core_properties.keywords = "SAM 3, instance segmentation, tracking, robustness"
+    document.core_properties.keywords = "YOLO, SAM 2.1, SAM-Track, MOTS, fine-tuning, robustness"
     document.core_properties.comments = "Generated from docs/proposal.md"
     output.parent.mkdir(parents=True, exist_ok=True)
     document.save(output)
@@ -189,12 +189,14 @@ def build(source: Path, output: Path) -> None:
 
 
 CITATIONS = {
-    "Aharon et al., 2022": "aharon2022",
+    "Cheng et al., 2023": "cheng2023",
     "Luiten et al., 2020": "luiten2020",
     "Meta AI, 2026": "meta2026",
+    "OpenCV, 2026": "opencv2026",
     "Ultralytics, 2026": "ultralytics2026",
-    "Yang et al., 2019": "yang2019",
-    "Zhang et al., 2022": "zhang2022",
+    "Yang et al., 2021": "yang2021",
+    "Voigtlaender et al., 2019": "voigtlaender2019",
+    "Yang and Yang, 2022": "yang2022",
 }
 
 

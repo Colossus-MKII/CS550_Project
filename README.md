@@ -1,163 +1,69 @@
-# CS550: Multi-Object Segmentation and Tracking
+# CS550 Project Proposal
 
-A semester research project comparing automatic segmentation and persistent object identities across different object categories. Vehicles are one category, alongside people and animals. The study measures mask accuracy, association stability, degradation under blur/brightness/compression, and processing cost.
+Proposal materials for **Evaluating Multi Object Segmentation and Tracking**.
 
-**Status:** proposal and research starter. No datasets or weights have been downloaded, models trained, or benchmark results claimed. SAM3 training feasibility depends on the actual university GPU allocation and a measured pilot. The code supports YOLO inference; the SAM3 canonical-output adapter and numerical benchmark integrations remain implementation milestones.
+**Authors:** Jingdi Wu, Yupu Guo, Christina Ross · Rutgers University · Fall 2026.
 
-## Proposal and study plan
+This repository contains the proposal and the files needed to rebuild it. The initial model implementation, experiment configurations, tests, and temporary outputs have been removed. Model execution, fine-tuning, and numerical evaluation are proposed future work; no benchmark results are claimed.
+
+## Proposal files
 
 - [Markdown proposal](docs/proposal.md)
-- [Word proposal](output/docx/proposal.docx)
-- [PDF proposal](output/pdf/proposal.pdf)
-- [ACL LaTeX source](paper/proposal.tex)
-- [Overleaf-ready ACL source ZIP](output/latex/proposal_acl_source.zip)
-- [User-supplied ACL template and provenance](templates/acl/README.md)
-- [Compute feasibility](docs/compute_feasibility.md)
-- [Experiment protocol](docs/experiment_protocol.md)
-- [Eight-page report outline](docs/report_outline.md)
-- [References](docs/references.md)
-- [Experiment matrix](configs/study.json)
-- [Hardware and fine-tuning gates](configs/hardware_gate.json)
+- [Two-page ACL PDF](output/pdf/proposal.pdf)
+- [Editable Word companion](output/docx/proposal.docx)
+- [LaTeX source](paper/proposal.tex) and [BibTeX references](paper/references.bib)
+- [Overleaf-ready source package](output/latex/proposal_acl_source.zip)
+- [Exact supplied ACL template and provenance](templates/acl/README.md)
 
-The core comparison is pretrained **YOLO11s-seg + ByteTrack**, **YOLO11s-seg + BoT-SORT**, and **SAM3 with fixed category text prompts**. SAM3 image detector/segmenter fine-tuning is conditional; the native video tracker remains pretrained. If adaptation cannot fit the lab allocation or the mask/checkpoint pilot fails, fine-tune YOLO and compare both trackers instead. This is adaptation of an existing model, rather than a new tracking algorithm.
+The PDF uses the original `acl.sty` and `acl_natbib.bst` from the user-supplied `Association_for_Computational_Linguistics__ACL__conference.zip`, with the standard two-column A4 layout and named authors. The local input ZIP is preserved. Word is an editable approximation of that layout. The course requires a two-page proposal and an eight-page final report excluding references.
 
-Team: **Jingdi Wu, Yupu Guo, Christina Ross**. Repository: [Colossus-MKII/CS550_Project](https://github.com/Colossus-MKII/CS550_Project).
+## Planned comparison
 
-The proposal is two pages including references, following chapter 1's two-page proposal requirement. Its PDF uses the standard two-column ACL layout from the exact user-supplied local archive, `Association_for_Computational_Linguistics__ACL__conference.zip`. The preserved ACL style and bibliography files come from that ZIP; no replacement web template is used. The course proposal shows the supplied authors without invented conference, publication, or acceptance metadata. The Word file is an editable companion to the authoritative LaTeX PDF. See [template provenance](templates/acl/README.md).
+| Method family | Baseline configurations | Adapted configurations |
+| --- | --- | --- |
+| YOLO segmentation | YOLO11s-seg + ByteTrack; YOLO11s-seg + BoT-SORT | Fine-tuned YOLO segmenter evaluated under both trackers; fixed tracker settings for each weight comparison. |
+| SAM 2 / SAM 2.1 | SAM 2.1 checkpoint, detector-generated box prompts, native temporal propagation | SAM 2.1 neural fine-tuning with explicitly recorded trainable components, conditional on a GPU and data-conversion pilot. |
+| SAM-Track | SAM keyframe segmentation + DeAOT propagation, with periodic object discovery | DeAOT component fine-tuning with SAM frozen, conditional on upstream training integration and the compute pilot; discovery settings tuned separately. |
+| OpenCV background subtraction | MOG2; KNN, each with foreground instance separation and persistent-ID association | Validation-tuned background and association settings plus online background adaptation; this is not neural fine-tuning. |
 
-`docs/proposal.md` is the prose source; `paper/references.bib` supplies reference metadata formatted by the supplied `acl_natbib.bst`. Rebuild the Word companion, LaTeX, and source ZIP with `python -m pip install python-docx` and `python tools/build_proposal.py`. To reproduce the authoritative PDF, install Tectonic or use the source ZIP in Overleaf. With Tectonic:
+YOLO is the required learned-weight adaptation. All three neural families have planned pretrained/adapted comparisons, but SAM 2.1 and DeAOT training remain conditional on the unconfirmed university GPU allocation. The [official SAM 2 training example](https://github.com/facebookresearch/sam2/blob/main/training/README.md) assumes A100 80 GB GPUs and uses eight GPUs; that example does not establish a universal minimum. DeAOT adaptation uses its [upstream training framework](https://github.com/yoxu515/aot-benchmark), rather than claiming that SAM-Track has an integrated end-to-end trainer. The classical [OpenCV methods](https://docs.opencv.org/4.x/d1/dc5/tutorial_background_subtraction.html) adapt their background model online and expose tuning parameters.
 
-```bash
-mkdir -p tmp/acl_build
-cp paper/proposal.tex paper/references.bib templates/acl/*.sty templates/acl/*.bst tmp/acl_build/
-cd tmp/acl_build
-tectonic --untrusted --keep-logs proposal.tex
-cp proposal.pdf ../../output/pdf/proposal.pdf
-cd ../..
-```
+Automatic SAM and OpenCV pipelines share a frozen YOLO detector for target labels and initialization/separation. They retain their own mask propagation or foreground association; detector tracking IDs are not supplied. These dependencies and all discovery work count toward runtime. Ground-truth-initialized propagation results, if collected, will be presented separately from automatic discovery.
 
-Tectonic supplies standard TeX dependencies during compilation. In Overleaf, upload `proposal_acl_source.zip` and select `proposal.tex` as the main document. Inspect both pages after rebuilding. Word and LaTeX can wrap text differently, so the compiled ACL PDF is the layout reference. Use these same user-supplied ACL style files for the later eight-page report, retaining the course's eight-page limit excluding references and its two-page proposal limit.
+## Evaluation plan
 
-Select a shared category subset from publicly labeled YouTube-VIS training videos and divide complete sequences into training, validation, and internal evaluation sets. Freeze exact dataset category IDs, YOLO class IDs, text prompts, and video membership in versioned manifests before running experiments. Use no ground-truth test masks/boxes to initialize SAM3 in the automatic setting. Prompted tracking, if studied, must be a separate experiment. Tracking objects does not itself classify physical movement versus stationary objects when the camera moves.
+Use a sequence-disjoint internal subset of [YouTube-VIS 2021](https://youtube-vos.org/dataset/vis/), covering people, dogs, cats, horses, and cars. Compare the same clips, frame timeline, categories, and perturbations. Report fixed- and moving-camera strata; camera motion is a stress test for background subtraction.
 
-## Quick start
+| Metric | What it diagnoses |
+| --- | --- |
+| sMOTSA | Joint mask quality, false positives, and identity-switch penalties. |
+| Mask HOTA, DetA, AssA | Overall tracking performance with detection and association decomposed. |
+| MOTSA | Detection and identity errors at the specified mask matching threshold. |
+| MOTSP | Mean mask IoU over matched instances; interpret alongside recall. |
+| Mask-matched IDF1 and ID switches | Identity consistency across the sequence. |
+| False positives and false negatives | Spurious instances and missed targets. |
+| Native video AP | Supplementary YouTube-VIS evaluation. |
+| FPS, peak memory, training time | Processing and adaptation costs. |
 
-Use Python **3.12+**. The dependency-free core can report hardware and validate records; image perturbations need Pillow. On a lab machine:
+Use validated mask-based matching and category/ignore handling, with consistent overlap resolution. The custom multicategory conversion must be checked before reporting numbers. These are **MOTS-style metrics on an internal YouTube-VIS subset**, not official KITTI-MOTS results. Metric definitions follow the [original MOTS paper](https://arxiv.org/abs/1902.03604) and [HOTA/TrackEval](https://github.com/JonathonLuiten/TrackEval). Robustness is measured through paired clean-to-corrupted changes under blur, brightness shifts, and JPEG compression, plus occlusion failure analysis.
 
-```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e '.[vision]'
-python -m unittest discover -s tests -v
-cs550 hardware --output runs/hardware.json
-```
+## Rebuild the proposal
 
-The probe reports devices it can actually detect. It does not convert installed VRAM into a promise that fine-tuning fits. CPU execution is sufficient for preparation and unit tests. SAM3's official setup requires a CUDA GPU, Python >=3.12, PyTorch >=2.7, and CUDA >=12.6; CPU or Apple MPS training is outside that setup. See the [official SAM3 installation guide](https://github.com/facebookresearch/sam3#installation).
-
-## YOLO baseline
-
-Install the optional runner. Obtain an official YOLO11 segmentation checkpoint separately and place it under `weights/`; the runner requires a local checkpoint and local video/frame directory.
+Install Python and `python-docx`, then run:
 
 ```bash
-python -m pip install -e '.[yolo]'
-cs550 yolo data/clip.mp4 --weights weights/yolo11s-seg.pt \
-  --tracker configs/bytetrack.yaml --device 0 --classes 0 2 15 \
-  --output runs/yolo_bytetrack
-cs550 validate runs/yolo_bytetrack/predictions.jsonl
+python -m pip install python-docx
+python tools/build_proposal.py
 ```
 
-`--classes 0 2 15` selects COCO person, car, and cat classes; this command illustrates class filtering, not the final dataset category mapping. Use the frozen study manifest instead. Switch to `configs/botsort.yaml` for BoT-SORT. Its checked-in setting enables camera-motion compensation and disables appearance ReID, so it cannot silently add an extra appearance model. A CPU device can be selected with `--device cpu`. For a frame directory, filenames must sort chronologically and `--fps` is required. `--max-frames 100` is useful for a pilot, but truncated runs cannot be treated as full-video evaluations.
-
-Each run saves `predictions.jsonl` and `metadata.json`: checkpoint SHA-256, complete package versions, tracker YAML, device, resolution, confidence, warmup count, elapsed time, and CUDA peak allocated/reserved memory when CUDA is used. End-to-end FPS includes association, mask transfer/RLE encoding, validation, and output writing; model loading and three prediction warmup passes are excluded. Repeat measurements on the same GPU and state the timing scope. CPU mask encoding is intentionally part of the measured pipeline and can limit this starter's throughput.
-
-Training the fallback segmenter uses Ultralytics' official CLI after creating a valid YOLO segmentation dataset from **training sequences only**:
+This creates Word, LaTeX, and the source ZIP. For the authoritative PDF, upload the ZIP to Overleaf and select `proposal.tex`, or install Tectonic and compile in a temporary directory:
 
 ```bash
-yolo segment train model=weights/yolo11s-seg.pt data=data/yolo_dataset.yaml \
-  epochs=20 imgsz=640 batch=4 device=0 seed=550 project=runs name=yolo_ft
+proposal_build_dir=$(mktemp -d)
+cp paper/proposal.tex paper/references.bib templates/acl/*.sty templates/acl/*.bst "$proposal_build_dir/"
+tectonic --untrusted --keep-logs --outdir "$proposal_build_dir" "$proposal_build_dir/proposal.tex"
+cp "$proposal_build_dir/proposal.pdf" output/pdf/proposal.pdf
+rm -r "$proposal_build_dir"
 ```
 
-This is an example starting budget, not a tuned result. Choose the checkpoint and thresholds using validation videos; freeze them before final evaluation. See [YOLO segmentation training](https://docs.ultralytics.com/tasks/segment/) and [tracking](https://docs.ultralytics.com/modes/track/). ByteTrack/BoT-SORT settings are configuration tuning, distinct from training neural weights.
-
-## SAM3 comparison and conditional fine-tuning
-
-Use a separate upstream checkout and environment to avoid dependency conflicts. Request gated checkpoint access and authenticate according to the [official SAM3 README](https://github.com/facebookresearch/sam3). Then install upstream and open its official video notebook:
-
-```bash
-git clone https://github.com/facebookresearch/sam3.git vendor/sam3
-cd vendor/sam3
-python -m pip install -e '.[notebooks]'
-git rev-parse HEAD
-jupyter notebook examples/sam3_video_predictor_example.ipynb
-```
-
-Install a CUDA-compatible PyTorch build using upstream's current instructions first. Save the commit hash and exact checkpoint version. **Freeze SAM3 versus SAM3.1 explicitly:** newer upstream code/checkpoints exist; switching versions mid-study changes the experiment. The official notebook demonstrates video text prompts, propagation, and single/multi-GPU selection. For this study choose one GPU and fixed category prompts without interactive corrections. Export masks, native IDs, frame indices, and calibrated category mappings into the canonical schema below; a validated SAM3 adapter is still to be written and tested on the lab GPU. Running one session per category may multiply compute and requires category-namespaced IDs, so report the prompt policy and include all sessions in timing.
-
-The [official training guide](https://github.com/facebookresearch/sam3/blob/main/README_TRAIN.md) includes a single-GPU image fine-tuning example:
-
-```bash
-python sam3/train/train.py \
-  -c configs/roboflow_v100/roboflow_v100_full_ft_100_images.yaml \
-  --use-cluster 0 --num-gpus 1
-```
-
-That command is **an upstream detection recipe, not a ready-made segmentation/MOTS training command**. Its [stock configuration](https://github.com/facebookresearch/sam3/blob/main/sam3/train/configs/roboflow_v100/roboflow_v100_full_ft_100_images.yaml) disables segmentation and comments out mask losses. Before any project fine-tuning: adapt an image configuration to mask annotations, enable segmentation and mask losses, verify the intended parameters receive finite gradients, then verify that checkpoint keys actually load into the inference detector/segmenter. A changed checkpoint file is insufficient if incompatible key prefixes leave inference weights unchanged. Keep the video tracker fixed and describe exactly which image/shared-encoder parameters were trained.
-
-Run a **100-frame inference pilot** and **20 optimizer steps at batch size 1** before committing to a longer job. Record peak memory, step time, total GPU-hours estimate, and validation sanity checks. Smaller image resolution, frozen components, or gradient accumulation are possible experimental choices only when the adapted recipe supports them and masks remain valid. They do not guarantee the model fits. Use the YOLO fallback if the gate fails. No custom SAM3 training configuration is claimed to work in this repository yet.
-
-## Robustness experiments
-
-Extract the same ordered frames for every condition. Apply one corruption at a time; each preserves geometry so ground-truth masks and identities stay aligned:
-
-```bash
-cs550 perturb data/frames data/frames_blur \
-  --spec '{"kind":"blur","radius":1.0}'
-cs550 perturb data/frames data/frames_dim \
-  --spec '{"kind":"brightness","factor":0.75}'
-cs550 perturb data/frames data/frames_jpeg \
-  --spec '{"kind":"jpeg","quality":50}'
-```
-
-Frames are read in lexicographic order and written as zero-padded PNGs. Ensure source ordering really is chronological. JPEG corruption performs exactly one lossy encode/decode; PNG output avoids adding a second lossy step. A manifest preserves source-to-output frame mapping and parameters. Compare each condition with a clean PNG export created using `{"kind":"clean"}`. Do not train on final evaluation corruptions or retune thresholds separately for each test condition.
-
-## Canonical output and evaluation
-
-One JSONL record per consecutive zero-based frame, including frames with no objects:
-
-```json
-{
-  "frame_idx": 0,
-  "timestamp_s": 0.0,
-  "image_size": [2, 3],
-  "objects": [{
-    "object_id": 7,
-    "category_id": 0,
-    "category_name": "person",
-    "score": 0.8,
-    "mask": {"size": [2, 3], "counts": [1, 3, 2]}
-  }]
-}
-```
-
-This tiny mask is a schema example, not a model result. Masks are original-resolution binary **uncompressed COCO RLE in column-major order**, beginning with a background run. IDs are positive and unique within a frame; model category IDs must be mapped explicitly to benchmark IDs. YOLO detections without persistent IDs are omitted and counted in metadata. `validate` checks frame consecutiveness, dimensions, mask coverage, IDs, and scores.
-
-The optional exporter produces one video's official VIS-format prediction entries with compressed RLE and absent-frame nulls:
-
-```bash
-python -m pip install -e '.[evaluation]'
-cs550 export-vis runs/yolo_bytetrack/predictions.jsonl \
-  --video-id 12 --frame-count 100 --category-map data/category_map.json \
-  --output runs/yolo_bytetrack/vis_video12.json
-```
-
-Supply the actual benchmark video ID, exact frame count, and a JSON dictionary mapping model IDs as strings to positive dataset IDs. Aggregate entries across videos into one prediction array. Track confidence is the mean score over detected frames. The exporter rejects category changes within a track; adopt and document a validation-selected class-voting rule before exporting such tracks. Frame resolution and ordering must match the official annotations.
-
-Compute **video AP** with the [official YouTube-VIS evaluator](https://github.com/youtubevos/vis), on a labeled internal held-out split as specified in the proposal. This exporter prepares predictions; it does not compute AP. **Mask-based HOTA/AssA**, ID switches, and per-frame mask AP need separately verified dataset adapters and matching rules; do not substitute bounding-box HOTA and label it mask HOTA. Use [TrackEval](https://github.com/JonathonLuiten/TrackEval) once the selected dataset adapter is validated. Recovery after occlusion should use annotated visibility/absence rules. Simple adjacent-mask differences confuse real motion with flicker.
-
-## Reproducibility and verification
-
-Commit the resolved experiment configuration, upstream model commit, checkpoint identifier/hash, split manifest, prompt/category mapping, seed, package snapshot, hardware report, and evaluator revision. The YOLO integration is pinned to an explicit Ultralytics release; Pillow/evaluation dependency ranges are resolved on installation, so save `python -m pip freeze` for each environment. SAM3 is installed from upstream separately and must be pinned to a recorded commit. Do not commit datasets, gated checkpoints, tokens, or large run outputs.
-
-Local checks cover RLE orientation/round trips, invalid annotations, track/frame integrity, perturbation correctness/determinism, ordering, and overwrite protection. CI runs these checks on Python 3.12. **YOLO GPU inference, SAM3 inference/training, compressed VIS export against pycocotools, and numerical evaluator results remain unverified until the lab dependencies/GPU/data are available.** There are no fabricated benchmark tables.
-
-This repository includes project scaffolding only; upstream packages/checkpoints retain their respective licenses. Review the [SAM license](https://github.com/facebookresearch/sam3/blob/main/LICENSE) and [Ultralytics licensing](https://www.ultralytics.com/license) before redistribution or non-course use.
+The compiler supplies standard TeX dependencies. Inspect every page after rebuilding; Word and LaTeX may wrap differently. Keep the original ACL template geometry and the course page limits.
