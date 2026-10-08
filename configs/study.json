@@ -1,0 +1,29 @@
+{
+  "status": "planned; no benchmark results yet",
+  "task": "automatic multi-category video instance segmentation and tracking",
+  "dataset": "YouTube-VIS 2021 publicly labeled training split; sequence-disjoint train/validation/test partition",
+  "initial_target": {"maximum_videos": 200, "shared_categories": 5, "split_proportions": [0.6, 0.2, 0.2]},
+  "category_policy": "Freeze a shared YOLO-supported and benchmark-labeled subset before experiments; record explicit IDs and SAM3 prompts",
+  "split_seed": 550,
+  "core_runs": [
+    {"id": "yolo_pretrained_bytetrack", "model": "YOLO11s-seg", "tracker": "configs/bytetrack.yaml", "weights": "pretrained"},
+    {"id": "yolo_pretrained_botsort", "model": "YOLO11s-seg", "tracker": "configs/botsort.yaml", "weights": "pretrained"},
+    {"id": "sam3_pretrained", "model": "SAM 3", "tracker": "native pretrained", "prompts": "fixed category names", "backend": "official example notebook; canonical adapter pending"}
+  ],
+  "conditional_runs": [
+    {"id": "sam3_image_ft", "gate": "mask-training configuration and checkpoint-loading checks plus compute pilot", "tracker": "fixed pretrained", "note": "No claim of end-to-end video tracker fine-tuning"},
+    {"id": "yolo_ft_bytetrack", "gate": "fallback if SAM3 image fine-tuning gate fails", "tracker": "configs/bytetrack.yaml"},
+    {"id": "yolo_ft_botsort", "gate": "fallback if SAM3 image fine-tuning gate fails", "tracker": "configs/botsort.yaml"}
+  ],
+  "perturbations": [
+    {"kind": "clean"},
+    {"kind": "blur", "radius": 1.0},
+    {"kind": "brightness", "factor": 0.75},
+    {"kind": "jpeg", "quality": 50}
+  ],
+  "evaluation": {
+    "primary": "video AP using official YouTube-VIS evaluator",
+    "secondary": ["mask-based HOTA/AssA if a verified TrackEval dataset adapter is completed", "ID switches under the same matching protocol", "end-to-end FPS", "peak CUDA allocated/reserved memory", "clean-to-corrupt metric drop"],
+    "compute_control": "same GPU and precision; report actual model resolutions and prompt count; separate model loading from inference/export; warm up and repeat timing"
+  }
+}

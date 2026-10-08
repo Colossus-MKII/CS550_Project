@@ -1,0 +1,14 @@
+{
+  "status": "planning gate; not an executed benchmark",
+  "required_access": ["NVIDIA CUDA GPU", "SAM3 checkpoint access", "lab queue and storage allocation"],
+  "inference_pilot": {"frames": 100, "measure": ["peak allocated/reserved VRAM", "elapsed wall time", "masks and IDs exported", "number of prompted categories"]},
+  "image_finetuning_pilot": {
+    "optimizer_steps": 20,
+    "batch_size": 1,
+    "scope": "image detector/segmenter adaptation; video tracker remains pretrained",
+    "must_check": ["enable_segmentation=true", "active mask losses and annotated masks", "finite nonzero gradients on intended trainable parameters", "checkpoint keys load into the inference model", "changed predictions after reloading", "peak VRAM and step time"]
+  },
+  "decision": "Proceed only when estimated total GPU-hours and memory fit the actual lab allocation; otherwise fine-tune YOLO and retain pretrained SAM3 if inference fits",
+  "notes": "No universal minimum VRAM or claimed speed is inferred from parameter count alone. Stock SAM3 Roboflow detection recipes are not a ready-made MOTS training recipe."
+}
+
