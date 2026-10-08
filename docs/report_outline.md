@@ -1,6 +1,6 @@
 # Eight-Page Final Report Plan
 
-The chapter 1 slides require an eight-page final report excluding references. Use the course's requested AI conference format. The allocation below is a writing plan; adjust it once the actual results show which findings need space.
+The chapter 1 slides require an eight-page final report excluding references. Use the official ACML conference-track class preserved in [templates/acml](../templates/acml/README.md), as selected for this project. Start from [paper/proposal.tex](../paper/proposal.tex) and preserve its single-column typography and geometry. The allocation below is a writing plan; adjust it once the actual results show which findings need space.
 
 | Pages | Content | Evidence to prepare |
 | --- | --- | --- |

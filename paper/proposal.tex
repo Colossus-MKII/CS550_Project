@@ -1,0 +1,89 @@
+% Generated from docs/proposal.md; rebuild with tools/build_proposal.py.
+% Uses the unmodified class supplied by the official ACML 2026 template.
+\documentclass[wcp]{jmlr}
+\hypersetup{hypertexnames=false}
+\pagenumbering{gobble}
+\jmlrproceedings{}{CS550 Project Proposal}
+\jmlryear{2026}
+\jmlrworkshop{Fall 2026}
+\jmlrvolume{}
+\jmlrpages{}
+\editors{}
+% Course metadata only: no claim of publication in ACML/PMLR proceedings.
+\makeatletter
+\renewcommand*{\@titlefoot}{}
+\makeatother
+\title[Multi-Object Segmentation and Tracking]{Robust Multi-Object Segmentation and Tracking}
+\author[Wu, Guo and Ross]{\Name{Jingdi Wu}\\
+\Name{Yupu Guo}\\
+\Name{Christina Ross}\\
+\addr Rutgers University, CS550 Massive Data Mining}
+\begin{document}
+\maketitle
+
+
+\begin{abstract}
+
+We compare automatic segmentation and tracking across people, animals, and vehicles using SAM 3 and YOLO with ByteTrack or BoT-SORT. We test whether adaptation improves mask accuracy, identity continuity, and robustness on annotated, sequence-disjoint videos. SAM 3 image-stage fine-tuning requires a GPU and mask-training pilot; YOLO adaptation provides a fallback. Deliverables are reproducible code, an eight-page report excluding references, and a presentation.
+
+\end{abstract}
+
+\begin{keywords}
+video instance segmentation; multi-object tracking; fine-tuning; robustness
+\end{keywords}
+
+\section{Introduction}
+
+Accurate masks do not ensure identity continuity through motion or occlusion. We ask how methods trade accuracy, association, and computation; whether adaptation improves unseen-video performance; and how degradation affects these measures. We hypothesize that adaptation improves masks while association may remain a bottleneck.
+
+\section{Methods and Adaptation}
+
+SAM 3 tracks instances matching a text concept \citep{meta2026}. Baselines use YOLO11s-seg with ByteTrack or BoT-SORT \citep{ultralytics2026,zhang2022,aharon2022}. Each outputs masks, categories, confidence, and IDs. SAM 3 uses fixed prompts without manual corrections; separate concept runs use namespaced IDs and validation-selected conflict handling. Timing includes every run.
+
+If feasible, we adapt SAM 3's image detector and shared features, holding its tracker fixed. Its example configuration disables segmentation; mask supervision and checkpoint transfer must be verified. Otherwise, we fine-tune YOLO with both trackers, retaining pretrained SAM 3 when inference fits. Threshold selection is configuration tuning. Custom LoRA and tracker training are outside scope.
+
+\section{Data and Experimental Protocol}
+
+We target up to 200 labeled YouTube-VIS 2021 training videos covering person, dog, cat, horse, and car \citep{yang2019}, split 60/20/20 by complete source video with category coverage. Training uses sampled frames and masks; evaluation retains annotated sequences. We freeze splits, category mappings, prompts, checkpoints, preprocessing, and tracker settings. Test annotations serve only scoring; annotation limitations and known pretraining overlap will be disclosed.
+
+\section{Evaluation and Robustness}
+
+Primary evaluation is held-out video AP using the official YouTube-VIS evaluator. Frame mask AP diagnoses segmentation. Supplementary mask HOTA, DetA, AssA, and ID switches require validated annotation conversion and matching \citep{luiten2020}. These are internal subset results. Validation fixes track-confidence aggregation.
+
+Paired blur, brightness, and JPEG tests preserve geometry. We report score drops, identity continuity, occlusion failures, FPS, and peak GPU memory, recording hardware, precision, resolutions, and timing scope. Uncertainty resamples videos; repeated seeds depend on budget. Adjacent-mask overlap cannot measure stability because objects move.
+
+\section{Feasibility and Work Plan}
+
+Hardware is unconfirmed. SAM 3 supports single-GPU image-stage training without a universal memory guarantee. A 100-frame inference and 20-step mask-training pilot at batch size one must verify memory headroom, finite gradients, changed intended parameters, and reloaded weights. Measured throughput sets the training budget.
+
+Weeks 1-2 establish data, baselines, and evaluation; weeks 3-4 cover the pilot and adaptation; week 5 runs frozen held-out comparisons; week 6 analyzes robustness; weeks 7-8 prepare the report and presentation. YOLO fallback begins by week 3. Improvement claims require measured evidence.
+
+\begin{thebibliography}{6}
+
+\bibitem[Aharon et~al.(2022)]{aharon2022}
+
+Aharon, Orfaig, and Bobrovsky. BoT-SORT: Robust Associations Multi-Pedestrian Tracking. 2022. \href{https://arxiv.org/abs/2206.14651}{Paper}.
+
+\bibitem[Luiten et~al.(2020)]{luiten2020}
+
+Luiten et al. HOTA: A Higher Order Metric for Evaluating Multi-Object Tracking. IJCV, 2020. \href{https://arxiv.org/abs/2009.07736}{Paper}; \href{https://github.com/JonathonLuiten/TrackEval}{implementation}.
+
+\bibitem[Meta AI(2026)]{meta2026}
+
+Meta AI. SAM 3 model and training documentation. 2026. \href{https://github.com/facebookresearch/sam3}{Repository}; \href{https://github.com/facebookresearch/sam3/blob/main/README_TRAIN.md}{training guide}.
+
+\bibitem[Ultralytics(2026)]{ultralytics2026}
+
+Ultralytics. Segmentation and tracking documentation. 2026. \href{https://docs.ultralytics.com/tasks/segment/}{Segmentation}; \href{https://docs.ultralytics.com/modes/track/}{tracking}.
+
+\bibitem[Yang et~al.(2019)]{yang2019}
+
+Yang, Fan, and Xu. Video Instance Segmentation. ICCV, 2019. \href{https://youtube-vos.org/dataset/vis/}{YouTube-VIS dataset}.
+
+\bibitem[Zhang et~al.(2022)]{zhang2022}
+
+Zhang et al. ByteTrack: Multi-Object Tracking by Associating Every Detection Box. ECCV, 2022. \href{https://arxiv.org/abs/2110.06864}{Paper}.
+
+\end{thebibliography}
+
+\end{document}

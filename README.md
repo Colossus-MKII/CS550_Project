@@ -9,6 +9,9 @@ A semester research project comparing automatic segmentation and persistent obje
 - [Markdown proposal](docs/proposal.md)
 - [Word proposal](output/docx/proposal.docx)
 - [PDF proposal](output/pdf/proposal.pdf)
+- [ACML LaTeX source](paper/proposal.tex)
+- [Overleaf-ready source ZIP](output/latex/proposal_acml_source.zip)
+- [Official template and provenance](templates/acml/README.md)
 - [Compute feasibility](docs/compute_feasibility.md)
 - [Experiment protocol](docs/experiment_protocol.md)
 - [Eight-page report outline](docs/report_outline.md)
@@ -20,9 +23,20 @@ The core comparison is pretrained **YOLO11s-seg + ByteTrack**, **YOLO11s-seg + B
 
 Team: **Jingdi Wu, Yupu Guo, Christina Ross**. Repository: [Colossus-MKII/CS550_Project](https://github.com/Colossus-MKII/CS550_Project).
 
-The proposal is two pages including references, following chapter 1's two-page proposal requirement. Its editable Word layout uses an adapted AI conference style: US Letter, two columns, Times New Roman 10-point body, and 12-point line spacing. The chapter 1 slides do not name a particular conference template; confirm any instructor-provided template before submission.
+The proposal is two pages including references, following chapter 1's two-page proposal requirement. The PDF is compiled with the unmodified `jmlr.cls` from the [official ACML 2026 conference-track template](https://www.acml-conf.org/2026/downloads/ACML_camera_ready.zip): single column, 11-point body, Computer Modern typography, and author-year citations. Its header identifies it as a CS550 course proposal; the supplied authors remain visible. The Word file is an editable companion approximating this layout, because the official ACML template is LaTeX. See [template provenance](templates/acml/README.md).
 
-`docs/proposal.md` is the content source. Rebuild the Word file with `python -m pip install python-docx` and `python tools/build_proposal.py`. To reproduce the matching PDF with LibreOffice, run `soffice --headless --convert-to pdf --outdir output/pdf output/docx/proposal.docx`, then inspect both pages. Changes to the Markdown require rebuilding both deliverables.
+`docs/proposal.md` is the content source. Rebuild the Word companion, LaTeX, and source ZIP with `python -m pip install python-docx` and `python tools/build_proposal.py`. To reproduce the authoritative PDF, install Tectonic or use the source ZIP in Overleaf. With Tectonic:
+
+```bash
+mkdir -p tmp/acml_build
+cp paper/proposal.tex templates/acml/jmlr.cls tmp/acml_build/
+cd tmp/acml_build
+tectonic --untrusted --keep-logs proposal.tex
+cp proposal.pdf ../../output/pdf/proposal.pdf
+cd ../..
+```
+
+The verified PDF was compiled with Tectonic 0.17.0. Standard TeX dependencies are supplied by the compiler. In Overleaf, upload the ZIP and select `proposal.tex` as the main document. Inspect both pages after rebuilding. Do not replace the official PDF with a Word export; Word and LaTeX can wrap text differently. Use the same ACML class for the later eight-page report, retaining the course's page limits rather than ACML's conference submission limit.
 
 Select a shared category subset from publicly labeled YouTube-VIS training videos and divide complete sequences into training, validation, and internal evaluation sets. Freeze exact dataset category IDs, YOLO class IDs, text prompts, and video membership in versioned manifests before running experiments. Use no ground-truth test masks/boxes to initialize SAM3 in the automatic setting. Prompted tracking, if studied, must be a separate experiment. Tracking objects does not itself classify physical movement versus stationary objects when the camera moves.
 
