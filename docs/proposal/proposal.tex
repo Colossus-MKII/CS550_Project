@@ -32,7 +32,7 @@ YOLO11s-seg will be paired separately with ByteTrack and BoT-SORT, allowing us t
 
 SAM 2.1 and SAM-Track will receive box prompts and category labels from the same frozen YOLO detector. It will also help label and separate OpenCV's foreground regions. The interval for adding new objects will be chosen on validation videos. The detector will not supply tracking IDs, and its processing time will count toward each pipeline's runtime. Automatic runs will use no ground-truth prompts from evaluation videos. If we also test propagation from ground-truth masks, those results will be reported separately.
 
-We will fine-tune YOLO's segmenter and test the resulting weights with both trackers. We also plan to fine-tune SAM 2.1 and SAM-Track's DeAOT component, keeping SAM fixed in the latter case \citep{yang2022}. These two experiments depend on successful GPU and training-data pilots. To isolate weight adaptation, each comparison will keep prompts, the shared detector, tracking settings, and image preparation unchanged. OpenCV's history, thresholds, and learning rate will be tuned on validation videos. Its online background updates and tracker settings are parameter adaptation, not neural fine-tuning.
+We plan to fine-tune YOLO's segmenter and test the resulting weights with both trackers. We will also investigate fine-tuning SAM 2.1 and SAM-Track's DeAOT component, keeping SAM fixed in the latter case \citep{yang2022}. These two experiments depend on successful GPU and training-data pilots. To isolate weight adaptation, each comparison will keep prompts, the shared detector, tracking settings, and image preparation unchanged. OpenCV's history, thresholds, and learning rate will be tuned on validation videos. Its online background updates and tracker settings are parameter adaptation, not neural fine-tuning.
 
 \section{Dataset and Experiments}
 
@@ -42,17 +42,17 @@ Every method will process the same frames in the same order. We will report resu
 
 \section{Evaluation}
 
-Our main measures will be sMOTSA and mask-based HOTA, including DetA and AssA \citep{voigtlaender2019,luiten2020}. sMOTSA combines matched-mask overlap with penalties for false positives and identity switches. HOTA helps distinguish missed detections from poor identity association. We will also report MOTSA, MOTSP, mask-matched IDF1, ID switches, and false positives and negatives. MOTSP scores matched masks only, so it must be read alongside missed-object counts.
+We will report the three original MOTS measures \citep{voigtlaender2019}. Multi-Object Tracking and Segmentation Accuracy (MOTSA) counts correct matches and penalizes false positives and identity switches. Soft Multi-Object Tracking and Segmentation Accuracy (sMOTSA) weights each correct match by mask intersection over union (IoU), adding sensitivity to segmentation quality. Both scores are normalized by the total ground-truth instance masks across the evaluated frames. Multi-Object Tracking and Segmentation Precision (MOTSP) is the mean mask IoU of matched instances; it excludes missed objects.
+
+We will supplement these with mask-based Higher Order Tracking Accuracy (HOTA), its Detection Accuracy (DetA) and Association Accuracy (AssA) components, and the companion Localization Accuracy (LocA) measure \citep{luiten2020}. HOTA balances detection and identity association; LocA measures overlap for matched masks. We will also report the identity F1 score (IDF1), identity switches (IDS), false positives (FP), and false negatives (FN), using mask-based matching. Higher accuracy, overlap, and IDF1 scores are better; lower error counts are better. sMOTSA and HOTA will be our main comparison measures.
 
 MOTS matching requires non-overlapping masks and mask IoU above 0.5; HOTA uses its standard threshold sweep. We will check category mapping, frame indices, absent objects, ignore regions, and overlap resolution before computing scores. The five-category conversion needs validation rather than an unchanged car/pedestrian-only loader. We will describe these as MOTS-style results on our YouTube-VIS subset, with native video AP as an additional measure.
 
 For robustness, we will measure changes from each clean clip to its corrupted versions and inspect identity failures around occlusion. Speed, peak GPU memory, and training time will show the cost of each method. Timing will include detection, prompting, object discovery, and postprocessing. We will estimate uncertainty by resampling videos where practical. Mask overlap between adjacent frames alone cannot measure stability, because the objects themselves move.
 
-\section{Work Plan}
+\section{Computing Resources}
 
-Our lab GPU allocation is still unconfirmed. We will first test 100 inference frames and 20 training steps for each neural candidate to check memory, gradients, checkpoint loading, and expected training time. We will start with smaller checkpoints and record which components are trainable. If training does not fit, we will report pretrained results where inference is feasible and explain the missing experiment.
-
-During weeks 1-2 we will prepare the data and baseline pipelines. Weeks 3-4 will cover parameter tuning and feasible fine-tuning, followed by evaluation and robustness experiments in weeks 5-6. In weeks 7-8 we will analyze the failures and complete the eight-page report, excluding references, and the presentation.
+Our lab GPU allocation is still unconfirmed. We will ask the instructor about the available GPU models, memory, access limits, and computing budget before committing to SAM 2.1 or DeAOT fine-tuning. A pilot of 100 inference frames and 20 training steps per neural candidate will check memory, gradients, checkpoint loading, and expected training time. We will start with smaller checkpoints and record which components are trainable. If training does not fit, we will report pretrained results where inference is feasible and explain the missing experiment.
 
 \bibliography{references}
 
