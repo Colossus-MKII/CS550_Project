@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build the ACL LaTeX proposal from its Markdown source.
+"""Build the NeurIPS LaTeX proposal from its Markdown source.
 
-Uses only Python's standard library. The exact user-supplied ACL style and
-bibliography files compile the PDF separately in a TeX environment.
+Uses only Python's standard library. The exact user-supplied NeurIPS style
+compiles the PDF separately in a TeX environment.
 """
 
 from __future__ import annotations
@@ -58,21 +58,34 @@ def build_latex(source: Path, output: Path) -> None:
     lines = source.read_text(encoding="utf-8").splitlines()
     title = tex_escape(lines[0].removeprefix("# "))
     author = next(line for line in lines if line.startswith("**")).strip(" *")
-    names = r" \and ".join(tex_escape(name) for name in author.split(", "))
+    author_blocks = []
+    for name in author.split(", "):
+        prefix = f"{name} - Student ID: "
+        student_id = next((line.removeprefix(prefix).strip()
+                           for line in lines if line.startswith(prefix)), "pending")
+        author_blocks.append(tex_escape(name) + r"\\" + "\n" +
+                             r"{\normalfont Student ID: " + tex_escape(student_id) + r"}\\" + "\n" +
+                             r"{\normalfont Rutgers University}")
+    names = "\n\\And\n".join(author_blocks)
     preamble = r"""% CS550 project proposal.
-% ACL style and bibliography files are included in this directory.
-\documentclass[11pt]{article}
-\usepackage[final]{acl}
-\usepackage{times}
-\usepackage{latexsym}
+% Uses the unchanged, user-supplied NeurIPS 2026 style.
+\documentclass{article}
+\usepackage[preprint]{neurips_2026}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{url}
 \usepackage{microtype}
+\usepackage{xcolor}
+\hypersetup{hidelinks}
+\setcitestyle{authoryear,round}
+% Course metadata in the notice; template geometry and typography are unchanged.
+\makeatletter
+\renewcommand{\@noticestring}{CS550 Massive Data Mining, Fall 2026. Project proposal.}
+\makeatother
 % Named course proposal.
 \title{TITLE}
-\author{NAMES\\
-{\normalfont Rutgers University}\\
-{\normalfont CS550 Massive Data Mining, Fall 2026}}
+\author{NAMES}
 \begin{document}
 \maketitle
 """.replace("TITLE", title).replace("NAMES", names)
@@ -99,7 +112,8 @@ def build_latex(source: Path, output: Path) -> None:
             parts.append(tex_text(text))
             if mode == "abstract":
                 parts.append(r"\end{abstract}")
-    parts.extend([r"\bibliography{references}", r"\end{document}"])
+    parts.extend([r"\clearpage", r"\bibliographystyle{plainnat}",
+                  r"\bibliography{references}", r"\end{document}"])
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("\n\n".join(parts) + "\n", encoding="utf-8")
     print(output)

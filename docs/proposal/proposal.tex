@@ -1,17 +1,32 @@
 % CS550 project proposal.
-% ACL style and bibliography files are included in this directory.
-\documentclass[11pt]{article}
-\usepackage[final]{acl}
-\usepackage{times}
-\usepackage{latexsym}
+% Uses the unchanged, user-supplied NeurIPS 2026 style.
+\documentclass{article}
+\usepackage[preprint]{neurips_2026}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{url}
 \usepackage{microtype}
+\usepackage{xcolor}
+\hypersetup{hidelinks}
+\setcitestyle{authoryear,round}
+% Course metadata in the notice; template geometry and typography are unchanged.
+\makeatletter
+\renewcommand{\@noticestring}{CS550 Massive Data Mining, Fall 2026. Project proposal.}
+\makeatother
 % Named course proposal.
 \title{Comparing Methods for Multi Object Segmentation and Tracking}
-\author{Jingdi Wu \and Yupu Guo \and Christina Ross\\
-{\normalfont Rutgers University}\\
-{\normalfont CS550 Massive Data Mining, Fall 2026}}
+\author{Jingdi Wu\\
+{\normalfont Student ID: pending}\\
+{\normalfont Rutgers University}
+\And
+Yupu Guo\\
+{\normalfont Student ID: pending}\\
+{\normalfont Rutgers University}
+\And
+Christina Ross\\
+{\normalfont Student ID: pending}\\
+{\normalfont Rutgers University}}
 \begin{document}
 \maketitle
 
@@ -26,37 +41,37 @@ This project will compare YOLO segmentation with ByteTrack or BoT-SORT, SAM 2.1,
 
 When similar objects cross paths, a tracker may swap their identities even if their outlines remain accurate. Occlusion, lighting changes, and camera movement can make this harder. We will examine how mask quality relates to tracking accuracy and whether fine-tuning improves both across several categories. We study persistent object tracks, rather than estimating whether an object is physically moving relative to the world.
 
-\section{Methods}
+\section{Related work}
 
-YOLO11s-seg will be paired separately with ByteTrack and BoT-SORT to compare two trackers using one segmenter \citep{ultralytics2026}. SAM 2.1 will propagate prompted masks through video memory \citep{meta2026}. SAM-Track will use SAM on keyframes and DeAOT between them, with periodic object discovery \citep{cheng2023}. OpenCV's MOG2 and KNN will provide classical baselines \citep{opencv2026}, with foreground regions separated into instances and associated across frames by mask IoU.
+YOLO combines instance segmentation with ByteTrack or BoT-SORT association \citep{ultralytics2026}. SAM 2.1 uses video memory for prompted propagation \citep{meta2026}. SAM-Track combines SAM keyframes, DeAOT propagation, and object discovery \citep{cheng2023}. MOG2/KNN model an adapting background \citep{opencv2026}.
 
-SAM 2.1 and SAM-Track will receive box prompts and categories from a shared frozen YOLO detector, also used to label and separate OpenCV's foreground regions. The object-discovery interval will be chosen on validation videos. The detector will supply no tracking IDs, and its time will count toward runtime. Automatic runs will use no evaluation ground-truth prompts; any ground-truth-initialized propagation will be reported separately.
+\section{Proposed method}
+
+We will compare six baseline configurations: YOLO11s-seg with ByteTrack and with BoT-SORT, SAM 2.1, SAM-Track, MOG2, and KNN. OpenCV foreground regions will be separated into instances and associated across frames by mask IoU. SAM 2.1 and SAM-Track will receive box prompts and categories from a shared frozen YOLO detector, also used to label and separate OpenCV's foreground regions. The object-discovery interval will be chosen on validation videos. The detector will supply no tracking IDs, and its time will count toward runtime. Automatic runs will use no evaluation ground-truth prompts; any ground-truth-initialized propagation will be reported separately.
 
 We plan to fine-tune YOLO's segmenter for both trackers. SAM 2.1 and DeAOT fine-tuning depend on successful GPU and training-data pilots; SAM will remain fixed when adapting DeAOT \citep{yang2022}. Each pretrained/adapted pair will use identical prompts, shared detector, tracking settings, and image preparation. OpenCV's history, thresholds, and learning rate will be tuned on validation videos. These settings and online background updates constitute parameter adaptation, not neural fine-tuning.
 
-\section{Dataset and Experiments}
+\section{Dataset and experiments}
 
 We choose YouTube-VIS 2021 for its category labels, instance masks, and identities across frames \citep{yang2021}. It includes animals, unlike car/pedestrian-focused KITTI MOTS and pedestrian-only MOTSChallenge \citep{voigtlaender2019}. We fix the release for reproducibility, without claiming superiority over 2022's longer validation/test extension. Our short-clip subset will not establish long-term tracking performance.
 
-We will select up to 200 labeled training videos covering people, dogs, cats, horses, and cars. Whole videos will be split 60/20/20 for training, validation, and evaluation, preserving category coverage and preventing frame leakage. YOLO will train on images with instance masks; SAM 2.1 and DeAOT need annotated clips. We will check source-video overlap with upstream pretraining, especially YouTube-VOS-derived data. Our held-out split alone cannot establish that pretrained models have never seen a video.
-
-Every method will process identical frame sequences. We will separate fixed- and moving-camera results and test blur, brightness changes, and JPEG compression without changing mask coordinates. Model selection and tuning will use training/validation data only. We will record annotation coverage, pretraining overlap, splits, checkpoints, and settings.
+We will select up to 200 labeled training videos covering people, dogs, cats, horses, and cars. Whole videos will be split 60/20/20 for training, validation, and evaluation, preserving category coverage and preventing frame leakage. YOLO will train on images with instance masks; SAM 2.1 and DeAOT need annotated clips. We will check source-video overlap with upstream pretraining, especially YouTube-VOS-derived data. Our held-out split alone cannot establish that pretrained models have never seen a video. Every method will process identical frame sequences. We will separate fixed- and moving-camera results and test blur, brightness changes, and JPEG compression without changing mask coordinates. Model selection and tuning will use training/validation data only. We will record annotation coverage, pretraining overlap, splits, checkpoints, and settings.
 
 \section{Evaluation}
 
-The original MOTS measures are Multi-Object Tracking and Segmentation Accuracy (MOTSA), soft Multi-Object Tracking and Segmentation Accuracy (sMOTSA), and Multi-Object Tracking and Segmentation Precision (MOTSP) \citep{voigtlaender2019}. MOTSA counts matches and penalizes false positives and identity switches; sMOTSA weights matches by mask intersection over union (IoU). Both normalize by total ground-truth masks across frames. MOTSP averages matched-mask IoU, excluding missed objects.
-
-Supplementary measures are mask-based Higher Order Tracking Accuracy (HOTA), Detection Accuracy (DetA), Association Accuracy (AssA), and Localization Accuracy (LocA) \citep{luiten2020}. HOTA balances detection and association; LocA describes matched-mask overlap. We will report mask-matched identity F1 score (IDF1), identity switches (IDS), false positives (FP), and false negatives (FN). Higher scores and lower error counts are better. sMOTSA and HOTA are our primary measures.
+The original MOTS measures are Multi-Object Tracking and Segmentation Accuracy (MOTSA), soft Multi-Object Tracking and Segmentation Accuracy (sMOTSA), and Multi-Object Tracking and Segmentation Precision (MOTSP) \citep{voigtlaender2019}. MOTSA counts matches and penalizes false positives and identity switches; sMOTSA weights matches by mask intersection over union (IoU). Both normalize by total ground-truth masks across frames. MOTSP averages matched-mask IoU, excluding missed objects. Supplementary measures are mask-based Higher Order Tracking Accuracy (HOTA), Detection Accuracy (DetA), Association Accuracy (AssA), and Localization Accuracy (LocA) \citep{luiten2020}. HOTA balances detection and association; LocA describes matched-mask overlap. We will report mask-matched identity F1 score (IDF1), identity switches (IDS), false positives (FP), and false negatives (FN). Higher scores and lower error counts are better. sMOTSA and HOTA are our primary measures.
 
 MOTS matching requires non-overlapping masks and mask IoU above 0.5; HOTA uses its standard threshold sweep. We will validate category mapping, frame indices, absent objects, ignore regions, and overlap resolution. The five-category conversion needs more than an unchanged car/pedestrian loader. These will be internal MOTS-style results on our YouTube-VIS subset, with native video AP as an additional measure.
 
-We will show synchronized videos and report figures with identical frames, mask contours, persistent predicted IDs, and ground-truth references. Panels cover both YOLO trackers, SAM 2.1, SAM-Track, MOG2, and KNN, plus adapted versions where available. Colors remain tied to each pipeline's IDs. Fixed held-out clips will illustrate fixed/moving cameras, occlusion, crossings, and entry/re-entry. Successes and failures will be linked to identity switches, missed objects, mask errors, and per-clip scores.
+We will show synchronized videos and report figures with identical frames, mask contours, persistent predicted IDs, and ground-truth references. Panels cover both YOLO trackers, SAM 2.1, SAM-Track, MOG2, and KNN, plus adapted versions where available. Colors remain tied to each pipeline's IDs. Fixed held-out clips will illustrate fixed/moving cameras, occlusion, crossings, and entry/re-entry. Successes and failures will be linked to identity switches, missed objects, mask errors, and per-clip scores. Robustness scores will compare clean clips with their corrupted versions. We will report FPS, peak GPU memory, and training time; timing includes detection, prompting, discovery, and postprocessing. Where practical, uncertainty will be estimated by resampling videos. Adjacent-frame mask overlap alone cannot measure stability because objects move.
 
-Robustness scores will compare clean clips with their corrupted versions. We will report FPS, peak GPU memory, and training time; timing includes detection, prompting, discovery, and postprocessing. Where practical, uncertainty will be estimated by resampling videos. Adjacent-frame mask overlap alone cannot measure stability because objects move.
-
-\section{Computing Resources}
+\section{Computing resources}
 
 GPU allocation is unconfirmed. We will ask the instructor about GPU models, memory, access limits, and training budget before committing to SAM 2.1 or DeAOT fine-tuning. An inference/training pilot with smaller checkpoints will check memory, gradients, checkpoint loading, and training cost. We will record trainable components and report pretrained results where training is impractical but inference is feasible.
+
+\clearpage
+
+\bibliographystyle{plainnat}
 
 \bibliography{references}
 

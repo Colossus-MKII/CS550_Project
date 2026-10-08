@@ -11,7 +11,9 @@ The project compares YOLO segmentation with ByteTrack/BoT-SORT, SAM 2.1, SAM-Tra
 - [Markdown content](docs/proposal/proposal.md)
 - [BibTeX references](docs/proposal/references.bib)
 
-The proposal and its LaTeX support files are together in [docs/proposal](docs/proposal). It uses the supplied ACL template with a standard two-column layout. The original ACL ZIP is fully unpacked in [templates/acl](templates/acl), including its nested `latex` directory, README, and formatting examples. The course requires a two-page proposal and an eight-page final report excluding references.
+The proposal and its LaTeX support files remain together in [docs/proposal](docs/proposal). It now uses the supplied NeurIPS 2026 template with its standard single-column layout. The supplied archive is fully unpacked in [templates/neurips](templates/neurips). The earlier ACL files remain available in [templates/acl](templates/acl) and as inactive support files in the proposal folder.
+
+The assignment requires two proposal pages excluding references, an abstract, related work, a proposed method, and all authors' names and student IDs. References begin on a separate page. Student IDs are marked `pending` until supplied; update each author's metadata near the top of `proposal.md` before submission. Each student submits the same PDF individually. The final report limit is eight pages excluding references.
 
 ## Build
 
@@ -21,11 +23,11 @@ The Python builder uses the standard library and generates `docs/proposal/propos
 python tools/build_proposal.py
 ```
 
-Upload the plain LaTeX, bibliography, and support files from `docs/proposal` to Overleaf and select `proposal.tex` as the main document. To compile locally with Tectonic:
+Upload `proposal.tex`, `references.bib`, and `neurips_2026.sty` from `docs/proposal` to Overleaf and select `proposal.tex` as the main document. To compile locally with Tectonic:
 
 ```bash
 proposal_build_dir=$(mktemp -d)
-cp docs/proposal/proposal.tex docs/proposal/references.bib docs/proposal/*.sty docs/proposal/*.bst "$proposal_build_dir/"
+cp docs/proposal/proposal.tex docs/proposal/references.bib docs/proposal/neurips_2026.sty "$proposal_build_dir/"
 tectonic --untrusted --keep-logs --outdir "$proposal_build_dir" "$proposal_build_dir/proposal.tex"
 cp "$proposal_build_dir/proposal.pdf" docs/proposal/proposal.pdf
 rm -r "$proposal_build_dir"
