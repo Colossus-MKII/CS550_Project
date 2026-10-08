@@ -10,12 +10,11 @@ This repository contains the proposal and the files needed to rebuild it. The in
 
 - [Markdown proposal](docs/proposal.md)
 - [Two-page ACL PDF](output/pdf/proposal.pdf)
-- [Editable Word companion](output/docx/proposal.docx)
 - [LaTeX source](paper/proposal.tex) and [BibTeX references](paper/references.bib)
 - [Overleaf-ready source package](output/latex/proposal_acl_source.zip)
 - [Exact supplied ACL template and provenance](templates/acl/README.md)
 
-The PDF uses the original `acl.sty` and `acl_natbib.bst` from the user-supplied `Association_for_Computational_Linguistics__ACL__conference.zip`, with the standard two-column A4 layout and named authors. The local input ZIP is preserved. Word is an editable approximation of that layout. The course requires a two-page proposal and an eight-page final report excluding references.
+The PDF uses the original `acl.sty` and `acl_natbib.bst` from the user-supplied `Association_for_Computational_Linguistics__ACL__conference.zip`, with the standard two-column A4 layout and named authors. The local input ZIP is preserved. The course requires a two-page proposal and an eight-page final report excluding references.
 
 ## Planned comparison
 
@@ -49,14 +48,13 @@ Use validated mask-based matching and category/ignore handling, with consistent 
 
 ## Rebuild the proposal
 
-Install Python and `python-docx`, then run:
+The builder uses only the Python standard library. Run:
 
 ```bash
-python -m pip install python-docx
 python tools/build_proposal.py
 ```
 
-This creates Word, LaTeX, and the source ZIP. For the authoritative PDF, upload the ZIP to Overleaf and select `proposal.tex`, or install Tectonic and compile in a temporary directory:
+This creates the LaTeX source and source ZIP. For the PDF, upload the ZIP to Overleaf and select `proposal.tex`, or install Tectonic and compile in a temporary directory:
 
 ```bash
 proposal_build_dir=$(mktemp -d)
@@ -66,4 +64,4 @@ cp "$proposal_build_dir/proposal.pdf" output/pdf/proposal.pdf
 rm -r "$proposal_build_dir"
 ```
 
-The compiler supplies standard TeX dependencies. Inspect every page after rebuilding; Word and LaTeX may wrap differently. Keep the original ACL template geometry and the course page limits.
+The compiler supplies standard TeX dependencies. Inspect every page after rebuilding. Keep the original ACL template geometry and the course page limits.
