@@ -1,0 +1,59 @@
+% CS550 project proposal.
+% ACL style and bibliography files are included in this directory.
+\documentclass[11pt]{article}
+\usepackage[final]{acl}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+% Named course proposal.
+\title{Comparing Methods for Multi Object Segmentation and Tracking}
+\author{Jingdi Wu \and Yupu Guo \and Christina Ross\\
+{\normalfont Rutgers University}\\
+{\normalfont CS550 Massive Data Mining, Fall 2026}}
+\begin{document}
+\maketitle
+
+
+\begin{abstract}
+
+This project will compare four approaches to segmenting objects and keeping their identities consistent in video: YOLO segmentation with ByteTrack or BoT-SORT, SAM 2.1, SAM-Track, and OpenCV background subtraction. We will study people, animals, and vehicles, measuring mask quality, missed objects, identity errors, and processing cost. We will also compare pretrained models with fine-tuned versions where computing resources allow. The aim is to understand which errors each approach makes and whether adaptation helps on videos it has not seen during training.
+
+\end{abstract}
+
+\section{Introduction}
+
+When two similar objects cross paths, a tracker may swap their identities even if their outlines remain accurate. Occlusion, changes in lighting, and camera movement can make this problem harder. We will examine how segmentation quality relates to tracking accuracy and whether fine-tuning improves both. The project covers several object categories rather than only vehicles. Our focus is maintaining object tracks; estimating whether an object is physically moving relative to the world is outside the study.
+
+\section{Methods}
+
+YOLO11s-seg will be paired separately with ByteTrack and BoT-SORT, allowing us to compare two trackers using the same segmenter \citep{ultralytics2026}. SAM 2.1 will propagate prompted masks through its video memory \citep{meta2026}. SAM-Track will use SAM on keyframes and DeAOT between them, with periodic checks for new objects \citep{cheng2023}. For the classical baseline, we will test OpenCV's MOG2 and KNN background subtraction methods \citep{opencv2026}, separate their foreground regions into instances, and associate these instances across frames using mask IoU.
+
+SAM 2.1 and SAM-Track will receive box prompts and category labels from the same frozen YOLO detector. It will also help label and separate OpenCV's foreground regions. The interval for adding new objects will be chosen on validation videos. The detector will not supply tracking IDs, and its processing time will count toward each pipeline's runtime. Automatic runs will use no ground-truth prompts from evaluation videos. If we also test propagation from ground-truth masks, those results will be reported separately.
+
+We will fine-tune YOLO's segmenter and test the resulting weights with both trackers. We also plan to fine-tune SAM 2.1 and SAM-Track's DeAOT component, keeping SAM fixed in the latter case \citep{yang2022}. These two experiments depend on successful GPU and training-data pilots. To isolate weight adaptation, each comparison will keep prompts, the shared detector, tracking settings, and image preparation unchanged. OpenCV's history, thresholds, and learning rate will be tuned on validation videos. Its online background updates and tracker settings are parameter adaptation, not neural fine-tuning.
+
+\section{Dataset and Experiments}
+
+We will select up to 200 labeled videos from the YouTube-VIS 2021 training set, covering people, dogs, cats, horses, and cars \citep{yang2021}. Whole videos will be divided into training, validation, and evaluation sets in a 60/20/20 ratio, with category coverage in each set. Frames from one video will stay in one split. YOLO will train on sampled images with instance masks; SAM 2.1 and DeAOT need annotated video clips.
+
+Every method will process the same frames in the same order. We will report results separately for fixed and moving cameras, since background subtraction is sensitive to camera movement. We will also test blur, brightness changes, and JPEG compression on the same evaluation clips. These changes preserve the mask coordinates. Model selection and parameter tuning will use only training and validation data. We will record annotation coverage, any known overlap with model pretraining, and the splits, checkpoints, and settings used in each experiment.
+
+\section{Evaluation}
+
+Our main measures will be sMOTSA and mask-based HOTA, including DetA and AssA \citep{voigtlaender2019,luiten2020}. sMOTSA combines matched-mask overlap with penalties for false positives and identity switches. HOTA helps distinguish missed detections from poor identity association. We will also report MOTSA, MOTSP, mask-matched IDF1, ID switches, and false positives and negatives. MOTSP scores matched masks only, so it must be read alongside missed-object counts.
+
+MOTS matching requires non-overlapping masks and mask IoU above 0.5; HOTA uses its standard threshold sweep. We will check category mapping, frame indices, absent objects, ignore regions, and overlap resolution before computing scores. The five-category conversion needs validation rather than an unchanged car/pedestrian-only loader. We will describe these as MOTS-style results on our YouTube-VIS subset, with native video AP as an additional measure.
+
+For robustness, we will measure changes from each clean clip to its corrupted versions and inspect identity failures around occlusion. Speed, peak GPU memory, and training time will show the cost of each method. Timing will include detection, prompting, object discovery, and postprocessing. We will estimate uncertainty by resampling videos where practical. Mask overlap between adjacent frames alone cannot measure stability, because the objects themselves move.
+
+\section{Work Plan}
+
+Our lab GPU allocation is still unconfirmed. We will first test 100 inference frames and 20 training steps for each neural candidate to check memory, gradients, checkpoint loading, and expected training time. We will start with smaller checkpoints and record which components are trainable. If training does not fit, we will report pretrained results where inference is feasible and explain the missing experiment.
+
+During weeks 1-2 we will prepare the data and baseline pipelines. Weeks 3-4 will cover parameter tuning and feasible fine-tuning, followed by evaluation and robustness experiments in weeks 5-6. In weeks 7-8 we will analyze the failures and complete the eight-page report, excluding references, and the presentation.
+
+\bibliography{references}
+
+\end{document}

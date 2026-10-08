@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build ACL LaTeX source and an Overleaf-ready package from proposal.md.
+"""Build the ACL LaTeX proposal from its Markdown source.
 
 Uses only Python's standard library. The exact user-supplied ACL style and
 bibliography files compile the PDF separately in a TeX environment.
@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import re
-import zipfile
 from pathlib import Path
 
 
@@ -60,8 +59,8 @@ def build_latex(source: Path, output: Path) -> None:
     title = tex_escape(lines[0].removeprefix("# "))
     author = next(line for line in lines if line.startswith("**")).strip(" *")
     names = r" \and ".join(tex_escape(name) for name in author.split(", "))
-    preamble = r"""% Generated from docs/proposal.md; rebuild with tools/build_proposal.py.
-% Uses acl.sty and acl_natbib.bst unmodified from the user-supplied ACL ZIP.
+    preamble = r"""% CS550 project proposal.
+% ACL style and bibliography files are included in this directory.
 \documentclass[11pt]{article}
 \usepackage[final]{acl}
 \usepackage{times}
@@ -69,7 +68,7 @@ def build_latex(source: Path, output: Path) -> None:
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{microtype}
-% Named class proposal; final mode follows the supplied template's option.
+% Named course proposal.
 \title{TITLE}
 \author{NAMES\\
 {\normalfont Rutgers University}\\
@@ -106,32 +105,9 @@ def build_latex(source: Path, output: Path) -> None:
     print(output)
 
 
-def build_source_zip(latex_source: Path, output: Path) -> None:
-    output.parent.mkdir(parents=True, exist_ok=True)
-    instructions = (
-        "CS550 proposal using the exact user-supplied ACL conference template.\n\n"
-        "Upload this ZIP to Overleaf and set proposal.tex as the main document,\n"
-        "or compile with tectonic --untrusted proposal.tex.\n"
-        "Standard TeX dependencies come from the compiler/TeX distribution.\n"
-        "acl.sty and acl_natbib.bst are unmodified from the supplied ZIP.\n"
-        "See TEMPLATE-PROVENANCE.md and LICENSE-LPPL-1.3c.txt.\n"
-    )
-    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        archive.write(latex_source, "proposal.tex")
-        archive.write(ROOT / "paper/references.bib", "references.bib")
-        archive.write(ROOT / "templates/acl/acl.sty", "acl.sty")
-        archive.write(ROOT / "templates/acl/acl_natbib.bst", "acl_natbib.bst")
-        archive.write(ROOT / "templates/acl/LICENSE-LPPL-1.3c.txt", "LICENSE-LPPL-1.3c.txt")
-        archive.write(ROOT / "templates/acl/README.md", "TEMPLATE-PROVENANCE.md")
-        archive.writestr("README.txt", instructions)
-    print(output)
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", type=Path, default=ROOT / "docs/proposal.md")
-    parser.add_argument("--latex-output", type=Path, default=ROOT / "paper/proposal.tex")
-    parser.add_argument("--source-zip", type=Path, default=ROOT / "output/latex/proposal_acl_source.zip")
+    parser.add_argument("--source", type=Path, default=ROOT / "docs/proposal/proposal.md")
+    parser.add_argument("--latex-output", type=Path, default=ROOT / "docs/proposal/proposal.tex")
     args = parser.parse_args()
     build_latex(args.source, args.latex_output)
-    build_source_zip(args.latex_output, args.source_zip)
