@@ -19,12 +19,15 @@ LINK = re.compile(r"\[([^\]]+)\]\((https?://[^)]+)\)")
 CITATIONS = {
     "Cheng et al., 2023": "cheng2023",
     "Luiten et al., 2020": "luiten2020",
+    "Luiten and Hoffhues, 2020": "trackeval2020",
+    "Ristani et al., 2016": "ristani2016",
     "Meta AI, 2026": "meta2026",
     "OpenCV, 2026": "opencv2026",
     "Ultralytics, 2026": "ultralytics2026",
     "Yang et al., 2021": "yang2021",
     "Voigtlaender et al., 2019": "voigtlaender2019",
     "Yang and Yang, 2022": "yang2022",
+    "Zhang et al., 2021": "zhang2021",
 }
 
 
@@ -73,6 +76,7 @@ def build_latex(source: Path, output: Path) -> None:
 \usepackage{url}
 \usepackage{microtype}
 \usepackage{xcolor}
+\usepackage{booktabs}
 \hypersetup{hidelinks}
 \setcitestyle{authoryear,round}
 % Named course proposal.
@@ -85,6 +89,21 @@ def build_latex(source: Path, output: Path) -> None:
     blocks = "\n".join(lines[lines.index("## Abstract"):]).split("\n\n")
     mode = ""
     for block in blocks:
+        if block.lstrip().startswith("|"):
+            rows = [line.strip().strip("|").split("|") for line in block.splitlines()]
+            rows = [[cell.strip() for cell in row] for row in rows]
+            parts.append(r"\begin{center}" + "\n" +
+                         r"\begin{tabular}{lll}" + "\n" + r"\toprule")
+            for index, row in enumerate(rows):
+                if index == 1 and all(re.fullmatch(r":?-+:?", cell) for cell in row):
+                    continue
+                if len(row) != 3:
+                    raise ValueError("Proposal tables must have exactly three columns")
+                parts.append(" & ".join(tex_text(cell) for cell in row) + r" \\")
+                if index == 0:
+                    parts.append(r"\midrule")
+            parts.extend([r"\bottomrule", r"\end{tabular}", r"\end{center}"])
+            continue
         text = " ".join(line.strip() for line in block.splitlines()).strip()
         if not text:
             continue

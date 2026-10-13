@@ -1,0 +1,56 @@
+﻿[
+    {
+        "File":  "models/checkpoints/yolo11s-seg.pt",
+        "Bytes":  20669228,
+        "SHA256":  "1caa81c0195412efa411b632bcfb8c184939dddb6ae41f6a80c41b211ff257c3",
+        "Source":  "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-seg.pt"
+    },
+    {
+        "File":  "models/checkpoints/sam2.1_hiera_tiny.pt",
+        "Bytes":  156008466,
+        "SHA256":  "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69",
+        "Source":  "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_tiny.pt"
+    },
+    {
+        "File":  "models/checkpoints/sam2.1_hiera_small.pt",
+        "Bytes":  184416285,
+        "SHA256":  "6d1aa6f30de5c92224f8172114de081d104bbd23dd9dc5c58996f0cad5dc4d38",
+        "Source":  "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_small.pt"
+    },
+    {
+        "File":  "models/checkpoints/DeAOTB_PRE_YTB_DAV.pth",
+        "Bytes":  158464770,
+        "SHA256":  "bc2d313b4d46f8acfff1491714c9209a3e35a3c955fba48cd934c53010d62acd",
+        "Source":  "https://drive.usercontent.google.com/download?id=1BHxsonnvJXylqHlZ1zJHHc-ymKyq-CFf\u0026export=download\u0026confirm=t"
+    },
+    {
+        "File":  "data/pilot/videos/01_dog.mp4",
+        "Bytes":  1738970,
+        "SHA256":  "21425eb9b7fce7d3fb23fa17b1c07bcbe99ba9e64e3b5347d8052ba6d9c38924",
+        "Source":  "https://raw.githubusercontent.com/facebookresearch/sam2/main/demo/data/gallery/01_dog.mp4"
+    },
+    {
+        "File":  "data/pilot/videos/02_cups.mp4",
+        "Bytes":  2543710,
+        "SHA256":  "6320759eede8c82c7d43fe1cc569f3a389758ec37b2b1dc9e9b7b4ce4110ab13",
+        "Source":  "https://raw.githubusercontent.com/facebookresearch/sam2/main/demo/data/gallery/02_cups.mp4"
+    },
+    {
+        "File":  "data/pilot/videos/03_blocks.mp4",
+        "Bytes":  1808832,
+        "SHA256":  "2868f2c62f5cfa28dabbe925fae95da7f896531630a0627e5edbc784ea42413d",
+        "Source":  "https://raw.githubusercontent.com/facebookresearch/sam2/main/demo/data/gallery/03_blocks.mp4"
+    },
+    {
+        "File":  "data/pilot/videos/04_coffee.mp4",
+        "Bytes":  1177415,
+        "SHA256":  "f9a439a8bf66910db3e2a9d9ea853bc24c760c8d4ca227f4c33051b1cef28c03",
+        "Source":  "https://raw.githubusercontent.com/facebookresearch/sam2/main/demo/data/gallery/04_coffee.mp4"
+    },
+    {
+        "File":  "data/pilot/videos/05_default_juggle.mp4",
+        "Bytes":  1842699,
+        "SHA256":  "60d23773ad50389a5c2df9ba4ab05e9b4d39d21dfa7b75d15b46666ff7a4e2bb",
+        "Source":  "https://raw.githubusercontent.com/facebookresearch/sam2/main/demo/data/gallery/05_default_juggle.mp4"
+    }
+]

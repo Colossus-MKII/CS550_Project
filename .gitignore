@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 .venv/
+.pytest_cache/
 .DS_Store
 .env
 .env.*
@@ -13,3 +14,22 @@ tmp/
 *.synctex.gz
 Association_for_Computational_Linguistics__ACL__conference.zip
 Formatting_Instructions_For_NeurIPS_2026.zip
+
+# Local datasets, pretrained weights, third-party checkouts, and experiment output.
+data/raw/
+data/processed/
+data/pilot/videos/
+models/checkpoints/
+external/
+outputs/
+
+# Personal teaching site/code and private connection notes stay local.
+/learning/
+.local-private/
+
+# Video assets and rendered demonstrations are not shared through Git.
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
