@@ -32,6 +32,8 @@ For B, periodic detections match same-category propagated-mask boxes one-to-one 
 
 After A0/B0, we will fine-tune one YOLO11s-seg with supervised segmentation losses for A1/B1. A uses its masks and boxes; B uses boxes and labels, so benefits may differ. A pilot fixes the budget: initially at most 30 epochs, 640-pixel input, and memory-appropriate batch size. Validation mask AP50:95 selects the checkpoint. We record sampling, augmentation, optimizer, seed, and head/category-space changes, which limit weight-only causal claims. All runs share the target-category mapping. Detector thresholds and downstream rules stay fixed within A0/A1 and B0/B1; validation tuning precedes evaluation.
 
+The pretrained comparison is the minimum deliverable; YOLO fine-tuning is the prioritized, feasibility-gated extension. SAM/DeAOT training and additional pipelines are outside scope.
+
 ## 4 Dataset and controls
 
 We target 200 labeled YouTube-VIS 2021 training videos covering person, dog, cat, horse, and car (Yang et al., 2021). Seed 550 defines whole-video splits of 120 training, 40 validation, and 40 held-out evaluation videos. Split first, then sample temporally spaced training frames with all target instances retained. Related clips from an identifiable source stay together. Files, coverage, frame lists, mappings, and any reduced counts will be verified and frozen before tuning. These are planned internal splits, not official challenge test sets; upstream pretraining overlap may be unknown.
@@ -45,10 +47,6 @@ Primary evaluation uses mask HOTA with its standard threshold sweep, reporting D
 Standalone YOLO box/mask AP50:95 and classification-error inspection will distinguish detector changes from tracking changes. We will compare A1-A0 and B1-B0, including regressions and ambiguous outcomes, and inspect occlusion, crossings, and re-entry cases. These are internal measurements, not official leaderboard scores or evidence from one teaching clip. A versus B compares complete systems, including different detector call frequencies, not isolated backbones.
 
 On the same GPU and inputs, we report peak memory, detector calls, and median FPS from three synchronized, warmed-up runs. Timing covers decoding through masks/IDs, excluding model loading, rendering, and scoring. Training GPU-hours are separate. Deliverables include configurations, manifests, complete predictions, training logs, four-condition results when feasible, synchronized videos, and a report.
-
-## 6 Feasibility and milestones
-
-Short inference works on our RTX 3080 (10 GB); full SAM tracking and YOLO training need pilots. Rutgers iLab use follows access/scheduling rules; availability is not assumed. With data/environment ready, estimated milestones are baseline/data/evaluator work (3-5 working days), adaptation pilot and experiments (2-4), then reporting (1-2), revised using measured costs. Both pretrained baselines on the entire evaluation split are the minimum deliverable; fine-tuning is prioritized, with resource-driven omissions documented. SAM/DeAOT training and additional pipelines are out of scope. Success does not require gains.
 
 ## References
 
