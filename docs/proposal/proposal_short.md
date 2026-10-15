@@ -3,7 +3,7 @@
 **Jingdi Wu, Yupu Guo, Christina Ross**
 
 Rutgers University · CS550 Massive Data Mining · Fall 2026
-Three-page proposal body · October 15, 2026
+Concise proposal · October 15, 2026
 
 ## Abstract
 
@@ -20,8 +20,6 @@ Detection, segmentation, and identity association have different failure sources
 ## 2 Related work
 
 ByteTrack combines detection association with Kalman motion prediction (Zhang et al., 2021). OC-SORT addresses motion-state errors under occlusion and nonlinear movement (Cao et al., 2023). SAM 2 propagates prompted masks using visual memory (Ravi et al., 2024); SAM2Long explores candidate histories and memory selection (Ding et al., 2025), while SAMURAI adds motion consistency (Yang et al., 2024). These motivate controlled recovery analysis, rather than additional mandatory baselines. Our contribution is comparison, explanation, and system validation; we do not claim resetting itself as a new algorithm.
-
-<!-- pagebreak -->
 
 ## 3 Baselines and controlled recovery
 
@@ -53,8 +51,6 @@ After correction, preserve each pipeline's native input schedule: continued dete
 ### Interpretation and follow-up
 
 Compare within-pipeline effects before cross-system patterns; detection frequency, representation, and association remain confounders. If evidence supports it, test at most one automatic policy against its unchanged baseline, using inference-time signals only. Otherwise, paired findings remain the research outcome. All core model weights remain fixed.
-
-<!-- pagebreak -->
 
 ## 4 Data and controls
 

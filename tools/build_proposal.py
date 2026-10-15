@@ -65,7 +65,8 @@ def tex_text(text: str) -> str:
     return "".join(pieces)
 
 
-def build_latex(source: Path, output: Path, *, separate_references: bool = True) -> None:
+def build_latex(source: Path, output: Path, *, separate_references: bool = True,
+                natural_spacing: bool = False) -> None:
     lines = source.read_text(encoding="utf-8").splitlines()
     title = tex_escape(lines[0].removeprefix("# "))
     author = next(line for line in lines if line.startswith("**")).strip(" *")
@@ -95,6 +96,10 @@ def build_latex(source: Path, output: Path, *, separate_references: bool = True)
 \maketitle
 """.replace("TITLE", title).replace("NAMES", names)
     parts = [preamble]
+    if natural_spacing:
+        # Keep normal paragraph spacing instead of stretching every page to
+        # the same bottom edge. Font sizes and template margins stay unchanged.
+        parts.append(r"\raggedbottom")
     blocks = "\n".join(lines[lines.index("## Abstract"):]).split("\n\n")
     mode = ""
     for block in blocks:
@@ -162,5 +167,8 @@ if __name__ == "__main__":
     parser.add_argument("--latex-output", type=Path, default=ROOT / "docs/proposal/proposal.tex")
     parser.add_argument("--inline-references", action="store_true",
                         help="Keep references in the normal flow for a concise, page-limited edition.")
+    parser.add_argument("--natural-spacing", action="store_true",
+                        help="Do not stretch vertical spacing to align page bottoms.")
     args = parser.parse_args()
-    build_latex(args.source, args.latex_output, separate_references=not args.inline_references)
+    build_latex(args.source, args.latex_output, separate_references=not args.inline_references,
+                natural_spacing=args.natural_spacing)

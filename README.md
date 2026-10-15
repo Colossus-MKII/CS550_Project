@@ -19,7 +19,7 @@ The October 15 revision retains two pretrained baselines: YOLO11s-seg + class-ga
 
 The proposal and its LaTeX support files remain together in [docs/proposal](docs/proposal). It now uses the supplied NeurIPS 2026 template with its standard single-column layout. The supplied archive is fully unpacked in [templates/neurips](templates/neurips). The earlier ACL files remain available in [templates/acl](templates/acl) and as inactive support files in the proposal folder.
 
-Both editions include an abstract, related work, experimental design, evaluation, and all three authors' names. Student ID lines are omitted at the team's request. The complete team-reviewed design is retained in the full edition: five English body pages plus one reference page, and four Chinese body pages plus one reference page. At the team's request, the concise edition uses three body pages with references on a separate page, preserving headings, readable paragraphs and a four-group comparison table. The original course-format source is recorded in [template provenance](docs/proposal/TEMPLATE-PROVENANCE.md); the current review format does not reinterpret that source. Coursework submission is performed by the human, never by an agent.
+Both editions include an abstract, related work, experimental design, evaluation, and all three authors' names. Student ID lines are omitted at the team's request. The complete team-reviewed design is retained in the full edition: five English body pages plus one reference page, and four Chinese body pages plus one reference page. At the team's request, the concise edition allows up to three body pages, with references on a separate page. Content flows naturally without manual chapter breaks or stretched paragraph spacing, preserving headings, readable paragraphs and a four-group comparison table. The current English edition has three body pages; the Chinese edition has two. The original course-format source is recorded in [template provenance](docs/proposal/TEMPLATE-PROVENANCE.md); the current review format does not reinterpret that source. Coursework submission is performed by the human, never by an agent.
 
 ## Build
 
@@ -44,7 +44,7 @@ Inspect the resulting PDF after edits to confirm the layout and page count.
 For the concise edition, generate the separate source with references on their own page:
 
 ```bash
-python tools/build_proposal.py --source docs/proposal/proposal_short.md --latex-output docs/proposal/proposal_short.tex
+python tools/build_proposal.py --source docs/proposal/proposal_short.md --latex-output docs/proposal/proposal_short.tex --natural-spacing
 python tools/build_proposal_zh.py --source docs/proposal/proposal_short_zh.md --output docs/proposal/proposal_short_zh.pdf
 ```
 
