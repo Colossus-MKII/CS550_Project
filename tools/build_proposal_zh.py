@@ -31,10 +31,17 @@ LINK = re.compile(r"\[([^\]]+)\]\((https?://[^)]+)\)")
 
 def inline(text: str) -> str:
     parts, cursor = [], 0
-    for match in LINK.finditer(text):
+    tokens = re.compile(r"\*\*([^*]+)\*\*|`([^`]+)`|\[([^\]]+)\]\((https?://[^)]+)\)")
+    for match in tokens.finditer(text):
         parts.append(escape(text[cursor:match.start()]))
-        parts.append('<link href="' + escape(match.group(2), {'"': '&quot;'})
-                     + '" color="#204B67">' + escape(match.group(1)) + '</link>')
+        strong, code, label, url = match.groups()
+        if strong is not None:
+            parts.append('<b>' + escape(strong) + '</b>')
+        elif code is not None:
+            parts.append(escape(code))
+        else:
+            parts.append('<link href="' + escape(url, {'"': '&quot;'})
+                         + '" color="#204B67">' + escape(label) + '</link>')
         cursor = match.end()
     parts.append(escape(text[cursor:]))
     return "".join(parts)
@@ -51,11 +58,11 @@ def page_frame(canvas, doc) -> None:
     canvas.drawString(52, 29, "CS550 项目提案 | 中文审阅版")
     canvas.drawRightString(width - 52, 29, str(doc.page))
     if doc.page > 1:
-        canvas.drawString(52, height - 31, "面向多目标分割与跟踪的检测器微调研究")
+        canvas.drawString(52, height - 31, doc.title)
     canvas.restoreState()
 
 
-def build(source: Path, output: Path, regular: Path, bold: Path) -> None:
+def build(source: Path, output: Path, regular: Path, bold: Path, *, separate_references: bool = True) -> None:
     # ReportLab's default CJK prohibition list omits some Chinese punctuation.
     # Add it in both line-breaking paths to avoid punctuation at line starts.
     for module in (textsplit, paragraph_module):
@@ -65,7 +72,7 @@ def build(source: Path, output: Path, regular: Path, bold: Path) -> None:
     pdfmetrics.registerFontFamily("ReviewRegular", normal="ReviewRegular", bold="ReviewBold")
     body = ParagraphStyle(
         "Body", fontName="ReviewRegular", fontSize=10.2, leading=16.2,
-        textColor=INK, alignment=TA_LEFT, wordWrap="CJK", spaceAfter=7,
+        textColor=INK, alignment=TA_LEFT, wordWrap="CJK", spaceAfter=6,
         allowWidows=0, allowOrphans=0,
     )
     heading = ParagraphStyle(
@@ -73,6 +80,12 @@ def build(source: Path, output: Path, regular: Path, bold: Path) -> None:
         leading=17, spaceBefore=9, spaceAfter=5, keepWithNext=True,
         textColor=ACCENT,
     )
+    subheading = ParagraphStyle("Subheading", parent=heading, fontSize=10.5,
+                                leading=16, spaceBefore=7, spaceAfter=4)
+    list_item = ParagraphStyle("ListItem", parent=body, leftIndent=14,
+                              firstLineIndent=0, bulletIndent=0, spaceAfter=3)
+    table_body = ParagraphStyle("TableBody", parent=body, fontSize=9.5,
+                                leading=14, spaceAfter=0)
     title = ParagraphStyle(
         "Title", parent=body, fontName="ReviewBold", fontSize=18,
         leading=27, spaceAfter=9, keepWithNext=True,
@@ -86,6 +99,9 @@ def build(source: Path, output: Path, regular: Path, bold: Path) -> None:
     in_body = False
     in_references = False
     for block in "\n".join(lines).split("\n\n"):
+        if block.strip() == "<!-- pagebreak -->":
+            story.append(PageBreak())
+            continue
         if block.lstrip().startswith("|"):
             rows = []
             for line in block.splitlines():
@@ -94,27 +110,36 @@ def build(source: Path, output: Path, regular: Path, bold: Path) -> None:
                     continue
                 if len(cells) != 3:
                     raise ValueError("Proposal tables must have exactly three columns")
-                rows.append([Paragraph(inline(cell), body) for cell in cells])
+                rows.append([Paragraph(inline(cell), table_body) for cell in cells])
             table = Table(rows, colWidths=[64, 145, A4[0] - 104 - 209], repeatRows=1,
-                          hAlign="LEFT", spaceBefore=3, spaceAfter=10)
+                          hAlign="LEFT", spaceBefore=3, spaceAfter=10, splitByRow=0)
             table.setStyle(TableStyle([
                 ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EAF0F4")),
                 ("LINEBELOW", (0, 0), (-1, 0), 0.7, ACCENT),
                 ("LINEBELOW", (0, -1), (-1, -1), 0.5, ACCENT),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("TOPPADDING", (0, 0), (-1, -1), 5),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                ("TOPPADDING", (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
             ]))
             story.append(table)
+            continue
+        list_lines = block.strip().splitlines()
+        if list_lines and all(re.match(r"^(?:- |\d+\. )", line) for line in list_lines):
+            for line in list_lines:
+                match = re.match(r"^(-|\d+\.) (.+)$", line)
+                bullet = "•" if match[1] == "-" else match[1]
+                story.append(Paragraph(inline(match[2]), list_item, bulletText=bullet))
             continue
         text = " ".join(line.strip() for line in block.splitlines()).strip()
         if not text:
             continue
         if text.startswith("# "):
             story.append(Paragraph(inline(text[2:]), title))
+        elif text.startswith("### "):
+            story.append(Paragraph(inline(text[4:]), subheading))
         elif text.startswith("## "):
             label = text[3:]
-            if label == "参考文献":
+            if label == "参考文献" and separate_references:
                 story.append(PageBreak())
             in_body = True
             in_references = label == "参考文献"
@@ -144,5 +169,8 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path, default=ROOT / "docs/proposal/proposal_zh.pdf")
     parser.add_argument("--font-regular", type=Path, default=Path("C:/Windows/Fonts/msyh.ttc"))
     parser.add_argument("--font-bold", type=Path, default=Path("C:/Windows/Fonts/msyhbd.ttc"))
+    parser.add_argument("--inline-references", action="store_true",
+                        help="Keep references in the normal flow for the concise edition.")
     args = parser.parse_args()
-    build(args.source, args.output, args.font_regular, args.font_bold)
+    build(args.source, args.output, args.font_regular, args.font_bold,
+          separate_references=not args.inline_references)

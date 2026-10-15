@@ -14,7 +14,7 @@ video ID + frame index + track ID + category + predicted mask
 
 The exact serialization will be chosen during implementation. Masks must use the same image coordinates as the annotations. Define how absence is represented, how duplicate predictions are handled, and how categories are mapped. A track kept in memory during occlusion does not necessarily have a visible mask on that frame.
 
-Ground truth supplies the reference masks and identities. Predicted IDs need not numerically equal ground-truth IDs; the evaluator establishes correspondences. Annotations are used for scoring, not as automatic-method prompts on evaluation videos.
+Ground truth supplies the reference masks and identities. Predicted IDs need not numerically equal ground-truth IDs; the full-system evaluator establishes correspondences. Automatic A0/B0 inference does not use annotation prompts. The separately reported controlled recovery experiment supplies target correspondence and may use a current-frame reference box; no future annotations assist its predictions.
 
 ## Mask IoU: are the selected pixels correct?
 
@@ -27,7 +27,7 @@ IoU = number of pixels in both P and G
 
 If their intersection contains 80 pixels and their union contains 100, IoU is 0.80. Perfect overlap is 1; no overlap is 0. Box IoU instead compares rectangles, so a good box score does not establish a good mask score.
 
-**Matched-mask mean IoU** is a useful diagnostic, not a complete accuracy measure. Suppose a system finds only one of ten dogs, with a perfect mask. Its mean IoU over that single matched object can be 1.0 while nine dogs are missed. Always read this measure alongside detection and tracking metrics. Specify which matching rule and threshold define “matched”; do not choose pairs separately to maximize the displayed mean. The October 13 proposal uses mask HOTA/DetA/AssA and IDF1 for tracking, with standalone box/mask AP50:95 to diagnose YOLO adaptation.
+**Matched-mask mean IoU** is a useful diagnostic, not a complete accuracy measure. Suppose a system finds only one of ten dogs, with a perfect mask. Its mean IoU over that single matched object can be 1.0 while nine dogs are missed. Always read this measure alongside detection and tracking metrics. Specify which matching rule and threshold define “matched”; do not choose pairs separately to maximize the displayed mean. The current proposal keeps mask HOTA/DetA/AssA, IDF1, and standalone box/mask AP50:95, then adds fixed-target recovery curves and paired retain/reset comparisons.
 
 ## HOTA: detection and association together
 
@@ -59,13 +59,36 @@ Example: one object is visible for ten frames, with perfect masks. A system labe
 
 An FP is an unmatched predicted object; an FN is an unmatched annotated object. An identity switch records a change in an object's assigned predicted identity under the evaluator's temporal rules. The exact continuity and matching rules matter, so we should use a tested implementation rather than invent a counter. See [TrackEval's CLEAR metric implementation](https://github.com/JonathonLuiten/TrackEval/blob/master/trackeval/metrics/clear.py).
 
-The October 13 proposal specifies TrackEval CLEAR diagnostic counts at mask IoU 0.5, alongside IDF1 at mask IoU 0.5. HOTA, IDF1, and CLEAR counts have their own matching procedures; a shared input adapter does not make their internal assignments identical.
+The project uses TrackEval CLEAR diagnostic counts at mask IoU 0.5, alongside IDF1 at mask IoU 0.5. HOTA, IDF1, and CLEAR counts have their own matching procedures; a shared input adapter does not make their internal assignments identical.
+
+## Recovery: does the corrected target stay correct afterwards?
+
+The October 15 proposal adds a local question that whole-video scores can obscure. After the same correction, compare A-R against A-H and B-R against B-H on the same event. Each pair shares its pipeline history up to the event, receives the same external correction, and continues with identical normal input schedules. Neural weights stay fixed.
+
+Exclude the directly corrected frame from primary recovery scores. Predeclare the observation window, visibility handling, success threshold, and required consecutive annotated times on development/validation data. The exact values remain protocol decisions; they are not measured or fixed by this guide.
+
+| Measure | What it tells us |
+| --- | --- |
+| Correct target following and localization | Whether the designated track remains on the intended visible object |
+| Recovery proportion and time | How many events reach the success criterion, and how long this takes |
+| Correct duration and relapse | Whether recovery persists or later fails again |
+| Output during target absence | Whether the system continues segmenting or tracking something else |
+| ByteTrack prediction and assignment diagnostics | Whether stale motion state affects box prediction or subsequent detection association |
+| SAM mask quality and drift | Whether visual history affects the propagated target mask |
+
+Keep the target correspondence fixed from the event; do not pick the best overlapping prediction afresh each frame. A visible target with no output counts as failure, and unrecovered events remain in the recovery denominator. An unchanged integer ID is not success if it follows another object. Restoring an ID at the controlled correction does not prove automatic re-identification.
+
+ByteTrack's reset does not modify YOLO's already-generated masks. A mask-only score that ignores identity could therefore miss an important assignment change. Conversely, a SAM mask improvement need not restore a fragmented full-video identity. Report system and component diagnostics separately.
+
+Analyze paired time curves, not only a post-correction mean. The effect of historical state may disappear after reliable new observations or return during another gap. Report actual annotation timestamps and elapsed time; sampled annotation points are not necessarily consecutive original frames. Aggregate multiple events within each video first so videos with more events do not dominate.
+
+Actual-detector and reference-box conditions are separate results, as are controlled and fully automatic runs. Differences across A and B can also reflect their input frequency, association and representation; pairwise effects do not establish that one form of memory is universally superior.
 
 ## FPS and memory: how expensive is the whole system?
 
 For our protocol, end-to-end FPS means evaluated frames divided by timed elapsed seconds. Include decoding, preprocessing, YOLO, prompt creation, propagation/association, and postprocessing. Exclude model loading, visualization, and scoring as specified in the proposal, and record those exclusions. Preloading or caching must not silently remove work from only one method's timing.
 
-Peak GPU memory needs a named measurement method. Framework-allocated memory, framework-reserved memory, and process memory reported by the driver are not interchangeable. Record GPU model, precision, frame dimensions, object count, video length, and any CPU offloading. Synchronize GPU work around timing, warm up, and report the median of three runs under the same conditions.
+Peak GPU memory needs a named measurement method. Framework-allocated memory, framework-reserved memory, and process memory reported by the driver are not interchangeable. Record GPU model, precision, frame dimensions, object count, video length, and any CPU offloading. Synchronize GPU work around timing, warm up, and report the median of three runs under the same conditions. Report correction/reinitialization overhead separately from full-system throughput.
 
 More FPS is better for throughput; less memory is better for capacity. Neither establishes greater accuracy. Keeping the full quality-versus-cost table is more informative than naming one universal winner.
 

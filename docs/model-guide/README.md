@@ -1,10 +1,10 @@
 # Model study guide for the CS550 project
 
-English learning notes for the [revised proposal](../proposal/proposal.md). Prepared October 10; scope updated October 13, 2026.
+English learning notes for the [revised proposal](../proposal/proposal.md). Prepared October 10; scope updated October 15, 2026.
 
 The central idea is to compare two complete systems: one finds objects again in each frame and links the detections; the other finds objects periodically and propagates their masks through time. We are not training a new foundation model.
 
-The October 13 revision first evaluates pretrained A0/B0, then prioritizes one small YOLO fine-tune whose selected checkpoint is reused in A1/B1. SAM 2.1 remains frozen. The two pretrained baselines are the minimum deliverable; training is feasibility-gated, and a positive gain is not required. SAM-Track/DeAOT is background reading, not a third planned experiment.
+The October 15 revision keeps the A0/B0 system comparison and adds a common recovery question: when does retained history help after an error, and when is reinitialization more effective? ByteTrack has motion and track state; SAM has visual inference history. Each system gets its own retain/reset pair, with model weights fixed and the same correction information inside each pair. The study analyzes recovery conditions and duration before considering at most one simple automatic policy. SAM-Track/DeAOT remains background reading.
 
 This guide separates established model capabilities from our proposed integration choices. Examples are illustrative, not measured results. Downloaded checkpoints do not mean the pipelines have been implemented or tested.
 
@@ -16,9 +16,9 @@ This guide separates established model capabilities from our proposed integratio
 | [2. SAM 2.1](02-sam2.md) | What does prompted video segmentation do, and what must we add? |
 | [3. SAM-Track and DeAOT](03-sam-track-and-deaot.md) | How does this background approach differ from SAM 2? |
 | [4. Evaluation metrics](04-evaluation-metrics.md) | What do IoU, HOTA, IDF1, FPS, and memory actually measure? |
-| [5. Reviewing our proposal](05-proposal-review.md) | Which assumptions and implementation decisions need checking? |
+| [5. Reviewing our proposal](05-proposal-review.md) | How do A0/B0, the four history branches, and system validation connect? |
 
-For a quick review, read this page, Chapters 1 and 2, and the decision table in Chapter 5. Chapter 3 is optional for the required two-method study.
+For a quick review, read this page, Chapters 1 and 2, and the branch table in Chapter 5. Chapter 3 is optional for the required two-method study.
 
 ## First distinguish the tasks
 
@@ -41,7 +41,7 @@ A stationary dog still belongs in our current project. Conversely, a moving shad
 | Component | Main input | Main output or role | Project status |
 | --- | --- | --- | --- |
 | YOLO11s-seg | One image/frame | Category, confidence, box, and instance mask | Required in both pipelines |
-| ByteTrack | Frame-by-frame detection boxes and scores | Association of detections with track IDs | Required in pipeline A |
+| ByteTrack | Frame-by-frame detection boxes and scores plus historical motion/track state | Association of detections with track IDs | Required in pipeline A |
 | SAM 2.1 Hiera Tiny | Frames plus spatial prompts and object state | Masks propagated for specified objects | Required in pipeline B |
 | Original SAM | Image plus spatial prompts, or automatic mask-generation procedure | Image masks | Background: part of SAM-Track |
 | DeAOT | Frames plus reference masks carrying object identities | Subsequent masks for those objects | Background; outside current scope |
@@ -58,7 +58,7 @@ A: every evaluated frame
    -> matched YOLO masks with track IDs
 
 B: selected discovery/refresh frames
-   -> shared YOLO11s-seg supplies boxes and categories (pretrained B0 / adapted B1)
+   -> shared pretrained YOLO11s-seg supplies boxes and categories (B0)
    -> our matching and track-management code assigns prompt IDs
    -> SAM 2.1 propagates masks across the evaluated frames
    -> SAM masks with track IDs and externally maintained categories
@@ -69,6 +69,10 @@ C, earlier idea retained for background only:
 ```
 
 In B, “category” is metadata in our code, not a text instruction to SAM 2.1. In C, using YOLO discovery is our proposed adaptation, not a claim to reproduce every setting of the original SAM-Track paper.
+
+The mechanism study branches A into A-H (retain motion state) and A-R (reinitialize motion state), and B into B-H (retain visual history) and B-R (reinitialize target inference state). Each pair shares its own run up to one correction frame, keeps the external target ID, receives the same box, and continues with normal inputs. A and B do not have identical internal state, so their pairwise effects are analyzed before comparing patterns across systems.
+
+Actual detector boxes and current-frame reference boxes are separate conditions. The diagnostic test supplies the target correspondence; the automatic pipelines still have to establish that correspondence themselves. A recovery that works with a correctly routed box does not prove automatic re-identification works. See [Chapter 5](05-proposal-review.md) for the controls and [Chapter 4](04-evaluation-metrics.md) for recovery metrics.
 
 ## Files already downloaded
 

@@ -2,7 +2,7 @@
 
 [Guide index](README.md) · [Previous: SAM 2.1](02-sam2.md) · [Next: Evaluation metrics](04-evaluation-metrics.md)
 
-Scope note, October 13: SAM-Track/DeAOT is retained as background reading. The current proposal prioritizes YOLO adaptation in two pipelines and does not include this third pipeline or DeAOT training.
+Scope note, October 15: SAM-Track/DeAOT is retained as background reading. The current proposal studies A0/B0 and history retention versus reinitialization within ByteTrack and SAM 2.1. It does not include a third pipeline or DeAOT training.
 
 ## The one-sentence explanation
 
@@ -50,7 +50,7 @@ The local checkpoint inventory does not contain an original SAM checkpoint. The 
 
 ## Why it is outside the current scope
 
-Adding this method introduces another integration, environment, and evaluation path. The October 13 revision instead allocates that effort to testing whether one adapted YOLO improves both existing pipelines. Background explanations and downloaded resources are retained, but do not constitute a commitment to run this method.
+Adding this method introduces another integration, environment, and evaluation path. The October 15 revision keeps two pretrained baselines and examines four history branches (A-H/A-R/B-H/B-R), with at most one follow-up automatic policy supported by the controlled findings. It does not add SAM-Track/DeAOT as a third pipeline. Background explanations and downloads remain available.
 
 Expected failure cases to investigate include a poor reference mask, drift toward a similar nearby object, accumulated propagation errors, and duplicate initialization when discovery fails to recognize an existing track. These are proposed checks, not measured failures in our repository.
 

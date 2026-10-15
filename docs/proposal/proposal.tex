@@ -9,10 +9,11 @@
 \usepackage{microtype}
 \usepackage{xcolor}
 \usepackage{booktabs}
+\usepackage{tabularx}
 \hypersetup{hidelinks}
 \setcitestyle{authoryear,round}
 % Named course proposal.
-\title{Detector Fine-Tuning for Multi-Object Segmentation and Tracking}
+\title{Multi-Object Segmentation and Tracking: The Role of Historical State in Error Recovery}
 \author{Jingdi Wu\\
 {\normalfont Rutgers University}
 \And
@@ -27,63 +28,201 @@ Christina Ross\\
 
 \begin{abstract}
 
-We will compare YOLO11s-seg with ByteTrack and detector-assisted SAM 2.1 on a fixed YouTube-VIS 2021 subset. After pretrained baselines, prioritized, budgeted YOLO fine-tuning will test whether improved detections benefit downstream segmentation and identity consistency. Both pipelines share the adapted detector; SAM remains frozen. We evaluate quality and computational cost without assuming improvement.
+We will compare YOLO11s-seg with ByteTrack and detector-assisted SAM 2.1 on a fixed YouTube-VIS 2021 subset, examining segmentation quality, identity continuity, and computational cost. Building on this comparison, we will study how historical state affects error recovery in both pipelines: when a new target observation becomes available, under what conditions is retaining the existing state or reinitializing it more effective, and how long do these effects persist?
+
+With model weights fixed, we will compare retention and reset for ByteTrack's motion state and SAM's visual history, using identical corrective information and subsequent inputs within each pipeline. Paired comparisons, frame-level recovery curves, and failure cases will examine the relationship between historical reliability, new-observation quality, and scene changes. If reproducible and actionable patterns emerge, we will test whether one simple policy improves the complete automatic system.
 
 \end{abstract}
 
-\section{Introduction and research questions}
+\section{Background and research questions}
 
-A teaching-video misclassification motivates investigation, not a quantitative claim. We ask: (RQ1) how do tracking-by-detection and detector-assisted mask propagation differ in accuracy and cost? (RQ2) does limited target-domain YOLO adaptation improve detection/segmentation and consequently tracking in both pipelines? Better observations need not solve identity recovery after occlusion. Our contribution is an empirical study, not a new architecture or semantic re-identification system.
+Object detection, segmentation, and identity association in video are related tasks with different sources of error. YOLO provides frame-level boxes, classes, and masks; ByteTrack maintains tracks through motion prediction and detection association; SAM 2.1 propagates target masks using prompts and visual memory.
+
+Preliminary teaching experiments motivated us to distinguish these components. For example, a returning object receiving a new ID does not by itself justify detector fine-tuning. The failure could arise from a missed detection, incorrect association, track termination, or the influence of historical state on subsequent predictions.
+
+Both ByteTrack and SAM use history, but store different information and use it differently. ByteTrack summarizes past observations as a motion state and an uncertainty estimate, whereas SAM uses visual information encoded from historical images and predicted masks. History can support prediction when reliable observations are temporarily unavailable, but it can also continue to influence a system after motion changes, incorrect associations, or mask drift.
+
+We organize the project around how historical state and new observations jointly affect recovery:
+
+\begin{itemize}
+
+\item \textbf{RQ1: System performance and error sources.} How do the two automatic pipelines differ in segmentation, identity continuity, and computational cost, and where do their main failures occur?
+
+\item \textbf{RQ2: Conditional benefits of retention and reset.} Given identical corrective information, when does retaining history or reinitializing help? How do these differences relate to prediction quality before correction, new-observation quality, and scene changes?
+
+\item \textbf{RQ3: Recovery dynamics and practical relevance.} How long does the influence of historical state persist, can subsequent reliable observations remove it, and can the observed patterns inform a policy for the complete system?
+
+\end{itemize}
+
+We do not assume that either historical mechanism or recovery strategy is universally superior. Improvements, regressions, and negligible differences under different conditions are all research outcomes.
 
 \section{Related work}
 
-YOLO11 predicts masks, boxes, and classes and supports fine-tuning \citep{ultralytics2026}. ByteTrack associates detections; it is not a neural model to fine-tune \citep{zhang2021}. SAM 2.1 propagates prompted masks using video memory, requiring external discovery and labels \citep{meta2026}. HOTA and IDF1 measure tracking quality \citep{luiten2020,ristani2016}.
+ByteTrack maintains trajectories by associating high- and low-confidence detections and uses Kalman filtering for motion prediction \citep{zhang2021}. OC-SORT examines state-estimation errors under occlusion and nonlinear motion, using renewed observations to correct accumulated errors \citep{cao2023}. These studies motivate an investigation of motion-state retention and recovery.
 
-\section{Methods and adaptation study}
+SAM 2 propagates masks for prompted targets using visual memory \citep{ravi2024}. SAM2Long reduces error propagation through multiple candidate historical pathways and memory selection \citep{ding2025}; SAMURAI uses motion consistency to guide candidate-mask and historical-memory selection \citep{yang2024}. These studies show that the organization and use of history can affect tracking even when model weights are fixed.
 
-Pipeline A uses YOLO11s-seg masks and ByteTrack associations every frame. We will run ByteTrack separately per category with video-wide unique IDs, documenting this class-gated variant. Pipeline B uses the same YOLO checkpoint for periodic box prompts and labels, with frozen SAM 2.1 Hiera Tiny for mask propagation. It receives neither ByteTrack IDs nor ground-truth prompts.
+We place these questions in a common recovery-experiment framework, examining the roles of motion state and visual history after a new observation becomes available. Our contribution is controlled comparison, analysis of applicable conditions, and system-level validation. We do not claim state reset or memory selection itself as a new algorithm, nor require complete reproduction of every related method.
+
+\section{Experimental design}
+
+\subsection{Automatic system baselines}
+
+We retain the two original pipelines:
+
+\begin{itemize}
+
+\item \textbf{A0: YOLO11s-seg + ByteTrack.} Run pretrained YOLO on every frame, associate detections with ByteTrack, and attach each ID to the corresponding instance mask. Use separate trackers per category and video-wide unique IDs.
+
+\item \textbf{B0: Detector-assisted SAM 2.1.} Use the same YOLO weights as A0 to provide periodic box prompts and classes, with frozen SAM 2.1 Hiera Tiny propagating the masks.
+
+\end{itemize}
+
+B0 matches detections one-to-one to the bounding boxes of same-category propagated masks using box IoU. A match refreshes the prompt while retaining target history; an accepted unmatched detection creates a new ID. Discovery intervals, duplicate suppression, prompt refresh, and lost-track retention rules are determined during development and validation.
+
+B0 uses neither ByteTrack IDs nor ground-truth prompts. Neither baseline includes an explicit long-term appearance re-identification module. A0/B0 compare complete systems, including their detection frequencies and association rules; performance differences are not attributed directly to their historical-state representations.
+
+\subsection{Failure localization and event selection}
+
+Using frame-level predictions and annotation review, we distinguish:
+
+\begin{enumerate}
+
+\item \textbf{Observation problems:} the target is not detected, or its detected class, location, or mask is inaccurate.
+
+\item \textbf{Association and track-management problems:} an adequate detection exists but is not assigned to the correct target, or the original track has already terminated.
+
+\item \textbf{State-update and subsequent-prediction problems:} a new observation has been provided for the corresponding target, but later prediction or association still deviates, or fails again after recovery.
+
+\end{enumerate}
+
+Using predefined rules, select events from development and validation data covering stable tracking, occlusion, disappearance and re-entry, abrupt motion changes, and similar-object distractors. Events are not selected based on which recovery strategy ultimately performs better.
+
+The primary four-group comparison uses common events for which both systems retain an operable target state. Cases that cannot support retention, such as already-deleted tracks, are recorded separately with their counts and proportions so that these real failures are not overlooked.
+
+\subsection{Retention and reset experiments}
+
+At the correction time of an event, provide a box with an explicit correspondence to the target being recovered. The two branches within each pipeline share the same pre-correction execution history and receive the same corrective box and accompanying information.
 
 \begin{center}
-\begin{tabular}{lll}
+\begin{tabularx}{\linewidth}{@{}p{0.10\linewidth}p{0.28\linewidth}X@{}}
 \toprule
 
-Group & YOLO weights & Downstream pipeline \\
+Group & Historical-state treatment & Corrective operation \\
 
 \midrule
 
-A0 & Pretrained & ByteTrack + YOLO masks \\
+A-H & Retain ByteTrack motion state & Perform a normal Kalman update with the corrective box \\
 
-B0 & Pretrained & Frozen SAM 2.1 \\
+A-R & Reinitialize ByteTrack motion state & Initialize position and size from the corrective box, zero velocities, and set covariance using the default initialization rule \\
 
-A1 & Fine-tuned & ByteTrack + YOLO masks \\
+B-H & Retain SAM target history & Add the same box prompt to the existing target \\
 
-B1 & Same as A1 & Frozen SAM 2.1 \\
+B-R & Rebuild SAM target inference state & Clear that target's old prompts, visual memory, and associated state, then initialize with the same box prompt \\
 
 \bottomrule
 
-\end{tabular}
+\end{tabularx}
 
 \end{center}
 
-For B, periodic detections match same-category propagated-mask boxes one-to-one by box IoU. Accepted unmatched detections start tracks; matches refresh prompts. Empty masks yield no output box and mark tracks lost. Reappearing propagated masks can recover a retained ID; otherwise unmatched detections receive new IDs. Lost-track expiry, duplicate suppression, and refresh rules will be fixed on validation data. No explicit long-term re-identification is added.
+A-H/A-R keep the same external ID, post-correction alive status, and lifecycle handling, changing only the defined treatment of the motion state. B-H/B-R likewise preserve the external ID and do not explicitly reset other targets. The reset scope differs between systems: conclusions concern each recovery strategy rather than treating the internal operations as identical.
 
-After A0/B0, we will fine-tune one YOLO11s-seg with supervised segmentation losses for A1/B1. A uses its masks and boxes; B uses boxes and labels, so benefits may differ. A pilot fixes the budget: initially at most 30 epochs, 640-pixel input, and memory-appropriate batch size. Validation mask AP50:95 selects the checkpoint. We record sampling, augmentation, optimizer, seed, and head/category-space changes, which limit weight-only causal claims. All runs share the target-category mapping. Detector thresholds and downstream rules stay fixed within A0/A1 and B0/B1; validation tuning precedes evaluation.
+Each branch consumes the corrective information once, avoiding duplicate updates in the same frame. Thereafter, prediction and association return to the system's own operation; annotations no longer repair target correspondence. Subsequent losses, ID changes, or tracking of the wrong target are scored as they occur.
 
-The pretrained comparison is the minimum deliverable; YOLO fine-tuning is the prioritized, feasibility-gated extension. SAM/DeAOT training and additional pipelines are outside scope.
+Use two corrective-box sources and report them separately:
 
-\section{Dataset and controls}
+\begin{itemize}
 
-We target 200 labeled YouTube-VIS 2021 training videos covering person, dog, cat, horse, and car \citep{yang2021}. Seed 550 defines whole-video splits of 120 training, 40 validation, and 40 held-out evaluation videos. Split first, then sample temporally spaced training frames with all target instances retained. Related clips from an identifiable source stay together. Files, coverage, frame lists, mappings, and any reduced counts will be verified and frozen before tuning. These are planned internal splits, not official challenge test sets; upstream pretraining overlap may be unknown.
+\item \textbf{Actual YOLO detection boxes:} examine recovery with noisy detector inputs.
 
-All conditions process identical ordered annotated frames, using a common external resize and documented model-specific preprocessing. Masks return to annotation coordinates. Training-label conversion will be checked against original masks; evaluation uses original annotations, including late arrivals and disappearances. Held-out data and teaching clips are excluded from training, checkpoint selection, and tuning. Annotation-based failure-case selection will precede inspection of model results.
+\item \textbf{Reference boxes derived from the current frame's annotations:} provide an explicit corrective reference to analyze historical-state effects. A reference box can still contain background or other objects and does not guarantee correct segmentation.
 
-\section{Evaluation and deliverables}
+\end{itemize}
 
-Primary evaluation uses mask HOTA with its standard threshold sweep, reporting DetA and AssA, plus mask IDF1 at IoU 0.5. A shared class-aware TrackEval adapter will also report CLEAR false positives, false negatives, and ID switches at mask IoU 0.5 \citep{trackeval2020}. Per-category scores combine sequences using each metric's official aggregation, then categories receive equal weight. Per-video results support diagnosis. Synthetic perfect, missed, and switched-ID cases will validate scoring.
+Box-to-target correspondence is fixed manually in the mechanism experiment. This control asks whether the system can recover after receiving a correction opportunity; it does not imply that automatic re-identification has been solved. Report the fully automatic A0/B0 results separately, and retain the event's baseline trajectory without additional controlled correction as a reference.
 
-Standalone YOLO box/mask AP50:95 and classification-error inspection will distinguish detector changes from tracking changes. We will compare A1-A0 and B1-B0, including regressions and ambiguous outcomes, and inspect occlusion, crossings, and re-entry cases. These are internal measurements, not official leaderboard scores or evidence from one teaching clip. A versus B compares complete systems, including different detector call frequencies, not isolated backbones.
+\subsection{Unified analysis and system validation}
 
-On the same GPU and inputs, we report peak memory, detector calls, and median FPS from three synchronized, warmed-up runs. Timing covers decoding through masks/IDs, excluding model loading, rendering, and scoring. Training GPU-hours are separate. Deliverables include configurations, manifests, complete predictions, training logs, four-condition results when feasible, synchronized videos, and a report.
+After correction, both strategies within a pipeline receive the same normal input schedule: ByteTrack continues to receive frame-level detections, and SAM continues its predefined automatic prompt refreshes. No additional human or annotation-based corrections are supplied during the observation window.
+
+First compare reset against retention within each pipeline, then compare the conditions and duration of benefits across pipelines. Examine:
+
+\begin{itemize}
+
+\item whether the pre-correction prediction has already deviated from the target;
+
+\item whether new observations are accurate and remain available;
+
+\item how occlusion, motion changes, and similar-object distractors affect recovery;
+
+\item whether later observations shrink or amplify the difference, or lead to repeated failures.
+
+\end{itemize}
+
+These factors explain outcomes; the initial study does not perform an exhaustive parameter search over every combination. Cross-pipeline differences may still reflect detection frequency, input format, and association method, and cannot alone establish that one memory mechanism is superior.
+
+If stable, actionable patterns emerge, select at most one simple policy for the corresponding A or B pipeline and compare it with its original baseline. An automatic policy may use only inference-time signals, not ground truth to decide when to reset. If evidence is insufficient to support an improved policy, the complete paired experiments, recovery-dynamics analysis, and failure explanations remain the research outcome.
+
+All core experiments freeze YOLO and SAM weights; detector fine-tuning is not introduced simultaneously.
+
+\section{Dataset and experimental controls}
+
+Retain the original data plan: select 200 annotated videos from the official YouTube-VIS 2021 training set, covering person, dog, cat, horse, and car \citep{yang2021}. With seed 550, split whole videos into 120 development, 40 validation, and 40 held-out evaluation videos. Keep clips from the same source together and split videos before extracting frames.
+
+The development set supports implementation, pilot experiments, and candidate-rule exploration; validation supports diagnosis and configuration selection. Start the recovery study with a small event subset to verify correct implementation of the interventions and check scenario coverage, annotation density, and observation length. Freeze event rules, recovery criteria, and any automatic policy before inspecting held-out evaluation results.
+
+All variants process identical ordered frames, share external resizing, and record internal preprocessing, precision, model versions, and parameters. Map outputs back to annotation coordinates and process time forward, without using future prompts to revise already-scored earlier outputs.
+
+Within each pipeline's H/R pair, detection inputs and subsequent prompt schedules are identical, while the system's own predictions and associations may diverge. Use consistent post-correction windows, visibility handling, and time units. Report recovery at actual annotation timestamps and intervals rather than treating sampled annotation points as consecutive original frames.
+
+Ground truth is used only for complete-system scoring, event diagnosis, and explicitly labeled reference-prompt experiments. Pre-correction box or mask quality is an offline proxy for historical reliability, not an input to the automatic policy. Correlations across natural-scene groups are not treated as causal evidence on their own.
+
+\section{Evaluation and expected outcomes}
+
+\subsection{Complete-system evaluation}
+
+Retain class-aware mask HOTA, DetA, AssA, IDF1 at mask IoU 0.5, and false-positive, false-negative, and ID-switch counts. Also report standalone YOLO box/mask AP50:95 to help separate detection and association problems.
+
+Validate the evaluator with perfect predictions, deliberate misses, and deliberate ID switches. Aggregate videos within each class according to metric rules, then weight classes equally, retaining per-video results. HOTA, IDF1, and TrackEval provide the main evaluation basis \citep{luiten2020,ristani2016,trackeval2020}.
+
+\subsection{Recovery-dynamics evaluation}
+
+Both pipelines are evaluated on whether they continue to follow the designated target correctly after correction, including:
+
+\begin{itemize}
+
+\item target localization quality and the fraction of correct following while visible;
+
+\item the fraction of events reaching the predefined recovery criterion and time to recovery;
+
+\item the duration of sustained correct following after recovery and recurrence of errors;
+
+\item erroneous output while the target is not visible.
+
+\end{itemize}
+
+Primary scoring excludes the directly corrected frame. Keep target correspondence fixed rather than choosing the prediction with the largest annotation overlap anew on every frame. Missing or empty output while the target is visible counts as failure. Determine and lock localization thresholds, the required number of consecutive successful annotation timestamps, and observation windows during development and validation.
+
+Add diagnostics appropriate to each pipeline's function:
+
+\begin{itemize}
+
+\item \textbf{ByteTrack:} motion-predicted box error, subsequent detection association, and identity errors. Resetting its state does not directly change masks already generated by YOLO, so mask quality alone cannot evaluate the intervention.
+
+\item \textbf{SAM:} mask IoU, drift, false foreground, and post-correction propagation quality.
+
+\end{itemize}
+
+Compute paired H/R differences for the same events and plot post-correction time courses to examine when differences appear, how long they persist, and whether they recur. Aggregate multiple events within a video before aggregating across videos so that event-rich videos do not dominate the results.
+
+\subsection{Cost and deliverables}
+
+On the same GPU and inputs, report peak GPU memory, detector-call counts, and median FPS across three synchronized, warmed-up runs. End-to-end timing includes decoding, detection, prompt or state handling, segmentation, and ID generation; exclude model loading, rendering, and scoring. Separately report correction and reinitialization overhead.
+
+Deliver split and event manifests, configurations and version records, complete predictions, A/B baseline results, the four controlled experiments, recovery curves, conditional analyses, failure cases, and any automatic-policy validation results.
+
+The expected outcome is an account of when historical state helps or impedes recovery in the two pipelines and whether subsequent observations remove these effects. Report improvements, regressions, and negligible differences, distinguishing local mechanism findings from complete-system benefits.
 
 \clearpage
 

@@ -29,4 +29,8 @@ The bibliography style includes an LPPL notice; `LICENSE-LPPL-1.3c.txt` supplies
 
 ## Editing and submission
 
-Edit `proposal.md`, then run `python tools/build_proposal.py` from the repository root to update `proposal.tex`. The bibliography metadata stays in `references.bib`. Compile `proposal.tex` with Tectonic or upload the three active LaTeX files listed in the repository README to Overleaf. The proposal's body limit is two pages excluding references; references start on a separate page. The final report limit is eight pages excluding references. Student ID lines are omitted at the team's request.
+Edit `proposal.md`, then run `python tools/build_proposal.py` from the repository root to update `proposal.tex`. The bibliography metadata stays in `references.bib`. Compile locally with Tectonic. The current October 15 document is a detailed team-review draft, with five English body pages plus a separate reference page; it is not a page-limit-compliant course version.
+
+The original course source, `CS550/Slides/chap1_intro.pdf`, slide 4 (Assignments and Projects), specifies a two-page proposal using an AI conference template. That slide explicitly excludes references only from the eight-page final-report limit. This provenance records that original source, not a certification of a later submission's requirements.
+
+After reviewing the two-page condensed draft, the team requested three body pages with references excluded from the body count. The current `proposal_short` edition follows that request, restoring research-question lists, subsection headings, separate paragraphs and a four-group table. It uses the unchanged NeurIPS style and the default separate-reference-page build; do not use `--inline-references` for this edition. The full review draft remains intact. Student ID lines are omitted at the team's request. The human performs any coursework upload or submission.

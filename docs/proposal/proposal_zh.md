@@ -1,66 +1,167 @@
-# 面向多目标分割与跟踪的检测器微调研究
+# 多目标分割与跟踪：历史状态对错误恢复的影响
 
 **Jingdi Wu, Yupu Guo, Christina Ross**  
 
 Rutgers University · CS550 Massive Data Mining · 2026 年秋季  
-修订版项目提案 · 2026 年 10 月 13 日  
+修订版项目提案 · 2026 年 10 月 15 日
 中文审阅版，与英文修订稿逐节对应。
 
 ## 摘要
 
-本项目将在固定的 YouTube-VIS 2021 子集上，比较 YOLO11s-seg 搭配 ByteTrack 与检测器辅助的 SAM 2.1。先建立预训练基线，再优先开展一项预算受限的 YOLO 微调研究，检验更好的检测结果能否改善后续分割和身份一致性。两套流程共用同一个微调后的检测器，SAM 始终冻结。我们将评估质量、速度和显存，不预设微调一定有效。
+本项目将在固定的 YouTube-VIS 2021 子集上，比较 YOLO11s-seg 搭配 ByteTrack 与检测器辅助的 SAM 2.1，分析两套流程在分割质量、身份保持和计算成本上的差异。在此基础上，研究两种流程中的历史状态如何影响错误恢复：当获得新的目标观察时，延续已有状态与重新初始化分别在什么条件下有效，其影响能够持续多久？
+
+我们将固定模型权重，分别对 ByteTrack 的运动状态和 SAM 的视觉历史进行保留／重置实验，在各流程内部使用相同的纠正信息和后续输入。通过成对比较、逐帧恢复曲线和失败案例，分析历史可靠性、新观察质量及场景变化之间的关系。若发现可复核且可利用的规律，将进一步检验一项简单处理策略能否改善完整自动系统。
 
 ## 1 研究背景与问题
 
-教学视频中观察到的一次类别误识别，是研究动机而非定量结论。我们研究两个问题：（RQ1）检测关联式跟踪与检测器辅助的掩码传播，在准确性和计算成本上有何差异？（RQ2）利用有限的目标领域数据微调 YOLO，能否改善检测和分割，这些改善又能否转化为两套流程的跟踪提升？更准确的观测不一定能解决遮挡后的身份恢复。项目贡献是可复现的实证研究，不是提出新架构，也不是开发语义推理式的身份重识别系统。
+视频中的目标检测、分割与身份关联相互联系，但具有不同的错误来源。YOLO 提供逐帧的框、类别和掩码；ByteTrack 利用运动预测与检测关联维护轨迹；SAM 2.1 利用提示和视觉记忆传播目标掩码。
+
+前期教学实验促使我们区分这些环节。例如，目标离开后返回并获得新 ID，不能单独构成微调检测器的依据。失败可能来自漏检、错误关联、轨迹终止，也可能来自历史状态对后续预测的影响。
+
+ByteTrack 与 SAM 都利用历史信息，但保存的信息和使用方式不同。前者将过去的观察融合为运动状态及不确定性估计，后者使用由历史图像和预测掩码编码得到的视觉信息。历史能够支持暂时缺乏可靠观察时的预测，也可能在运动变化、错误关联或掩码漂移后持续影响系统。
+
+本项目以“历史状态与新观察如何共同影响恢复”为统一问题，研究：
+
+- **RQ1：系统表现与错误来源。** 两套自动流程在分割、身份保持和计算成本上有何差异？主要失败发生在哪些环节？
+- **RQ2：保留与重置的条件收益。** 在相同纠正信息下，延续历史与重新初始化分别何时有益？这种差异与纠正前的预测质量、新观察质量及场景变化有何关系？
+- **RQ3：恢复过程与实际意义。** 历史状态的影响会持续多久，后续可靠观察能否消除这种影响？观察到的规律能否指导完整系统中的处理策略？
+
+我们不预设某种历史机制或恢复策略普遍更优。不同条件下的提升、退步以及无明显差异，均属于研究结果。
 
 ## 2 相关工作
 
-YOLO11 输出实例掩码、检测框和类别，支持从预训练权重开始微调（Ultralytics, 2026）。ByteTrack 负责跨帧关联检测结果（Zhang et al., 2021），其关联算法不是本项目要训练的神经网络。SAM 2.1 利用视频记忆传播提示指定的掩码，但自动发现目标和获取类别仍依赖外部检测器（Meta AI, 2026）。HOTA 与 IDF1 从互补角度衡量跟踪质量（Luiten et al., 2020；Ristani et al., 2016）。
+ByteTrack 通过关联高、低置信度检测结果维护轨迹，并使用卡尔曼滤波进行运动预测（Zhang et al., 2021）。OC-SORT 进一步讨论了遮挡及非线性运动下的状态估计误差，并利用重新获得的观察修正积累的误差（Cao et al., 2023）。这些工作为研究运动状态的保留与恢复提供了依据。
 
-## 3 方法与微调实验
+SAM 2 使用视觉记忆进行提示指定目标的掩码传播（Ravi et al., 2024）。SAM2Long 通过多个候选历史路径及记忆选择缓解误差传播（Ding et al., 2025）；SAMURAI 将运动一致性用于候选掩码和历史记忆选择（Yang et al., 2024）。这些工作说明，固定模型权重后，历史信息的组织和使用仍会影响跟踪表现。
 
-流程 A 每帧运行 YOLO11s-seg，使用它的掩码及 ByteTrack 的关联结果。我们将按类别分别运行 ByteTrack，并使用视频内唯一的目标编号，明确记录这一类别隔离版本。流程 B 使用同一个 YOLO 权重定期提供检测框提示和类别，由冻结的 SAM 2.1 Hiera Tiny 传播掩码。流程 B 不接收 ByteTrack 编号，也不使用真实标注作为提示。
+本项目将这些问题放在统一的恢复实验框架下：分别研究运动状态与视觉历史在获得新观察后的作用。主要贡献定位于受控比较、适用条件分析及系统验证，不将状态重置或记忆筛选本身宣称为新算法，也不要求完整复现所有相关方法。
 
-| 实验组 | YOLO 权重 | 后续处理流程 |
+## 3 实验设计
+
+### 自动系统基线
+
+保留原有两套流程：
+
+- **A0：YOLO11s-seg＋ByteTrack。** 每帧运行预训练 YOLO，使用 ByteTrack 关联检测，并将编号与对应实例掩码绑定。按类别分别运行跟踪器，保证编号在视频内唯一。
+- **B0：YOLO 辅助的 SAM 2.1。** 使用与 A0 相同的 YOLO 权重定期提供框提示和类别，由冻结的 SAM 2.1 Hiera Tiny 传播掩码。
+
+B0 将检测框与同类别传播掩码的外接框按 box IoU 一对一匹配。匹配成功后刷新提示并延续已有目标历史；未匹配的合格检测建立新编号。发现间隔、重复目标抑制、提示刷新及丢失保留规则在开发／验证阶段确定。
+
+B0 不使用 ByteTrack 编号或真实标注提示。两套基线均不包含显式的长期外观重识别模块。A0/B0 比较完整系统，包括各自的检测频率与关联规则，不将性能差异直接归因于历史状态的表示方式。
+
+### 失败定位与事件选择
+
+结合逐帧预测和标注复查，将失败区分为：
+
+1. **观察问题：** 目标未被检测到，或检测类别、位置及掩码不准确。
+2. **关联与轨迹管理问题：** 存在合格检测，但未分配给正确目标，或原轨迹已经终止。
+3. **状态更新与后续预测问题：** 已提供对应目标的新观察，但后续预测或关联仍然偏离，或者恢复后再次失效。
+
+从开发／验证数据中按预定规则选择稳定跟踪、遮挡、离开后返回、突然运动变化及相似目标干扰等事件。事件选择不依据哪一种恢复策略最终表现更好。
+
+主要四组比较使用双方均保留可操作目标状态的共同事件。轨迹已经删除等无法进行历史保留实验的情况单独记录，并报告其数量与比例，避免忽略这部分实际失败。
+
+### 保留／重置实验
+
+在同一事件的纠正时刻，为待恢复目标提供一个明确对应的框。每套流程内部的两个分支共享纠正前的运行历史，并获得相同的纠正框及附带信息。
+
+| 实验组 | 历史状态处理 | 纠正操作 |
 | --- | --- | --- |
-| A0 | 预训练 | ByteTrack + YOLO 掩码 |
-| B0 | 预训练 | 冻结的 SAM 2.1 |
-| A1 | 微调后 | ByteTrack + YOLO 掩码 |
-| B1 | 与 A1 相同 | 冻结的 SAM 2.1 |
+| A-H | 保留 ByteTrack 运动状态 | 使用纠正框进行正常卡尔曼更新 |
+| A-R | 重新初始化 ByteTrack 运动状态 | 用纠正框建立位置与尺寸状态，速度归零，协方差按默认初始化规则设置 |
+| B-H | 保留 SAM 目标历史 | 向已有目标加入相同框提示 |
+| B-R | 重新建立 SAM 目标推理状态 | 清除该目标旧提示、视觉记忆及相关状态，再使用相同框提示初始化 |
 
-对于流程 B，定期检测得到的框与同类别传播掩码的外接框按 box IoU 进行一对一匹配。通过过滤但未匹配的检测建立新轨迹，匹配成功则刷新提示。空掩码不生成输出框，并将轨迹标为暂时丢失；保留轨迹的传播掩码再次出现时可以沿用原编号，否则未匹配的检测得到新编号。丢失轨迹保留时长、重复目标抑制和提示刷新规则在验证集上确定。不额外加入长期身份重识别模块。
+A-H/A-R 保持相同的外部 ID、纠正后的存活状态及生命周期处理，仅按定义改变运动状态的继承方式。B-H/B-R 同样保留外部 ID，不主动重置其他目标。两种系统的重置范围不同，实验结论针对各自的恢复策略，不将其视为完全相同的内部操作。
 
-完成 A0/B0 后，只微调一个 YOLO11s-seg 模型，使用有监督的实例分割损失，再将同一权重用于 A1/B1。A 同时使用 YOLO 的掩码和框，B 使用框及类别，因此两者获益可能不同。试运行后固定较小的训练预算：初步上限为输入尺寸 640、30 个训练轮次，批量大小根据实测显存确定。按验证集掩码 AP50:95 选择权重。记录抽帧、数据增强、优化器、随机种子以及输出头或类别空间的变化；若类别空间发生变化，就不能将效果解释为仅改变权重的纯消融实验。四组采用相同的目标类别映射。A0/A1 内以及 B0/B1 内保持检测阈值和后续处理规则不变，所有验证调参都在保留评估集测试之前完成。
+纠正信息在每个分支中只处理一次，避免同一帧重复更新。纠正后恢复系统自身的预测和关联，不再使用标注替它修正目标对应关系；后续丢失、换号或跟错目标均按实际结果评分。
 
-预训练比较是最低交付；YOLO 微调是通过可行性试验后优先开展的扩展。SAM/DeAOT 训练和额外流程不在本次范围内。
+纠正框使用两种来源，分别报告：
+
+- **实际 YOLO 检测框：** 观察检测输入存在噪声时的恢复表现。
+- **当前帧标注生成的参考框：** 提供明确的纠正参考，用于分析历史状态的作用。参考框仍可能包含背景或其他目标，不保证正确分割。
+
+机制实验中人为固定框与目标的对应关系。这项控制用于研究“获得纠正机会之后能否恢复”，不代表系统已经解决自动重识别。A0/B0 的完整自动结果另行报告，并保留事件中未增加受控纠正的基线轨迹作为参考。
+
+### 统一分析与系统验证
+
+纠正后，两种策略接收相同的正常输入安排：ByteTrack 继续获得逐帧检测，SAM 继续执行预先固定的自动提示刷新。观察窗口内不追加人工或标注纠正。
+
+分析首先比较各流程内部的重置与保留差值，再对照两套流程中收益出现的条件及持续时间。重点考察：
+
+- 纠正前的预测是否已经偏离目标；
+- 新观察是否准确、是否持续可用；
+- 遮挡、运动变化与相似目标干扰如何影响恢复；
+- 后续观察使差异缩小、扩大，还是导致反复失效。
+
+这些因素用于解释结果，不在初期展开所有组合的全面参数搜索。跨流程差异仍可能包含检测频率、输入形式及关联方式的影响，不能单独证明某类记忆机制更优。
+
+若发现稳定且可利用的规律，最多选择一项简单处理策略，应用于 A 或 B 的对应流程，再与原基线比较。自动策略只能使用推理时可获得的信号，不得使用真实标注决定何时重置。若没有足够证据支持策略改进，则以完整的配对实验、恢复过程分析和失败解释作为研究成果。
+
+全部核心实验固定 YOLO 与 SAM 权重，不同时引入检测器微调。
 
 ## 4 数据集与实验控制
 
-计划从 YouTube-VIS 2021 官方训练集选择 200 段带标注视频，覆盖人、狗、猫、马和汽车（Yang et al., 2021）。以随机种子 550 按完整视频划分为 120 段训练、40 段验证和 40 段保留评估视频。先划分视频，再从训练视频按时间间隔抽帧，保留每帧全部目标类别实例；可识别为同源的视频片段放在同一划分。调参前核验并固定文件、类别覆盖、帧清单、映射及任何缩减后的数量。以上是计划中的内部划分，不是官方挑战赛测试集；上游预训练数据是否重叠可能无法确认。
+保留原数据计划：从 YouTube-VIS 2021 官方训练集选择 200 段带标注视频，覆盖人、狗、猫、马和汽车（Yang et al., 2021）。以随机种子 550 按完整视频划分为 120 段开发、40 段验证和 40 段保留评估。同源片段放在同组，先划分视频，再抽取帧。
 
-四组处理相同的有标注帧和时间顺序，采用共同的外部缩放策略，并记录模型特定预处理。预测掩码映射回原始标注坐标。训练标签转换后与原掩码核对；评估始终使用原始标注，包含中途进入及暂时消失的目标。保留评估集和教学视频都不参与训练、权重选择或调参。失败分析片段先根据标注选定，再查看模型结果。
+开发集用于实现、预实验和候选规则探索；验证集用于诊断及确定设置。恢复研究先在其中的小规模事件集上验证干预是否正确实现，并核验场景覆盖、标注密度和观察长度。事件规则、恢复标准及可能的自动策略均在查看保留评估结果之前固定。
 
-## 5 评估与交付成果
+各变体处理相同且有序的帧，共用外部缩放，并记录内部预处理、精度、模型版本及参数。输出映射回原始标注坐标，全程按时间前向处理，不利用未来提示改写已评分的过去结果。
 
-主要指标为采用标准多阈值计算的掩码 HOTA，同时报告 DetA、AssA，以及 IoU 阈值 0.5 下的掩码 IDF1。统一且按类别匹配的 TrackEval 适配器还将在 mask IoU 0.5 下报告 CLEAR 误检、漏检和身份切换数（Luiten and Hoffhues, 2020）。各类别先按照指标官方规则合并视频结果，再对类别等权平均，保留逐视频结果用于诊断。先用完美预测、故意漏检和故意切换编号的小样例验证评分流程。
+在同一流程的 H/R 配对中，检测结果与后续提示安排保持一致，但允许系统自身的预测和关联结果产生差异。纠正帧之后的观察窗口、可见性处理及时间单位统一；按实际标注时刻和时间间隔报告恢复过程，不把抽样标注点当作连续原始帧。
 
-单独测量 YOLO 的框与掩码 AP50:95，并检查类别错误，以区分检测器变化和跟踪变化。对比 A1-A0 与 B1-B0，报告退步、无明确提升等结果，并分析遮挡、目标交叉及离开后返回的案例。结果是本项目的内部测量，不是官方排行榜成绩，也不以一段教学视频作为效果证据。A 与 B 比较的是完整系统，包括不同的检测调用频率，不能将差异全部归因于分割骨干模型。
+真实标注仅用于完整系统评分、事件诊断及明确标记的参考提示实验。纠正前的框或掩码质量用于事后分析，是历史可靠性的代理指标，不作为自动策略输入。自然场景分组中的相关性不单独作为因果证据。
 
-在相同 GPU 和输入上报告峰值显存、检测器调用次数，以及预热后三次 GPU 同步运行的 FPS 中位数。计时包含从解码到最终掩码和编号的处理，不含模型加载、可视化和评分；训练 GPU 小时数单独报告。交付配置、数据划分清单、完整逐帧预测、训练日志、可行时的四组结果、同步对比视频及报告。
+## 5 评估与预期成果
+
+### 完整系统评估
+
+保留按类别匹配的 mask HOTA、DetA、AssA，mask IoU 0.5 下的 IDF1，以及误检、漏检和身份切换数。同时报告独立 YOLO box/mask AP50:95，辅助区分检测与关联问题。
+
+评分器使用完美预测、故意漏检及故意切换编号的样例验证。各类别按指标规则合并视频后等权平均，并保留逐视频结果。主要依据为 HOTA、IDF1 和 TrackEval（Luiten et al., 2020；Ristani et al., 2016；Luiten and Hoffhues, 2020）。
+
+### 恢复过程评估
+
+共同评估纠正后的指定目标是否被持续正确跟随，包括：
+
+- 可见期间的目标定位质量和正确跟随比例；
+- 达到预定标准的恢复比例与恢复时间；
+- 恢复后的持续正确时长及错误复发情况；
+- 目标不可见期间的错误输出。
+
+主要评分排除直接接受纠正的当帧。目标对应关系固定，不逐帧重新选择与标注最重合的预测；目标可见时，丢失或空输出计为失败。定位阈值、连续成功的标注时刻数及观察窗口在开发／验证阶段确定并锁定。
+
+两套流程增加与其作用环节对应的诊断：
+
+- **ByteTrack：** 运动预测框偏差、后续检测关联及身份错误。状态重置不会直接改变 YOLO 已生成的掩码，因此不能仅凭掩码质量评价其效果。
+- **SAM：** 掩码 IoU、漂移、错误前景及纠正后的传播质量。
+
+对同一事件计算 H/R 的配对差异，绘制纠正后的时间曲线，分析差异何时出现、持续多久及是否反复。一个视频包含多个事件时先在视频内汇总，避免事件较多的视频主导结果。
+
+### 成本与交付
+
+在相同 GPU 和输入条件下，报告峰值显存、检测器调用次数，以及预热后三次 GPU 同步运行的 FPS 中位数。端到端计时包含解码、检测、提示或状态处理、分割与编号生成，不含模型加载、渲染和评分；另报纠正与重初始化的开销。
+
+交付内容包括数据划分与事件清单、配置和版本记录、完整预测、A/B 基线结果、四组受控实验、恢复曲线、条件分析、失败案例，以及可能的自动策略验证结果。
+
+预期研究成果是说明两套流程中历史状态何时提供帮助、何时妨碍恢复，以及这些影响能否被后续观察消除。报告将同时呈现提升、退步和无明显差异的结果，并区分局部机制发现与完整系统收益。
 
 ## 参考文献
 
-Jonathon Luiten, Aljosa Osep, Patrick Dendorfer, Philip Torr, Andreas Geiger, Laura Leal-Taixe, and Bastian Leibe. 2020. [HOTA: A higher order metric for evaluating multi-object tracking](https://arxiv.org/abs/2009.07736). International Journal of Computer Vision.
+Jinkun Cao, Jiangmiao Pang, Xinshuo Weng, Rawal Khirodkar, and Kris Kitani. 2023. [Observation-Centric SORT: Rethinking SORT for Robust Multi-Object Tracking](https://arxiv.org/abs/2203.14360). CVPR.
+
+Shuangrui Ding, Rui Qian, Xiaoyi Dong, Pan Zhang, Yuhang Zang, Yuhang Cao, Yuwei Guo, Dahua Lin, and Jiaqi Wang. 2025. [SAM2Long: Enhancing SAM 2 for Long Video Segmentation with a Training-Free Memory Tree](https://arxiv.org/abs/2410.16268). ICCV.
+
+Jonathon Luiten, Aljosa Osep, Patrick Dendorfer, Philip Torr, Andreas Geiger, Laura Leal-Taixe, and Bastian Leibe. 2020. [HOTA: A Higher Order Metric for Evaluating Multi-Object Tracking](https://arxiv.org/abs/2009.07736). arXiv:2009.07736.
 
 Jonathon Luiten and Arne Hoffhues. 2020. [TrackEval](https://github.com/JonathonLuiten/TrackEval). Evaluation software.
 
-Meta AI. 2026. [SAM 2: Inference, SAM 2.1 checkpoints, and training documentation](https://github.com/facebookresearch/sam2). Online documentation, accessed October 13, 2026.
+Nikhila Ravi et al. 2024. [SAM 2: Segment Anything in Images and Videos](https://arxiv.org/abs/2408.00714). arXiv:2408.00714.
 
-Ergys Ristani, Francesco Solera, Roger Zou, Rita Cucchiara, and Carlo Tomasi. 2016. [Performance measures and a data set for multi-target, multi-camera tracking](https://arxiv.org/abs/1609.01775). ECCV Workshops.
+Ergys Ristani, Francesco Solera, Roger Zou, Rita Cucchiara, and Carlo Tomasi. 2016. [Performance Measures and a Data Set for Multi-Target, Multi-Camera Tracking](https://arxiv.org/abs/1609.01775). ECCV Workshops.
 
-Ultralytics. 2026. [YOLO11 instance segmentation and fine-tuning documentation, version 8.3.221](https://github.com/ultralytics/ultralytics/blob/v8.3.221/docs/en/tasks/segment.md). Online documentation, accessed October 13, 2026.
+Cheng-Yen Yang, Hsiang-Wei Huang, Wenhao Chai, Zhongyu Jiang, and Jenq-Neng Hwang. 2024. [SAMURAI: Adapting Segment Anything Model for Zero-Shot Visual Tracking with Motion-Aware Memory](https://arxiv.org/abs/2411.11922). arXiv:2411.11922.
 
-Linjie Yang, Yuchen Fan, Yang Fu, and Ning Xu. 2021. [The 3rd Large-scale Video Object Segmentation Challenge - video instance segmentation track](https://youtube-vos.org/dataset/vis/).
+Linjie Yang, Yuchen Fan, Yang Fu, and Ning Xu. 2021. [The 3rd Large-scale Video Object Segmentation Challenge - Video Instance Segmentation Track](https://youtube-vos.org/dataset/vis/).
 
-Yifu Zhang, Peize Sun, Yi Jiang, Dongdong Yu, Fucheng Weng, Zehuan Yuan, Ping Luo, Wenyu Liu, and Xinggang Wang. 2021. [ByteTrack: Multi-object tracking by associating every detection box](https://arxiv.org/abs/2110.06864). arXiv:2110.06864.
+Yifu Zhang, Peize Sun, Yi Jiang, Dongdong Yu, Fucheng Weng, Zehuan Yuan, Ping Luo, Wenyu Liu, and Xinggang Wang. 2021. [ByteTrack: Multi-Object Tracking by Associating Every Detection Box](https://arxiv.org/abs/2110.06864). arXiv:2110.06864.

@@ -36,9 +36,19 @@ The basic sequence is:
 3. Try remaining eligible tracks against weaker detections.
 4. Start tracks from suitable unmatched strong detections; retain lost tracks temporarily and eventually retire them.
 
-The inspected Ultralytics implementation uses a Kalman filter and box-overlap-based assignment, optionally combined with detection scores. It stores tracked, lost, and removed states. Basic ByteTrack does not require a separate neural appearance-recognition checkpoint. The [versioned implementation](https://github.com/ultralytics/ultralytics/blob/v8.3.0/ultralytics/trackers/byte_tracker.py) is a concrete reference, not a claim that this package version is installed or has been selected for our experiments.
+The project's local Ultralytics 8.3.221 implementation uses a Kalman filter and box-overlap-based assignment, optionally combined with detection scores. It stores tracked, lost, and removed states. Basic ByteTrack does not use a separate neural appearance-recognition checkpoint. See the [versioned implementation](https://github.com/ultralytics/ultralytics/blob/v8.3.221/ultralytics/trackers/byte_tracker.py); final experiment configurations must record the version actually run.
 
 For the two-dog example, the tracker might associate the current left-hand detection with track 7 and the right-hand detection with track 12. If the dogs cross, successful tracking follows each dog, not whichever dog occupies the left side.
+
+## What ByteTrack remembers, and what we will reset
+
+ByteTrack is not memoryless. Its Kalman state summarizes earlier detections as position, size, velocity, and uncertainty. Older observations can still influence the current prediction through repeated state updates. Track IDs and tracked/lost/removed status are a separate history maintained by the tracker. This is different from storing learned appearance features to recognize a dog by its coat after a long absence.
+
+In the planned A-H branch, the target keeps its motion state and receives a normal Kalman update from the correction box. In A-R, the same box initializes fresh motion state: the measured location and size, zero initial velocity, and default initialization covariance. Both branches keep the same external ID and the same post-correction lifecycle treatment. Other tracks are not actively reset. See the [selected Kalman implementation](https://github.com/ultralytics/ultralytics/blob/v8.3.221/ultralytics/trackers/utils/kalman_filter.py).
+
+Calling `re_activate()` is not a full state reset: the versioned implementation updates the old Kalman state. The intervention driver must explicitly implement and verify the proposed initialization. It must process the correction once, then let normal detections and matching continue without repeated annotation assistance.
+
+For example, retained velocity may help during steady motion, while stale velocity after a turn may hurt. These are hypotheses, not local findings. The filter already adjusts its reliance on measurements using uncertainty, so resetting is not guaranteed to help even after an error. [OC-SORT](https://arxiv.org/abs/2203.14360) is relevant reading on motion-state errors and observation-based recovery under occlusion.
 
 ## Where the masks come from
 
@@ -63,7 +73,7 @@ These are project implementation concerns, not additional neural models:
 
 Do not confuse detector duplicate-suppression IoU, tracker matching thresholds, and evaluation mask IoU. They operate at different stages and need not use the same values.
 
-In particular, the inspected v8.3.0 `get_dists` function does not explicitly gate matches by category. Class-aware *evaluation* does not make *tracking* class-aware. Check the selected implementation before claiming otherwise. If we introduce per-class trackers or category gating, document the adaptation and keep IDs unique within the video. This is a review finding, not a change already made to the baseline.
+In particular, the selected ByteTrack `get_dists` function does not explicitly gate matches by category. Class-aware *evaluation* does not make *tracking* class-aware. The proposal therefore uses per-class tracker instances with video-wide unique IDs. This adaptation still needs implementation and validation; writing the protocol does not establish that the full baseline is complete.
 
 ## Expected strengths and failure cases
 
@@ -73,6 +83,8 @@ A good outline does not guarantee a correct identity. Likewise, correct identity
 
 ## Training and project role
 
-The A0/B0 baselines use pretrained YOLO weights unchanged. The prioritized adaptation study fine-tunes one YOLO checkpoint on labeled training frames, selects it on validation data, and reuses it in A1/B1; it must not replace the baseline results. ByteTrack's thresholds and motion state are not trained YOLO weights. The October 13 proposal chooses per-category ByteTrack instances with video-wide unique IDs; this planned class-gated variant still needs implementation and validation. Detector thresholds and downstream rules stay fixed within each before/after pair.
+The A0/B0 baselines and all four history branches use pretrained YOLO weights unchanged. The October 15 proposal separates observation failures, association/lifecycle failures, and post-correction failures. A new ID after re-entry does not alone justify YOLO training. The core study measures whether retained or freshly initialized state changes subsequent target following, and for how long. ByteTrack's thresholds and motion state are not trained YOLO weights.
+
+A motion-state reset does not redraw the detector's masks. Its effect is primarily on motion prediction and which detection receives an ID. Assess association, identity continuity, recovery time and recurrence, alongside the complete system's segmentation metrics. Looking only at the best mask overlap on each frame could hide the exact failure we are studying.
 
 Before accepting pipeline A as complete, verify that it produces correctly aligned masks and IDs, handles an empty-detection frame, resets between videos, and exports every evaluated frame in the common format.

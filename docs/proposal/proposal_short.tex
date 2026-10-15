@@ -1,0 +1,135 @@
+% CS550 project proposal.
+% Uses the unchanged, user-supplied NeurIPS 2026 style.
+\documentclass{article}
+\usepackage[preprint]{neurips_2026}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\hypersetup{hidelinks}
+\setcitestyle{authoryear,round}
+% Named course proposal.
+\title{Multi-Object Segmentation and Tracking: Historical State and Error Recovery}
+\author{Jingdi Wu\\
+{\normalfont Rutgers University}
+\And
+Yupu Guo\\
+{\normalfont Rutgers University}
+\And
+Christina Ross\\
+{\normalfont Rutgers University}}
+\begin{document}
+\maketitle
+
+
+\begin{abstract}
+
+We will compare YOLO11s-seg with ByteTrack and detector-assisted SAM 2.1, then investigate how historical state affects recovery in both pipelines. With model weights fixed, paired experiments will retain or reinitialize motion state and visual history after identical corrective information. Recovery curves and failure analysis will examine when history helps, impedes, or has little effect on recovery. If supported by evidence, one simple policy will be tested in its automatic pipeline.
+
+\end{abstract}
+
+\section{Research questions}
+
+Detection, segmentation, and identity association have different failure sources. A returning object receiving a new ID does not alone justify detector training. Both ByteTrack and SAM use history, but their representations differ. We ask:
+
+\begin{itemize}
+
+\item \textbf{RQ1: System comparison.} How do the automatic pipelines differ in quality, cost, and main failure types?
+
+\item \textbf{RQ2: Conditional recovery.} When does retaining or resetting history help, considering prior prediction quality, new-observation quality, and scene changes?
+
+\item \textbf{RQ3: Recovery dynamics.} How long do effects persist, and can the observed patterns inform an automatic policy?
+
+\end{itemize}
+
+\section{Related work}
+
+ByteTrack combines detection association with Kalman motion prediction \citep{zhang2021}. OC-SORT addresses motion-state errors under occlusion and nonlinear movement \citep{cao2023}. SAM 2 propagates prompted masks using visual memory \citep{ravi2024}; SAM2Long explores candidate histories and memory selection \citep{ding2025}, while SAMURAI adds motion consistency \citep{yang2024}. These motivate controlled recovery analysis, rather than additional mandatory baselines. Our contribution is comparison, explanation, and system validation; we do not claim resetting itself as a new algorithm.
+
+\clearpage
+
+\section{Baselines and controlled recovery}
+
+\subsection{Automatic baselines}
+
+\textbf{A0: YOLO11s-seg + ByteTrack.} Run pretrained YOLO every frame, associate detections with separate trackers per category, and attach video-wide unique IDs to the corresponding YOLO masks.
+
+\textbf{B0: Detector-assisted SAM 2.1.} Use the same YOLO weights periodically. Match same-category detections to propagated-mask boxes by box IoU, refresh matched prompts while retaining SAM 2.1 Hiera Tiny history, and create IDs for accepted unmatched detections. B0 uses neither ByteTrack IDs nor annotation prompts. Neither baseline includes explicit long-term appearance re-identification.
+
+\subsection{Paired recovery}
+
+Distinguish observation errors, association/lifecycle errors, and failures after correctly routed new information. Select stable tracking, occlusion, re-entry, abrupt-motion, and distractor events without inspecting which strategy wins. The four-group study requires operable target state in both systems; report deleted-track and other ineligible cases separately.
+
+At one correction time, fork each pipeline's own pre-correction state. Both branches receive identical corrective information:
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}p{0.10\linewidth}p{0.28\linewidth}X@{}}
+\toprule
+
+Group & History treatment & Correction \\
+
+\midrule
+
+A-H & Retain motion state & Normal Kalman update with the corrective box \\
+
+\addlinespace[3pt]
+
+A-R & Reinitialize motion state & Same-box position/size, zero velocity, default initial covariance \\
+
+\addlinespace[3pt]
+
+B-H & Retain visual history & Add the same box prompt to the existing target \\
+
+\addlinespace[3pt]
+
+B-R & Reinitialize target inference state & Clear old prompts, visual memory, and associated state; initialize from the same box \\
+
+\bottomrule
+
+\end{tabularx}
+
+\end{center}
+
+H receives correction too. Preserve external IDs, align post-correction alive/lifecycle handling within each pair, and do not actively reset other targets. The systems' reset operations are not internally equivalent. Branch states must remain independent after forking.
+
+Separately study actual YOLO boxes and reference boxes derived from the current frame's annotations. Fix correction time, coordinates, source, and target routing within pairs; process the correction once. Reference boxes need not produce perfect masks. This diagnostic routing tests recovery after receiving a correction, not automatic re-identification.
+
+After correction, preserve each pipeline's native input schedule: continued detections for ByteTrack and predefined automatic refreshes for SAM. No further annotation assistance is supplied. Predictions and associations may diverge. Retain uncorrected baseline trajectories as references and report automatic and controlled results separately.
+
+\subsection{Interpretation and follow-up}
+
+Compare within-pipeline effects before cross-system patterns; detection frequency, representation, and association remain confounders. If evidence supports it, test at most one automatic policy against its unchanged baseline, using inference-time signals only. Otherwise, paired findings remain the research outcome. All core model weights remain fixed.
+
+\clearpage
+
+\section{Data and controls}
+
+Select 200 annotated YouTube-VIS 2021 training videos covering person, dog, cat, horse, and car. With seed 550, split whole videos into 120 development, 40 validation, and 40 held-out evaluation videos; keep same-source clips together before frame sampling.
+
+A small pilot checks interventions, event coverage, annotation density, and observation length. Freeze event rules, recovery thresholds, windows, and any policy before inspecting held-out results. Use identical ordered frames and external resizing, record preprocessing and versions, and map outputs to annotation coordinates. Process forward only. Pre-correction true overlap is an offline diagnostic proxy, not a policy input; natural-scene correlations alone do not establish causality. The full review details implementation controls.
+
+\section{Evaluation and outcomes}
+
+\subsection{Complete systems}
+
+Report class-aware mask HOTA, DetA, AssA \citep{luiten2020}, IDF1 at mask IoU 0.5, false positives, misses, ID switches, and standalone YOLO box/mask AP50:95. Validate scoring with perfect predictions, misses, and ID switches. Combine videos within classes according to metric rules, then weight classes equally.
+
+\subsection{Recovery dynamics}
+
+Fix the designated target correspondence/ID, exclude the corrected frame, and count missing or empty output during visibility as failure. Measure localization, correct-following fraction, recovery proportion/time, sustained duration, relapse, and absent-target false output. Diagnose ByteTrack motion prediction and association separately from SAM mask quality and drift. Plot paired time courses at actual annotation timestamps, not assumed consecutive video frames; summarize events within videos first.
+
+\subsection{Cost and deliverables}
+
+Report detector calls, peak GPU memory, median FPS over three warmed-up synchronized runs, and correction/reset overhead. Timing includes decoding through ID generation, excluding loading, rendering, and scoring. Deliver manifests, configurations, predictions, baseline and paired results, recovery curves, and failure explanations. Report regressions and null outcomes, distinguishing local recovery effects from complete-system benefits.
+
+\clearpage
+
+\bibliographystyle{plainnat}
+
+\bibliography{references}
+
+\end{document}

@@ -17,6 +17,10 @@ LINK = re.compile(r"\[([^\]]+)\]\((https?://[^)]+)\)")
 
 
 CITATIONS = {
+    "Cao et al., 2023": "cao2023",
+    "Ding et al., 2025": "ding2025",
+    "Ravi et al., 2024": "ravi2024",
+    "Yang et al., 2024": "yang2024",
     "Cheng et al., 2023": "cheng2023",
     "Luiten et al., 2020": "luiten2020",
     "Luiten and Hoffhues, 2020": "trackeval2020",
@@ -39,12 +43,16 @@ def tex_escape(text: str) -> str:
 
 
 def tex_text(text: str) -> str:
-    tokens = re.compile(r"\[[^\]]+\]\(https?://[^)]+\)|\([^()]+\)")
+    tokens = re.compile(r"\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\(https?://[^)]+\)|\([^()]+\)")
     pieces, cursor = [], 0
     for match in tokens.finditer(text):
         pieces.append(tex_escape(text[cursor:match.start()]))
         link = LINK.fullmatch(match.group())
-        if link:
+        if match.group().startswith("**"):
+            pieces.append(r"\textbf{" + tex_text(match.group()[2:-2]) + "}")
+        elif match.group().startswith("`"):
+            pieces.append(r"\texttt{" + tex_escape(match.group()[1:-1]) + "}")
+        elif link:
             pieces.append(r"\href{" + link.group(2).replace("%", r"\%") + "}{" + tex_escape(link.group(1)) + "}")
         else:
             keys = match.group()[1:-1].split("; ")
@@ -57,7 +65,7 @@ def tex_text(text: str) -> str:
     return "".join(pieces)
 
 
-def build_latex(source: Path, output: Path) -> None:
+def build_latex(source: Path, output: Path, *, separate_references: bool = True) -> None:
     lines = source.read_text(encoding="utf-8").splitlines()
     title = tex_escape(lines[0].removeprefix("# "))
     author = next(line for line in lines if line.startswith("**")).strip(" *")
@@ -77,6 +85,7 @@ def build_latex(source: Path, output: Path) -> None:
 \usepackage{microtype}
 \usepackage{xcolor}
 \usepackage{booktabs}
+\usepackage{tabularx}
 \hypersetup{hidelinks}
 \setcitestyle{authoryear,round}
 % Named course proposal.
@@ -89,11 +98,17 @@ def build_latex(source: Path, output: Path) -> None:
     blocks = "\n".join(lines[lines.index("## Abstract"):]).split("\n\n")
     mode = ""
     for block in blocks:
+        if block.strip() == "<!-- pagebreak -->":
+            parts.append(r"\clearpage")
+            continue
+        if block.startswith("## ") and mode == "abstract":
+            parts.append(r"\end{abstract}")
+            mode = "body"
         if block.lstrip().startswith("|"):
             rows = [line.strip().strip("|").split("|") for line in block.splitlines()]
             rows = [[cell.strip() for cell in row] for row in rows]
             parts.append(r"\begin{center}" + "\n" +
-                         r"\begin{tabular}{lll}" + "\n" + r"\toprule")
+                         r"\begin{tabularx}{\linewidth}{@{}p{0.10\linewidth}p{0.28\linewidth}X@{}}" + "\n" + r"\toprule")
             for index, row in enumerate(rows):
                 if index == 1 and all(re.fullmatch(r":?-+:?", cell) for cell in row):
                     continue
@@ -102,12 +117,23 @@ def build_latex(source: Path, output: Path) -> None:
                 parts.append(" & ".join(tex_text(cell) for cell in row) + r" \\")
                 if index == 0:
                     parts.append(r"\midrule")
-            parts.extend([r"\bottomrule", r"\end{tabular}", r"\end{center}"])
+                elif index < len(rows) - 1:
+                    parts.append(r"\addlinespace[3pt]")
+            parts.extend([r"\bottomrule", r"\end{tabularx}", r"\end{center}"])
+            continue
+        list_lines = block.strip().splitlines()
+        if list_lines and all(re.match(r"^(?:- |\d+\. )", line) for line in list_lines):
+            environment = "itemize" if list_lines[0].startswith("- ") else "enumerate"
+            parts.append(r"\begin{" + environment + "}")
+            parts.extend(r"\item " + tex_text(re.sub(r"^(?:- |\d+\. )", "", line)) for line in list_lines)
+            parts.append(r"\end{" + environment + "}")
             continue
         text = " ".join(line.strip() for line in block.splitlines()).strip()
         if not text:
             continue
-        if text.startswith("## "):
+        if text.startswith("### "):
+            parts.append(r"\subsection{" + tex_escape(text[4:]) + "}")
+        elif text.startswith("## "):
             heading = text.removeprefix("## ")
             if heading == "Abstract":
                 mode = "abstract"
@@ -121,9 +147,9 @@ def build_latex(source: Path, output: Path) -> None:
             continue
         else:
             parts.append(tex_text(text))
-            if mode == "abstract":
-                parts.append(r"\end{abstract}")
-    parts.extend([r"\clearpage", r"\bibliographystyle{plainnat}",
+    if separate_references:
+        parts.append(r"\clearpage")
+    parts.extend([r"\bibliographystyle{plainnat}",
                   r"\bibliography{references}", r"\end{document}"])
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("\n\n".join(parts) + "\n", encoding="utf-8")
@@ -134,5 +160,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, default=ROOT / "docs/proposal/proposal.md")
     parser.add_argument("--latex-output", type=Path, default=ROOT / "docs/proposal/proposal.tex")
+    parser.add_argument("--inline-references", action="store_true",
+                        help="Keep references in the normal flow for a concise, page-limited edition.")
     args = parser.parse_args()
-    build_latex(args.source, args.latex_output)
+    build_latex(args.source, args.latex_output, separate_references=not args.inline_references)

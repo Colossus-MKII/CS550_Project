@@ -2,13 +2,16 @@
 
 CS550 final project by **Jingdi Wu, Yupu Guo, and Christina Ross**, Rutgers University, Fall 2026.
 
-The October 13 revision compares two pretrained baselines: YOLO11s-seg + class-gated ByteTrack (A0) and detector-assisted frozen SAM 2.1 Hiera Tiny (B0). A prioritized, budgeted YOLO fine-tuning study then reuses one adapted checkpoint in both pipelines (A1/B1). We test whether detector improvements translate into segmentation and identity gains, using mask HOTA/DetA/AssA, IDF1, detector diagnostics, runtime, and memory. Fine-tuning is feasibility-gated; the pretrained study remains the minimum deliverable. SAM/DeAOT training and additional pipelines are outside this revision.
+The October 15 revision retains two pretrained baselines: YOLO11s-seg + class-gated ByteTrack (A0) and detector-assisted SAM 2.1 Hiera Tiny (B0). It adds a shared research question: when a new observation arrives, does retaining history help recovery, or does reinitializing the target work better? ByteTrack's motion state and SAM's visual history are studied through paired retain/reset experiments with fixed model weights. The study connects system comparison, error diagnosis, recovery curves, and at most one evidence-supported automatic policy.
 
 ## Proposal
 
 - [English model study guide](docs/model-guide/README.md): model roles, pipeline examples, evaluation metrics, and proposal-review questions.
-- [Revised English PDF](docs/proposal/proposal.pdf)
-- [Chinese review PDF](docs/proposal/proposal_zh.pdf)
+- [Concise English proposal PDF](docs/proposal/proposal_short.pdf)
+- [Concise Chinese review PDF](docs/proposal/proposal_short_zh.pdf)
+- [Concise English source](docs/proposal/proposal_short.md) / [Chinese source](docs/proposal/proposal_short_zh.md)
+- [Full English review PDF](docs/proposal/proposal.pdf)
+- [Full Chinese review PDF](docs/proposal/proposal_zh.pdf)
 - [Chinese Markdown](docs/proposal/proposal_zh.md)
 - [LaTeX source](docs/proposal/proposal.tex)
 - [Markdown content](docs/proposal/proposal.md)
@@ -16,7 +19,7 @@ The October 13 revision compares two pretrained baselines: YOLO11s-seg + class-g
 
 The proposal and its LaTeX support files remain together in [docs/proposal](docs/proposal). It now uses the supplied NeurIPS 2026 template with its standard single-column layout. The supplied archive is fully unpacked in [templates/neurips](templates/neurips). The earlier ACL files remain available in [templates/acl](templates/acl) and as inactive support files in the proposal folder.
 
-The proposal has two content pages excluding references and includes an abstract, related work, a proposed method, and all three authors' names. References begin on a separate page. Student ID lines are omitted at the team's request. Each student submits the same PDF individually. The final report limit is eight pages excluding references.
+Both editions include an abstract, related work, experimental design, evaluation, and all three authors' names. Student ID lines are omitted at the team's request. The complete team-reviewed design is retained in the full edition: five English body pages plus one reference page, and four Chinese body pages plus one reference page. At the team's request, the concise edition uses three body pages with references on a separate page, preserving headings, readable paragraphs and a four-group comparison table. The original course-format source is recorded in [template provenance](docs/proposal/TEMPLATE-PROVENANCE.md); the current review format does not reinterpret that source. Coursework submission is performed by the human, never by an agent.
 
 ## Build
 
@@ -38,13 +41,35 @@ rm -r "$proposal_build_dir"
 
 Inspect the resulting PDF after edits to confirm the layout and page count.
 
+For the concise edition, generate the separate source with references on their own page:
+
+```bash
+python tools/build_proposal.py --source docs/proposal/proposal_short.md --latex-output docs/proposal/proposal_short.tex
+python tools/build_proposal_zh.py --source docs/proposal/proposal_short_zh.md --output docs/proposal/proposal_short_zh.pdf
+```
+
+Compile `proposal_short.tex` with the same unchanged style and `references.bib`, using the isolated-build procedure above. The concise and full PDFs are separate files; do not overwrite the complete review edition when shortening the course proposal.
+
 The Chinese version follows the English version section by section and is intended for team review, not as a separate conference-template submission. Rebuild it with `python tools/build_proposal_zh.py` (requires ReportLab and Microsoft YaHei fonts; use `--font-regular` and `--font-bold` for other compatible CJK TrueType fonts).
 
 ## Revised experiment scope
 
-The target subset remains 200 labeled YouTube-VIS 2021 videos, with seed 550 and whole-video 60/20/20 splits: 120 for the planned adaptation study, 40 for validation, and 40 held out for evaluation. Split videos before sampling training frames. Both adapted pipelines reuse the same YOLO checkpoint selected on validation data, while thresholds and downstream policies remain fixed within each before/after pair. Counts and category coverage must be verified and frozen before tuning; these are planned counts, not a claim that the labeled dataset is already downloaded. Teaching clips are excluded from scoring and training.
+The target subset remains 200 labeled YouTube-VIS 2021 videos, with seed 550 and whole-video 60/20/20 splits: 120 for development, 40 for validation, and 40 held out for evaluation. The categories remain person, dog, cat, horse, and car. Split videos before sampling frames. Counts and coverage are planned until verified.
 
-Short local inference has been verified on the RTX 3080 (10 GB), but the complete automatic SAM wrapper and YOLO training still require pilots. School runs must observe current Rutgers access and scheduling rules; GPU availability is not assumed.
+| Controlled branch | Treatment at the correction event |
+| --- | --- |
+| A-H | Keep ByteTrack's motion state and apply a normal Kalman update |
+| A-R | Initialize motion state from the same box, with zero velocity and the default initial covariance |
+| B-H | Keep SAM's target history and add the same box prompt |
+| B-R | Clear the target's old inference state and initialize it from that box |
+
+H/R branches within a pipeline share the pre-correction run, target ID, correction information, and normal subsequent input schedule. A reset does not assign a new external ID or reset other targets. The two systems' internal state types are different; compare each H/R pair first, then analyze the conditions and duration of the differences.
+
+Actual YOLO boxes and annotation-derived current-frame reference boxes are separate diagnostic conditions. The controlled experiment explicitly supplies the target correspondence; full automatic A0/B0 results do not use that correspondence or annotation prompts. Already-deleted tracks are reported separately from common events where both systems retain usable state. Recovery experiments measure correct target following, recovery time and recurrence, with association diagnostics for ByteTrack and mask diagnostics for SAM.
+
+Fix event selection, thresholds, observation windows, and any follow-up policy on development/validation data before held-out evaluation. Model weights stay fixed throughout the core study. A simple automatic policy is optional only if the controlled findings support it; the paired analysis remains a complete research result if no policy improves the systems.
+
+Short local inference has been verified on the RTX 3080 (10 GB), but the complete automatic SAM wrapper, paired state interventions, and benchmark evaluation still require implementation and pilots. School runs must observe current Rutgers access and scheduling rules; GPU availability is not assumed.
 
 ## Pilot resources
 
