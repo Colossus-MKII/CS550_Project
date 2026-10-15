@@ -54,7 +54,7 @@ H 组也接收纠正。保留外部 ID，仅在各自配对内统一纠正后的
 
 ## 4 数据与控制
 
-从 YouTube-VIS 2021 训练集选择 200 段标注视频，覆盖人、狗、猫、马和汽车。种子 550，按完整视频划分 120 开发、40 验证、40 保留评估；同源片段同组，先划分再抽帧。
+通过 SlotCurri 的 Google Drive 预处理版本（Moon et al., 2026）获取 YouTube-VIS 2021。目标为 200 段带标注视频，覆盖人、狗、猫、马和汽车，数量以标注及类别覆盖核验为准。使用带标注的导出部分；其文档中的训练导出不含掩码。种子 550，按完整视频划分 120 开发、40 验证、40 保留评估；同源片段同组，先划分再抽帧。
 
 小规模预实验核验干预、事件覆盖、标注密度与观察长度；查看保留评估前锁定事件规则、恢复阈值、窗口及可能的策略。使用相同有序帧及外部缩放，记录预处理与版本，输出映射回标注坐标，仅向前处理。纠正前真实重合度只作事后诊断代理，不输入自动策略；自然场景相关性不单独证明因果。实现控制细节见完整审阅稿。
 
@@ -79,6 +79,8 @@ Cao et al. 2023. [Observation-Centric SORT: Rethinking SORT for Robust Multi-Obj
 Ding et al. 2025. [SAM2Long: Enhancing SAM 2 for Long Video Segmentation with a Training-Free Memory Tree](https://arxiv.org/abs/2410.16268). ICCV.
 
 Luiten et al. 2020. [HOTA: A Higher Order Metric for Evaluating Multi-Object Tracking](https://arxiv.org/abs/2009.07736).
+
+Moon et al. 2026. [Reconstruction-Guided Slot Curriculum: Addressing Object Over-Fragmentation in Video Object-Centric Learning](https://github.com/wjun0830/SlotCurri). CVPR.
 
 Ravi et al. 2024. [SAM 2: Segment Anything in Images and Videos](https://arxiv.org/abs/2408.00714).
 

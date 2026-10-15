@@ -106,7 +106,7 @@ Compare within-pipeline effects before cross-system patterns; detection frequenc
 
 \section{Data and controls}
 
-Select 200 annotated YouTube-VIS 2021 training videos covering person, dog, cat, horse, and car. With seed 550, split whole videos into 120 development, 40 validation, and 40 held-out evaluation videos; keep same-source clips together before frame sampling.
+Obtain preprocessed YouTube-VIS 2021 through SlotCurri's Google Drive release \citep{moon2026}. Target 200 annotated videos covering person, dog, cat, horse, and car, subject to label and category coverage. Use the annotated export; the documented training export omits masks. With seed 550, split whole videos into 120 development, 40 validation, and 40 held-out evaluation videos; keep same-source clips together before frame sampling.
 
 A small pilot checks interventions, event coverage, annotation density, and observation length. Freeze event rules, recovery thresholds, windows, and any policy before inspecting held-out results. Use identical ordered frames and external resizing, record preprocessing and versions, and map outputs to annotation coordinates. Process forward only. Pre-correction true overlap is an offline diagnostic proxy, not a policy input; natural-scene correlations alone do not establish causality. The full review details implementation controls.
 

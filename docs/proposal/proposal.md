@@ -101,7 +101,7 @@ All core experiments freeze YOLO and SAM weights; detector fine-tuning is not in
 
 ## 4 Dataset and experimental controls
 
-Retain the original data plan: select 200 annotated videos from the official YouTube-VIS 2021 training set, covering person, dog, cat, horse, and car (Yang et al., 2021). With seed 550, split whole videos into 120 development, 40 validation, and 40 held-out evaluation videos. Keep clips from the same source together and split videos before extracting frames.
+Retain the original target: select 200 annotated YouTube-VIS 2021 videos covering person, dog, cat, horse, and car, using the preprocessed Google Drive release linked by SlotCurri (Moon et al., 2026). Verify labeled-video and category coverage before confirming this target: the documented training export is video-only, while the validation export includes instance masks. With seed 550, split whole videos into 120 development, 40 validation, and 40 held-out evaluation videos. Keep clips from the same source together and split videos before extracting frames.
 
 The development set supports implementation, pilot experiments, and candidate-rule exploration; validation supports diagnosis and configuration selection. Start the recovery study with a small event subset to verify correct implementation of the interventions and check scenario coverage, annotation density, and observation length. Freeze event rules, recovery criteria, and any automatic policy before inspecting held-out evaluation results.
 
@@ -155,12 +155,12 @@ Jonathon Luiten, Aljosa Osep, Patrick Dendorfer, Philip Torr, Andreas Geiger, La
 
 Jonathon Luiten and Arne Hoffhues. 2020. [TrackEval](https://github.com/JonathonLuiten/TrackEval). Evaluation software.
 
+WonJun Moon, Hyun Seok Seong, and Jae-Pil Heo. 2026. [Reconstruction-Guided Slot Curriculum: Addressing Object Over-Fragmentation in Video Object-Centric Learning](https://github.com/wjun0830/SlotCurri). CVPR.
+
 Nikhila Ravi et al. 2024. [SAM 2: Segment Anything in Images and Videos](https://arxiv.org/abs/2408.00714). arXiv:2408.00714.
 
 Ergys Ristani, Francesco Solera, Roger Zou, Rita Cucchiara, and Carlo Tomasi. 2016. [Performance Measures and a Data Set for Multi-Target, Multi-Camera Tracking](https://arxiv.org/abs/1609.01775). ECCV Workshops.
 
 Cheng-Yen Yang, Hsiang-Wei Huang, Wenhao Chai, Zhongyu Jiang, and Jenq-Neng Hwang. 2024. [SAMURAI: Adapting Segment Anything Model for Zero-Shot Visual Tracking with Motion-Aware Memory](https://arxiv.org/abs/2411.11922). arXiv:2411.11922.
-
-Linjie Yang, Yuchen Fan, Yang Fu, and Ning Xu. 2021. [The 3rd Large-scale Video Object Segmentation Challenge - Video Instance Segmentation Track](https://youtube-vos.org/dataset/vis/).
 
 Yifu Zhang, Peize Sun, Yi Jiang, Dongdong Yu, Fucheng Weng, Zehuan Yuan, Ping Luo, Wenyu Liu, and Xinggang Wang. 2021. [ByteTrack: Multi-Object Tracking by Associating Every Detection Box](https://arxiv.org/abs/2110.06864). arXiv:2110.06864.

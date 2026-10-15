@@ -10,7 +10,7 @@ The large files themselves are intentionally ignored by Git:
 
 Official project sources:
 
-- YouTube-VIS 2021: <https://youtube-vos.org/dataset/vis/>
+- YouTube-VIS 2021 (via SlotCurri Google Drive archive): <https://github.com/wjun0830/SlotCurri>
 - Ultralytics YOLO11: <https://docs.ultralytics.com/models/yolo11/>
 - Meta SAM 2.1: <https://github.com/facebookresearch/sam2>
 - Segment and Track Anything: <https://github.com/z-x-yang/Segment-and-Track-Anything>

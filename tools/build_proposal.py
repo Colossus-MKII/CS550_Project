@@ -28,7 +28,7 @@ CITATIONS = {
     "Meta AI, 2026": "meta2026",
     "OpenCV, 2026": "opencv2026",
     "Ultralytics, 2026": "ultralytics2026",
-    "Yang et al., 2021": "yang2021",
+    "Moon et al., 2026": "moon2026",
     "Voigtlaender et al., 2019": "voigtlaender2019",
     "Yang and Yang, 2022": "yang2022",
     "Zhang et al., 2021": "zhang2021",

@@ -54,7 +54,7 @@ Compare within-pipeline effects before cross-system patterns; detection frequenc
 
 ## 4 Data and controls
 
-Select 200 annotated YouTube-VIS 2021 training videos covering person, dog, cat, horse, and car. With seed 550, split whole videos into 120 development, 40 validation, and 40 held-out evaluation videos; keep same-source clips together before frame sampling.
+Obtain preprocessed YouTube-VIS 2021 through SlotCurri's Google Drive release (Moon et al., 2026). Target 200 annotated videos covering person, dog, cat, horse, and car, subject to label and category coverage. Use the annotated export; the documented training export omits masks. With seed 550, split whole videos into 120 development, 40 validation, and 40 held-out evaluation videos; keep same-source clips together before frame sampling.
 
 A small pilot checks interventions, event coverage, annotation density, and observation length. Freeze event rules, recovery thresholds, windows, and any policy before inspecting held-out results. Use identical ordered frames and external resizing, record preprocessing and versions, and map outputs to annotation coordinates. Process forward only. Pre-correction true overlap is an offline diagnostic proxy, not a policy input; natural-scene correlations alone do not establish causality. The full review details implementation controls.
 
@@ -79,6 +79,8 @@ Cao et al. 2023. [Observation-Centric SORT: Rethinking SORT for Robust Multi-Obj
 Ding et al. 2025. [SAM2Long: Enhancing SAM 2 for Long Video Segmentation with a Training-Free Memory Tree](https://arxiv.org/abs/2410.16268). ICCV.
 
 Luiten et al. 2020. [HOTA: A Higher Order Metric for Evaluating Multi-Object Tracking](https://arxiv.org/abs/2009.07736).
+
+Moon et al. 2026. [Reconstruction-Guided Slot Curriculum: Addressing Object Over-Fragmentation in Video Object-Centric Learning](https://github.com/wjun0830/SlotCurri). CVPR.
 
 Ravi et al. 2024. [SAM 2: Segment Anything in Images and Videos](https://arxiv.org/abs/2408.00714).
 

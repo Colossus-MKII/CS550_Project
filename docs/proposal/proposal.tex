@@ -114,9 +114,15 @@ Group & Historical-state treatment & Corrective operation \\
 
 A-H & Retain ByteTrack motion state & Perform a normal Kalman update with the corrective box \\
 
+\addlinespace[3pt]
+
 A-R & Reinitialize ByteTrack motion state & Initialize position and size from the corrective box, zero velocities, and set covariance using the default initialization rule \\
 
+\addlinespace[3pt]
+
 B-H & Retain SAM target history & Add the same box prompt to the existing target \\
+
+\addlinespace[3pt]
 
 B-R & Rebuild SAM target inference state & Clear that target's old prompts, visual memory, and associated state, then initialize with the same box prompt \\
 
@@ -168,7 +174,7 @@ All core experiments freeze YOLO and SAM weights; detector fine-tuning is not in
 
 \section{Dataset and experimental controls}
 
-Retain the original data plan: select 200 annotated videos from the official YouTube-VIS 2021 training set, covering person, dog, cat, horse, and car \citep{yang2021}. With seed 550, split whole videos into 120 development, 40 validation, and 40 held-out evaluation videos. Keep clips from the same source together and split videos before extracting frames.
+Retain the original target: select 200 annotated YouTube-VIS 2021 videos covering person, dog, cat, horse, and car, using the preprocessed Google Drive release linked by SlotCurri \citep{moon2026}. Verify labeled-video and category coverage before confirming this target: the documented training export is video-only, while the validation export includes instance masks. With seed 550, split whole videos into 120 development, 40 validation, and 40 held-out evaluation videos. Keep clips from the same source together and split videos before extracting frames.
 
 The development set supports implementation, pilot experiments, and candidate-rule exploration; validation supports diagnosis and configuration selection. Start the recovery study with a small event subset to verify correct implementation of the interventions and check scenario coverage, annotation density, and observation length. Freeze event rules, recovery criteria, and any automatic policy before inspecting held-out evaluation results.
 

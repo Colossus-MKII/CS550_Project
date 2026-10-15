@@ -81,4 +81,4 @@ Download the pretrained checkpoints and small smoke-test videos used by the prop
 powershell -ExecutionPolicy Bypass -File tools/download_project_resources.ps1
 ```
 
-The downloaded files are ignored by Git. Their source URLs, sizes, and SHA-256 hashes are recorded in `resources/downloaded-resources.json`. See [data/README.md](data/README.md) for the authenticated YouTube-VIS 2021 download and video-level subset procedure, and [models/README.md](models/README.md) for model roles and upstream sources.
+The downloaded files are ignored by Git. Their source URLs, sizes, and SHA-256 hashes are recorded in `resources/downloaded-resources.json`. See [data/README.md](data/README.md) for the YouTube-VIS 2021 download via [SlotCurri](https://github.com/wjun0830/SlotCurri) (Google Drive) and video-level subset procedure, and [models/README.md](models/README.md) for model roles and upstream sources.

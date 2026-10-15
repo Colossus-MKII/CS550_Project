@@ -12,25 +12,36 @@ powershell -ExecutionPolicy Bypass -File tools/download_project_resources.ps1 -V
 
 It downloads the five small videos distributed with Meta's official SAM 2 demo into `data/pilot/videos/`. These files are useful for installation and inference smoke tests, but they are **not** the evaluation dataset and do not include YouTube-VIS ground truth.
 
-## YouTube-VIS 2021
+## YouTube-VIS 2021 (via SlotCurri Google Drive release)
 
-The proposal fixes the experimental dataset to YouTube-VIS 2021. Its official page is:
+The proposal retains YouTube-VIS 2021. Because the team could not complete CodaLab registration, the planned access route is the preprocessed Google Drive release linked by **SlotCurri** (Moon et al., 2026). SlotCurri supplies this distribution; it is not the original dataset creator.
 
-- <https://youtube-vos.org/dataset/vis/>
-- Official 2021 CodaLab download: <https://codalab.lisn.upsaclay.fr/competitions/7680>
+- Repository: <https://github.com/wjun0830/SlotCurri>
+- Google Drive archive (`ytvis2021_resized.zip`, 26.43 GB): <https://drive.google.com/file/d/1Iv-2zK6MnH0oDFTx9iBgQcPNh5PBzM7i/view?usp=sharing>
 
-CodaLab requires a signed-in account and acceptance of its participation/usage terms, so the archive is not downloaded by the unattended resource script. Download the 2021 training archive and annotations from the official competition page, then extract them under:
+The README advertises a 26.43 GB download. The archive has not been downloaded or inspected here; its actual contents and usable counts must be verified before fixing the experimental subset.
+
+The upstream [preparation script](https://github.com/wjun0830/SlotCurri/blob/main/data/save_ytvis2021.py) and [configuration](https://github.com/wjun0830/SlotCurri/blob/main/configs/slotcurri/ytvis2021.yaml) document the expected layout:
+
+- Resized WebDataset `.tar` shards under `ytvis2021_resized`, with a default short side of 320 pixels. The configuration names 84 training shards and 30 validation shards; these are expected paths, not a verified archive inventory.
+- The documented training command uses `--only-videos` and exports `video.npy` without masks. The validation command includes `segmentations.npy` with shape `(F, H, W, num_obj)`; each object's channel contains its mask multiplied by its category ID.
+- The current script derives both parts from the original labeled training data and reserves its final 300 video IDs for validation. This is an internal split, not the official challenge validation split; confirm that the downloaded release matches the script before relying on these counts.
+- Sample keys preserve source video IDs. Instance channels provide within-video correspondence, but original annotation IDs and frame filenames are not explicitly exported. Preserve channel identity during conversion, verify categories and frame ordering, and record the preprocessing and source mapping.
+
+Use the annotated portion for scored experiments. The target of 200 videos covering all five categories remains provisional until label availability and category counts are checked. The video-only portion can support inference smoke tests but cannot supply ground truth for MOTS evaluation.
+
+After converting annotated shards to frames and YTVIS-format JSON, place them under:
 
 ```text
 data/raw/youtube_vis_2021/
   train/
-    JPEGImages/          # exact archive layout may include another train subdirectory
-  instances_train.json   # use the actual extracted filename/path
+    JPEGImages/          # extracted video frames
+  instances_train.json   # COCO/YTVIS-format annotations
 ```
 
 Do not commit the dataset. `data/raw/` is ignored by Git.
 
-After extraction, create a reproducible, video-level pilot split for the five proposal categories:
+After extraction/conversion, create a reproducible, video-level pilot split for the five proposal categories:
 
 ```powershell
 python tools/select_ytvis_subset.py `

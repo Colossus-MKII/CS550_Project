@@ -102,7 +102,7 @@ A-H/A-R 保持相同的外部 ID、纠正后的存活状态及生命周期处理
 
 ## 4 数据集与实验控制
 
-保留原数据计划：从 YouTube-VIS 2021 官方训练集选择 200 段带标注视频，覆盖人、狗、猫、马和汽车（Yang et al., 2021）。以随机种子 550 按完整视频划分为 120 段开发、40 段验证和 40 段保留评估。同源片段放在同组，先划分视频，再抽取帧。
+保留原目标：通过 SlotCurri 链接的 Google Drive 预处理版本获取 YouTube-VIS 2021，选择 200 段带标注视频，覆盖人、狗、猫、马和汽车（Moon et al., 2026）。确认该目标前，先核验带标注视频及类别覆盖：其文档中的训练导出仅含视频，验证导出才包含实例掩码。以随机种子 550 按完整视频划分为 120 段开发、40 段验证和 40 段保留评估。同源片段放在同组，先划分视频，再抽取帧。
 
 开发集用于实现、预实验和候选规则探索；验证集用于诊断及确定设置。恢复研究先在其中的小规模事件集上验证干预是否正确实现，并核验场景覆盖、标注密度和观察长度。事件规则、恢复标准及可能的自动策略均在查看保留评估结果之前固定。
 
@@ -156,12 +156,12 @@ Jonathon Luiten, Aljosa Osep, Patrick Dendorfer, Philip Torr, Andreas Geiger, La
 
 Jonathon Luiten and Arne Hoffhues. 2020. [TrackEval](https://github.com/JonathonLuiten/TrackEval). Evaluation software.
 
+WonJun Moon, Hyun Seok Seong, and Jae-Pil Heo. 2026. [Reconstruction-Guided Slot Curriculum: Addressing Object Over-Fragmentation in Video Object-Centric Learning](https://github.com/wjun0830/SlotCurri). CVPR.
+
 Nikhila Ravi et al. 2024. [SAM 2: Segment Anything in Images and Videos](https://arxiv.org/abs/2408.00714). arXiv:2408.00714.
 
 Ergys Ristani, Francesco Solera, Roger Zou, Rita Cucchiara, and Carlo Tomasi. 2016. [Performance Measures and a Data Set for Multi-Target, Multi-Camera Tracking](https://arxiv.org/abs/1609.01775). ECCV Workshops.
 
 Cheng-Yen Yang, Hsiang-Wei Huang, Wenhao Chai, Zhongyu Jiang, and Jenq-Neng Hwang. 2024. [SAMURAI: Adapting Segment Anything Model for Zero-Shot Visual Tracking with Motion-Aware Memory](https://arxiv.org/abs/2411.11922). arXiv:2411.11922.
-
-Linjie Yang, Yuchen Fan, Yang Fu, and Ning Xu. 2021. [The 3rd Large-scale Video Object Segmentation Challenge - Video Instance Segmentation Track](https://youtube-vos.org/dataset/vis/).
 
 Yifu Zhang, Peize Sun, Yi Jiang, Dongdong Yu, Fucheng Weng, Zehuan Yuan, Ping Luo, Wenyu Liu, and Xinggang Wang. 2021. [ByteTrack: Multi-Object Tracking by Associating Every Detection Box](https://arxiv.org/abs/2110.06864). arXiv:2110.06864.
