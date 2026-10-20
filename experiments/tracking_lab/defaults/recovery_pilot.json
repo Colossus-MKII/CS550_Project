@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "seed": 550,
+  "role": "development_smoke_pilot_not_final_protocol",
+  "window": 8,
+  "mask_iou_threshold": 0.5,
+  "streak_required": 3,
+  "anchor_mask_iou": 0.5,
+  "correction_box_min_iou": 0.3,
+  "conditions": ["yolo", "reference"],
+  "events": [
+    {"name": "cat-stable", "video_id": 2689, "gt_id": 2, "category": "cat", "frame": 20, "purpose": "reliable-history control"},
+    {"name": "rider-ambiguity", "video_id": 2686, "gt_id": 1, "category": "person", "frame": 20, "purpose": "identity/segmentation ambiguity with retained state"},
+    {"name": "horse-drift", "video_id": 2718, "gt_id": 2, "category": "horse", "frame": 35, "purpose": "drift with an existing SAM target"},
+    {"name": "dog-eligibility", "video_id": 2744, "gt_id": 1, "category": "dog", "frame": 10, "purpose": "eligibility audit; do not fabricate a retained track"}
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "seed": 550,
+  "role": "local_development_single_scheduled_target_refresh_skip_frozen_before_inference",
+  "window": 30,
+  "report_windows": [8, 20, 30],
+  "mask_iou_threshold": 0.5,
+  "streak_required": 3,
+  "anchor_mask_iou": 0.5,
+  "correction_box_min_iou": 0.3,
+  "conditions": ["yolo", "reference"],
+  "byte_association_diagnostics": true,
+  "sam_skip_next_refresh": true,
+  "events": [
+    {"name": "equestrian-person-poor-mask", "video_id": 2718, "gt_id": 1, "category": "person", "frame": 14, "purpose": "Same reviewed rider event, longer follow-up; never select by H/R outcome"},
+    {"name": "cat-stable-control", "video_id": 2689, "gt_id": 2, "category": "cat", "frame": 20, "purpose": "Same SAM-stable cat control, longer follow-up including lifecycle changes"}
+  ]
+}

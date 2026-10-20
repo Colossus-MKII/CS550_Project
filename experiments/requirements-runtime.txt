@@ -1,0 +1,14 @@
+# Install a CUDA-compatible torch/torchvision pair separately for the allocated GPU.
+ultralytics==8.3.221
+numpy==2.2.6
+scipy==1.18.1
+opencv-python==4.12.0.88
+lap==0.5.12
+imageio-ffmpeg==0.6.0
+hydra-core==1.3.2
+iopath==0.1.10
+Pillow==12.3.0
+matplotlib==3.11.2
+pytest==8.4.2
+requests>=2.32,<3
+# SAM-2 is installed separately from the pinned upstream source revision.

@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cs550-tracking-experiments"
+version = "0.1.0"
+description = "Portable A0/B0 video tracking experiments and ground-truth evaluation"
+requires-python = ">=3.12"
+
+[project.scripts]
+cs550-run = "tracking_lab.run:main"
+cs550-report = "tracking_lab.report:main"
+cs550-verify = "tracking_lab.verify:main"
+cs550-prepare = "tracking_lab.prepare:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tracking_lab*"]
+
+[tool.setuptools.package-data]
+tracking_lab = ["defaults/*.json", "report.html", "report.js"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

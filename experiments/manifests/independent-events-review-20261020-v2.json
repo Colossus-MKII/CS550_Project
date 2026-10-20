@@ -1,0 +1,7332 @@
+{
+  "schema": 1,
+  "status": "awaiting_human_review_NOT_executable_HR_config",
+  "approved": false,
+  "H_R_run": false,
+  "device_scope": "local_RTX_3080_only",
+  "events": [
+    {
+      "video_id": 2719,
+      "gt_id": 1,
+      "category": "car",
+      "frame": 10,
+      "frames": 42,
+      "area": 19361,
+      "area_fraction": 0.10651958626760563,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 10,
+      "relative_acceleration": 0.008266745426844833,
+      "relative_speed": 0.03336840816327053,
+      "turn_angle": 5.8838187491832565,
+      "background_flow": {
+        "shift": [
+          -19.30810546875,
+          -0.42568206787109375
+        ],
+        "features": 131
+      },
+      "same_class_gt_overlap": 0.020682837807010874,
+      "same_class_nearby": 2,
+      "area_ratio_to_prefix_median": 0.8807260155574762,
+      "anchors": {
+        "A0": {
+          "prediction_id": 2,
+          "anchor_frame": 0,
+          "anchor_iou": 0.9573428961748633
+        },
+        "B0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.940752242926156
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 10,
+          "visible_frames": 10,
+          "mean_fixed_id_iou": 0.9495171308420428
+        },
+        "B0": {
+          "qualified_frames": 10,
+          "visible_frames": 10,
+          "mean_fixed_id_iou": 0.9471881963107099
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 2,
+          "category": "car",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            150.47776873903945,
+            104.13605935725778,
+            331.5812719911,
+            248.8541080566944
+          ],
+          "mean": [
+            241.02952036506971,
+            176.4950837069761,
+            1.2514230593876543,
+            144.71804869943662,
+            -15.489923467943004,
+            -1.124038579221959,
+            -1.4726576240316116e-07,
+            -2.0414217228208793
+          ],
+          "covariance_diagonal": [
+            36.134259687826955,
+            36.134259687826955,
+            0.000733023755554425,
+            36.134259687826955,
+            10.58961222948906,
+            10.58961222948906,
+            9.999963983023534e-10,
+            10.58961222948906
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 5
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 1,
+        "box": [
+          149.7334442138672,
+          107.09033203125,
+          309.8409729003906,
+          252.16917419433594
+        ],
+        "score": 0.7458046674728394,
+        "box_iou": 0.8993567265296163
+      },
+      "reference_correction": {
+        "box": [
+          145.0,
+          108.0,
+          321.0,
+          253.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 1,
+          "score": 0.7458046674728394,
+          "box_iou": 0.8993567265296163
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.9318043434138421,
+        "B0": 0.913573407202216
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 15,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 20,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 25,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 1
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        }
+      ],
+      "scene": "stable",
+      "title_zh": "道路前方黑色汽车：稳定跟车",
+      "rationale_zh": "同一前车连续可见，t0 没有明显近邻交叠；固定 ID 在自动 A0/B0 后续 30 步均保持合格，用作重置是否无端破坏正常轨迹的对照。",
+      "caveat_zh": "相机也在行驶；稳定指跟踪与分割稳定，不代表车辆或相机静止。",
+      "secondary_tags": [
+        "moving_camera",
+        "car",
+        "ceiling_control"
+      ],
+      "event_id": "E01",
+      "group_id": "visual-2719",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        20,
+        30,
+        40
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\01-stable-2719-GT1-t10.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\01-stable-2719-GT1-t10-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 11,
+              "mask_iou": 0.9460974332111053
+            },
+            {
+              "frame": 12,
+              "mask_iou": 0.9557999020194873
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.9490771259063941
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.9337770382695507
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.9589033415564028
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.9519891039101073
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.9343540037449058
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.9444601071327883
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.9593426589332423
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.9577825656553893
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.9516584333098095
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.9641486810551558
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.9506120979356697
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.9512952130834428
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.9375450829526328
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.9444813227928308
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.926348358915246
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.932373046875
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.951127119170341
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.9582599949710837
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.9455085656489032
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.9377184620273276
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.9426557439512288
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.9433938556260602
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.9439974659486855
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.952975233193953
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.9400974858902001
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.9643439149990223
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.941116622154394
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.959936507936508
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 11,
+              "mask_iou": 0.9282799748901444
+            },
+            {
+              "frame": 12,
+              "mask_iou": 0.9483267716535433
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.9509083880943178
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.930655509065551
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.9481401800373662
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.9502003434459073
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.9186771931761718
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.9360131720887981
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.9379491274096042
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.9432362913597568
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.9564624236312949
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.9494140157856972
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.9509732801354129
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.9474352770384709
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.9396217264791464
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.9237722941607622
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.9311210432865977
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.92969808995687
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.9463659147869674
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.9436931243680485
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.9454103809767322
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.9442807736646599
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.9427602967510872
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.9337391414621774
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.929049105152538
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.9430584281282316
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.9341309661649299
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.9568733153638814
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.9336541546358679
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.9407227994136019
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 18,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 30,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 40,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "dec77cd5b4cbb337de8b2b9216ca97ab145abf620b5ebc5c27fec805064184e2",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2719",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2845,
+      "gt_id": 1,
+      "category": "person",
+      "frame": 10,
+      "frames": 54,
+      "area": 3872,
+      "area_fraction": 0.02130281690140845,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 10,
+      "relative_acceleration": 0.058532678970222254,
+      "relative_speed": 0.018597458042153875,
+      "turn_angle": 51.431145024227106,
+      "background_flow": {
+        "shift": [
+          -0.3820953369140625,
+          0.10259246826171875
+        ],
+        "features": 150
+      },
+      "same_class_gt_overlap": 0.0,
+      "same_class_nearby": 0,
+      "area_ratio_to_prefix_median": 0.6032092226203458,
+      "anchors": {
+        "A0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.9082551939694797
+        },
+        "B0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8753231829933927
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 10,
+          "visible_frames": 10,
+          "mean_fixed_id_iou": 0.8984082109950242
+        },
+        "B0": {
+          "qualified_frames": 10,
+          "visible_frames": 10,
+          "mean_fixed_id_iou": 0.884003947329808
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 1,
+          "category": "person",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            241.4641255935993,
+            75.10124639934077,
+            330.08412716519615,
+            240.8491833509541
+          ],
+          "mean": [
+            285.7741263793977,
+            157.97521487514743,
+            0.534667297834709,
+            165.74793695161333,
+            8.871126582488492,
+            -1.6326983883544255,
+            -1.4020491124409062e-07,
+            -9.392283667992054
+          ],
+          "covariance_diagonal": [
+            48.87551015991146,
+            48.87551015991146,
+            0.000733023755554425,
+            48.87551015991146,
+            18.619737338503075,
+            18.619737338503075,
+            9.999963983023534e-10,
+            18.619737338503075
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 5
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 0,
+        "box": [
+          255.68617248535156,
+          74.35970306396484,
+          304.9512023925781,
+          238.0924530029297
+        ],
+        "score": 0.8542121648788452,
+        "box_iou": 0.871792948052555
+      },
+      "reference_correction": {
+        "box": [
+          256.0,
+          75.0,
+          311.0,
+          236.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 0,
+          "score": 0.8542121648788452,
+          "box_iou": 0.871792948052555
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.8778119820033152,
+        "B0": 0.8595653212323859
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 15,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 20,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 25,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        }
+      ],
+      "scene": "stable",
+      "title_zh": "海边单人慢跑：稳定身份、缓慢尺度变化",
+      "rationale_zh": "人物独立、背景无相近人体竞争；自动两套基线锁定的原 ID 在之后 30 步都合格，保留自然运动而非只用静态画面。",
+      "caveat_zh": "逆光且人物逐渐变小，不能把它称作无外观变化的理想静态对照。",
+      "secondary_tags": [
+        "backlighting",
+        "gradual_scale_change",
+        "ceiling_control"
+      ],
+      "event_id": "E02",
+      "group_id": "visual-2845",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        20,
+        30,
+        40
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\02-stable-2845-GT1-t10.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\02-stable-2845-GT1-t10-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 11,
+              "mask_iou": 0.844055140723722
+            },
+            {
+              "frame": 12,
+              "mask_iou": 0.9074116305587229
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.8908780903665814
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.8411803713527851
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.7984449760765551
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.8251946213729653
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.8368816530995616
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.8482758620689655
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.8368183681836818
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.8631541725601132
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.8626746506986028
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.848507744616547
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.8257275132275133
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.8571428571428571
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.8491504351429755
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.8078260869565217
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.8255984367366879
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.837953091684435
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.8114882506527415
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.8153347732181425
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.8053097345132744
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.8176638176638177
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.7856328392246295
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8045112781954887
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.7989097516656571
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.8160112359550562
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.8137817883511075
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.7899231426131511
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.7600267379679144
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.7569352708058125
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 11,
+              "mask_iou": 0.8618281202550866
+            },
+            {
+              "frame": 12,
+              "mask_iou": 0.8141082519964508
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.814535666218035
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.7747047855811062
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.8299280575539568
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.7580698835274542
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.7547683923705722
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.792729404866608
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.7325581395348837
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.8429261047159302
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.7740134028294863
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.8489702517162472
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.8693485226059096
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.8894736842105263
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.8812191842223218
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.8753032508491024
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.8629414865577227
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.9142689371697005
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.8747139588100686
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.8600823045267489
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.8422601530311948
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.8492252681764004
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.84
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.9069010416666666
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.8735709482178884
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.884853168469861
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.8907488986784141
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.8635547576301615
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.7879432624113475
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.8155792276964048
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 18,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 30,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 40,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "2d347ed2e0c65d3052e0341a444eb0ae5abaa726870de0167bf180558fe8879f",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2845",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2859,
+      "gt_id": 1,
+      "category": "person",
+      "frame": 10,
+      "frames": 45,
+      "area": 5260,
+      "area_fraction": 0.02893926056338028,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 10,
+      "relative_acceleration": 0.07666915853308115,
+      "relative_speed": 0.03384555739524074,
+      "turn_angle": 19.78460194892452,
+      "background_flow": {
+        "shift": [
+          0.40203094482421875,
+          -0.448150634765625
+        ],
+        "features": 123
+      },
+      "same_class_gt_overlap": 0.0,
+      "same_class_nearby": 0,
+      "area_ratio_to_prefix_median": 1.133132270573029,
+      "anchors": {
+        "A0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8519072550486163
+        },
+        "B0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8691247974068071
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 10,
+          "visible_frames": 10,
+          "mean_fixed_id_iou": 0.8759457987775384
+        },
+        "B0": {
+          "qualified_frames": 10,
+          "visible_frames": 10,
+          "mean_fixed_id_iou": 0.856565936087239
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 1,
+          "category": "person",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            333.1047201974324,
+            131.1083748197237,
+            405.75356868402196,
+            278.85312667842095
+          ],
+          "mean": [
+            369.4291444407272,
+            204.98075074907234,
+            0.49171864024023515,
+            147.74475185869727,
+            1.3376971798648531,
+            -0.08345283671021042,
+            6.123773969604791e-08,
+            -0.9913019761642606
+          ],
+          "covariance_diagonal": [
+            36.33901483690043,
+            36.33901483690043,
+            0.000733023755554425,
+            36.33901483690043,
+            10.891927583205668,
+            10.891927583205668,
+            9.999963983023534e-10,
+            10.891927583205668
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 5
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 0,
+        "box": [
+          327.013427734375,
+          117.88206481933594,
+          402.57379150390625,
+          269.04150390625
+        ],
+        "score": 0.8936512470245361,
+        "box_iou": 0.9165055739256983
+      },
+      "reference_correction": {
+        "box": [
+          332.0,
+          119.0,
+          403.0,
+          270.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 0,
+          "score": 0.8936512470245361,
+          "box_iou": 0.9165055739256983
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.8960763520678685,
+        "B0": 0.8670172802404207
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 15,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 20,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 25,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        }
+      ],
+      "scene": "stable",
+      "title_zh": "网球单人：击球姿态变化下的稳定基线",
+      "rationale_zh": "单一可见人体，无近邻同类竞争；两套自动基线未来 30 个可见步骤的固定 ID 均合格，可检查正常跟踪时重置的潜在损失。",
+      "caveat_zh": "击球存在肢体运动；本层按基线稳定性而不是目标完全不动来定义。",
+      "secondary_tags": [
+        "articulation",
+        "single_person",
+        "ceiling_control"
+      ],
+      "event_id": "E03",
+      "group_id": "visual-2859",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        20,
+        30,
+        40
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\03-stable-2859-GT1-t10.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\03-stable-2859-GT1-t10-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 11,
+              "mask_iou": 0.8963464696223317
+            },
+            {
+              "frame": 12,
+              "mask_iou": 0.8959637383984459
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.867898059387421
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.8319898175647009
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.8444214876033058
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.8936396511380558
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.8807544757033248
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.8852247009376011
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.8692915927061481
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.8947566246946063
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.8709480122324159
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.8573381950774841
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.889415822375512
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.8824851829143675
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.86875
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.8668711656441718
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.8772548206510471
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.8325697625989171
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.8768209083119108
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.8747180643838425
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.8716129032258064
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.8875567077122488
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8983860342555995
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8548577201549082
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.8869742449508986
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.8399773285471377
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.8305899759570926
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.89678984695782
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.8650615901455767
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.874503686897334
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 11,
+              "mask_iou": 0.8822877410773664
+            },
+            {
+              "frame": 12,
+              "mask_iou": 0.8940381928272008
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.8469696969696969
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.8620361560418649
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.8050660792951542
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.8551380715255772
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.8758933240369531
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.893719806763285
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.8669700682653597
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.8612623512805001
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.8920734437975817
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.9275436793422405
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.892074592074592
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.8811312417145383
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.8781214203894616
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.8788841007031073
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.8807256235827664
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.8336343115124154
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.835644464651057
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.8611733094491715
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.852519244226732
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.8532030022691569
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8441201716738197
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8291379310344827
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.8697470623381797
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.8304366256888512
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.7929892891918209
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.8704549970196702
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.841248097412481
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.8431192660550458
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 18,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 30,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 40,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "671e7e4d9e57df8f5967bd929aa7307d9fe557337b37be84266bc2b3943af6c9",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2859",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2965,
+      "gt_id": 1,
+      "category": "person",
+      "frame": 10,
+      "frames": 60,
+      "area": 2863,
+      "area_fraction": 0.015751540492957745,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 10,
+      "relative_acceleration": 0.03903779091311111,
+      "relative_speed": 0.09970278898367083,
+      "turn_angle": 22.41050743194043,
+      "background_flow": {
+        "shift": [
+          2.2522125244140625,
+          -3.6807479858398438
+        ],
+        "features": 144
+      },
+      "same_class_gt_overlap": 0.0,
+      "same_class_nearby": 0,
+      "area_ratio_to_prefix_median": 1.1835469202149649,
+      "anchors": {
+        "A0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.854292343387471
+        },
+        "B0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.9005389514943655
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 10,
+          "visible_frames": 10,
+          "mean_fixed_id_iou": 0.887425294587516
+        },
+        "B0": {
+          "qualified_frames": 10,
+          "visible_frames": 10,
+          "mean_fixed_id_iou": 0.9335638586758689
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 1,
+          "category": "person",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            246.91099195829645,
+            68.82657442494211,
+            311.76626315230556,
+            171.5954937207121
+          ],
+          "mean": [
+            279.338627555301,
+            120.2110340728271,
+            0.6310786533363745,
+            102.76891929576999,
+            -4.723108631658264,
+            -5.271234715780198,
+            -2.3598138033801364e-07,
+            3.0761815180925685
+          ],
+          "covariance_diagonal": [
+            14.634536290570566,
+            14.634536290570566,
+            0.000733023755554425,
+            14.634536290570566,
+            3.2337555328080434,
+            3.2337555328080434,
+            9.999963983023534e-10,
+            3.2337555328080434
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 5
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 0,
+        "box": [
+          243.7915496826172,
+          62.65377426147461,
+          291.9012451171875,
+          173.97012329101562
+        ],
+        "score": 0.8649116158485413,
+        "box_iou": 0.9283749839134784
+      },
+      "reference_correction": {
+        "box": [
+          245.0,
+          64.0,
+          292.0,
+          178.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 0,
+          "score": 0.8649116158485413,
+          "box_iou": 0.9283749839134784
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.872778297474275,
+        "B0": 0.9361338797814208
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 15,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 20,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 25,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        }
+      ],
+      "scene": "stable",
+      "title_zh": "拖曳滑水者：连续运动下的稳定身份",
+      "rationale_zh": "被摄人相对画面位置连续，两套自动基线后续 30 步均保住合格原 ID，补充不同背景的稳定性对照。",
+      "caveat_zh": "有水花、背景移动与小幅姿态变化；不能声称没有干扰因素。",
+      "secondary_tags": [
+        "water_background",
+        "moving_camera",
+        "ceiling_control"
+      ],
+      "event_id": "E04",
+      "group_id": "visual-2965",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        20,
+        30,
+        40
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\04-stable-2965-GT1-t10.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\04-stable-2965-GT1-t10-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 11,
+              "mask_iou": 0.8762043795620438
+            },
+            {
+              "frame": 12,
+              "mask_iou": 0.8648079957916885
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.8808893594494441
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.8738668738668739
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.8890885750962773
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.843236409608091
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.8435406698564594
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.8584905660377359
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.8834285714285715
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.842744513104624
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.8615415576574763
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.84375
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.841566265060241
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.863655462184874
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.8846993451081564
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.9048551292090838
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.9021210352208601
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.8846806105144149
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.888974408312488
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.9015572858731924
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.8620034542314335
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.8875666074600356
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.9008552976086577
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8957495189784852
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.9087855753933181
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.9070781032078103
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.9203369012107387
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.9268127016471387
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.8953374633192044
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.9066916397071343
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 11,
+              "mask_iou": 0.9320872274143303
+            },
+            {
+              "frame": 12,
+              "mask_iou": 0.9345955249569707
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.9244152880775813
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.9318564217610769
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.9257617728531856
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.9204355108877722
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.9304301646309081
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.9240981963927856
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.9292121212121213
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.9273716583865625
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.9355203619909502
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.9154557463672391
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.9396473779385172
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.9381858902575588
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.9368489583333334
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.9535864978902954
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.9374870197300104
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.9437563451776649
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.9384867746565512
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.9068100358422939
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.920265780730897
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.9264934057408845
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.9167918858001503
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.9284635711589279
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.9100766498410918
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.8885350318471338
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.9169000933706816
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.8896255151406558
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.938932664756447
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.9470792895074163
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 18,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 30,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 40,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "5be32111e7ac9c4709a3ea372620ce7858974eebd0694249a2ea105adb094ad4",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2965",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2967,
+      "gt_id": 3,
+      "category": "person",
+      "frame": 14,
+      "frames": 45,
+      "area": 1579,
+      "area_fraction": 0.011583039906103286,
+      "gap_before": 0,
+      "visible_followup": 12,
+      "prefix_visible": 14,
+      "relative_acceleration": 0.10448323596382741,
+      "relative_speed": 0.0245497916315906,
+      "turn_angle": 93.16233571544197,
+      "background_flow": {
+        "shift": [
+          -1.1831378936767578,
+          -1.7725830078125
+        ],
+        "features": 150
+      },
+      "same_class_gt_overlap": 0.3709419904204364,
+      "same_class_nearby": 1,
+      "area_ratio_to_prefix_median": 0.8041762159409218,
+      "anchors": {
+        "A0": {
+          "prediction_id": 15,
+          "anchor_frame": 8,
+          "anchor_iou": 0.777360066833751
+        },
+        "B0": {
+          "prediction_id": 3,
+          "anchor_frame": 5,
+          "anchor_iou": 0.8379864636209814
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 5,
+          "visible_frames": 14,
+          "mean_fixed_id_iou": 0.28539016315011306
+        },
+        "B0": {
+          "qualified_frames": 9,
+          "visible_frames": 14,
+          "mean_fixed_id_iou": 0.5114533285636825
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 15,
+          "category": "person",
+          "state": 2,
+          "activated": true,
+          "box_xyxy": [
+            93.35323217275705,
+            110.67375933087042,
+            125.06696266449208,
+            182.34746495674676
+          ],
+          "mean": [
+            109.21009741862456,
+            146.5106121438086,
+            0.4424737107534932,
+            71.67370562587635,
+            -4.427210639204814,
+            -4.845820128663658,
+            -7.989637711299985e-09,
+            -3.4546916711164726
+          ],
+          "covariance_diagonal": [
+            45.8510832976387,
+            45.8510832976387,
+            0.0005509785572339394,
+            45.8510832976387,
+            7.218060146493578,
+            7.218060146493578,
+            5.999998675378734e-10,
+            7.218060146493578
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 10
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 1,
+        "box": [
+          100.65037536621094,
+          106.14118194580078,
+          153.94097900390625,
+          152.86891174316406
+        ],
+        "score": 0.6263617873191833,
+        "box_iou": 0.36818712387632313
+      },
+      "reference_correction": {
+        "box": [
+          83.0,
+          119.0,
+          142.0,
+          165.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 1,
+          "score": 0.6263617873191833,
+          "box_iou": 0.36818712387632313
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.0,
+        "B0": 0.4868913857677903
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 26,
+          "action": "retire",
+          "id": 3
+        }
+      ],
+      "scene": "motion",
+      "title_zh": "越过栏杆的人：跳跃转向与形状突变",
+      "rationale_zh": "t12–14 从起跳到越栏，GT 轨迹方向与人体形状明显变化；t14 原 ID 的 A0 输出已中断、B0 mask 也降至阈值附近，同时仍有可用旧状态和 YOLO 框。",
+      "caveat_zh": "伴随另一个人体靠近及栏杆干扰。自动 B0 原目标后续 t26 被生命周期删除；必须将这种删除与 mask 漂移分开，不预判 H/R 分支会同样删除。 指定目标自 t27 起离开画面，后续30步只有12步GT可见，20/30步终点无法评价恢复；是否保留为边界案例请人工审阅，不能当完整长窗样本。",
+      "secondary_tags": [
+        "jump",
+        "turn",
+        "nearby_person",
+        "lifecycle_risk"
+      ],
+      "event_id": "E05",
+      "group_id": "visual-2967",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        17,
+        24,
+        34,
+        44
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\05-motion-2967-GT3-t14.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\05-motion-2967-GT3-t14-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 12,
+          "GT_absent_steps": [
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44
+          ],
+          "qualified_fixed_id_steps": 0,
+          "values": [
+            {
+              "frame": 15,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.0
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 12,
+          "GT_absent_steps": [
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44
+          ],
+          "qualified_fixed_id_steps": 4,
+          "values": [
+            {
+              "frame": 15,
+              "mask_iou": 0.437033349925336
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.4835164835164835
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.4779033915724563
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.3485124468731026
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.14551526717557253
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.5562130177514792
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.16384915474642392
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.5540594059405941
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.4739454094292804
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.7425451490970181
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.6300751879699248
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.0
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 22,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 34,
+          "GT_visible_at_endpoint": false,
+          "GT_visible_in_last_3_steps": false
+        },
+        "30": {
+          "frame": 44,
+          "GT_visible_at_endpoint": false,
+          "GT_visible_in_last_3_steps": false
+        }
+      },
+      "complete_GT_visible_followup": false,
+      "readout_endpoint_limited": true,
+      "preflight_sha256": "44ce4b430bbbfc5853ad8eb919e29594ce04b740ef451e253219716991d488e3",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2967",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2944,
+      "gt_id": 1,
+      "category": "person",
+      "frame": 15,
+      "frames": 54,
+      "area": 3214,
+      "area_fraction": 0.017682658450704224,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 15,
+      "relative_acceleration": 0.04507521413174555,
+      "relative_speed": 0.05324284442063441,
+      "turn_angle": 45.77451414040643,
+      "background_flow": {
+        "shift": [
+          -0.8563613891601562,
+          5.367055892944336
+        ],
+        "features": 150
+      },
+      "same_class_gt_overlap": 0.0,
+      "same_class_nearby": 0,
+      "area_ratio_to_prefix_median": 0.9344381450792266,
+      "anchors": {
+        "A0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8733969986357435
+        },
+        "B0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.9271285350890319
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 15,
+          "visible_frames": 15,
+          "mean_fixed_id_iou": 0.878442028866415
+        },
+        "B0": {
+          "qualified_frames": 15,
+          "visible_frames": 15,
+          "mean_fixed_id_iou": 0.9345628621373838
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 1,
+          "category": "person",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            187.35117372945547,
+            89.6493095925617,
+            249.51432446093833,
+            184.69078757066393
+          ],
+          "mean": [
+            218.4327490951969,
+            137.17004858161283,
+            0.6540633842605582,
+            95.04147797810224,
+            -3.8904737824932623,
+            -4.2635061663293605,
+            1.6100954363468384e-06,
+            -2.8683138981769
+          ],
+          "covariance_diagonal": [
+            13.18093870449287,
+            13.18093870449287,
+            0.000865029922212094,
+            13.18093870449287,
+            3.9009283630542573,
+            3.9009283630542573,
+            1.4999786872409494e-09,
+            3.9009283630542573
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 10
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 0,
+        "box": [
+          159.56883239746094,
+          93.4536361694336,
+          284.1529846191406,
+          186.16319274902344
+        ],
+        "score": 0.886970043182373,
+        "box_iou": 0.9189497800904881
+      },
+      "reference_correction": {
+        "box": [
+          162.0,
+          95.0,
+          284.0,
+          182.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 0,
+          "score": 0.886970043182373,
+          "box_iou": 0.9189497800904881
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.8721886999451454,
+        "B0": 0.9296482412060302
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 20,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 25,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 45,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        }
+      ],
+      "scene": "motion",
+      "title_zh": "滑板者：坡面转向与身体倾斜",
+      "rationale_zh": "t13–16 在碗池坡面运动时明显改变身体倾斜与行进方向，适合测试连续但非匀速匀向的运动历史；两套旧状态和纠正框均存在。",
+      "caveat_zh": "镜头跟拍与透视同时变化；光流补偿只是近似，不把质心加速度当真实物理加速度。自动基线此刻仍好，不要求每个困难场景都已有错误。",
+      "secondary_tags": [
+        "camera_tracking",
+        "turn",
+        "pose_change"
+      ],
+      "event_id": "E06",
+      "group_id": "visual-2944",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        18,
+        25,
+        35,
+        45
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\06-motion-2944-GT1-t15.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\06-motion-2944-GT1-t15-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 16,
+              "mask_iou": 0.8441624365482233
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.8355378088345395
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.8523456790123457
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.878987608752966
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.8702207862143242
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.8629862700228833
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.8620788121073673
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.888196915776987
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.881547619047619
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.8654399079930994
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.8254901960784313
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.8215377380672466
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.8717301514456173
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.8477056962025317
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.8110761252083719
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.8609636586361781
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.8013217678645188
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8445945945945946
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8201603665521191
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.8522700541049165
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.902221204488207
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.8705649157581764
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.8667267808836789
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.8652309829802015
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.8646555896112276
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.8864872812821644
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.8664846220178212
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.9012625904383601
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.9002166064981949
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.8782768881961174
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 16,
+              "mask_iou": 0.9222574143391881
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.9165270798436628
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.927608037434627
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.925436128306134
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.9344645991808075
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.9317768344451183
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.9319227230910764
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.9243513597999374
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.9082626453031731
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.8694096601073346
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.8538098050797401
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.8803790983606558
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.8575729504400186
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.8522537562604341
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.882034180908712
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.882031905961377
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.867026055705301
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8759425930430552
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8588669950738916
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.8712654845761477
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.8704907013219807
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.9054574964495841
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.8767994017573378
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.8606339649371347
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.8604572965702757
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.9084689067964118
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.9415775608244228
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.9254954552227685
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.9199215804554366
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.9125475285171103
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 23,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 35,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 45,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "fc37e7678682d32732ce32311b8830b749eb6213f0fead1cff1c0c6ccddad577",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2944",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2924,
+      "gt_id": 1,
+      "category": "person",
+      "frame": 17,
+      "frames": 48,
+      "area": 4008,
+      "area_fraction": 0.022051056338028167,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 17,
+      "relative_acceleration": 0.10069843080497277,
+      "relative_speed": 0.07910253414499098,
+      "turn_angle": 1.3197462835137963,
+      "background_flow": {
+        "shift": [
+          -15.598419189453125,
+          2.74420166015625
+        ],
+        "features": 141
+      },
+      "same_class_gt_overlap": 0.0,
+      "same_class_nearby": 0,
+      "area_ratio_to_prefix_median": 0.7913910553855267,
+      "anchors": {
+        "A0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.851030767637004
+        },
+        "B0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.9274550968042921
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 17,
+          "visible_frames": 17,
+          "mean_fixed_id_iou": 0.8533061141602032
+        },
+        "B0": {
+          "qualified_frames": 17,
+          "visible_frames": 17,
+          "mean_fixed_id_iou": 0.9263127112194041
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 1,
+          "category": "person",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            263.925821028376,
+            104.34490760123266,
+            320.47397505869367,
+            258.7315229785493
+          ],
+          "mean": [
+            292.1998980435348,
+            181.53821528989099,
+            0.36627627266855695,
+            154.38661537731664,
+            2.056001164733569,
+            0.8115461004870682,
+            2.1948808940382554e-08,
+            -4.371729718612623
+          ],
+          "covariance_diagonal": [
+            39.73165190916616,
+            39.73165190916616,
+            0.0008926380320674001,
+            39.73165190916616,
+            11.149268249403809,
+            11.149268249403809,
+            1.6999640069199618e-09,
+            11.149268249403809
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 15
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 0,
+        "box": [
+          258.21026611328125,
+          107.0985107421875,
+          318.6584167480469,
+          258.1065368652344
+        ],
+        "score": 0.8811796307563782,
+        "box_iou": 0.8761443689489194
+      },
+      "reference_correction": {
+        "box": [
+          260.0,
+          106.0,
+          323.0,
+          254.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 0,
+          "score": 0.8811796307563782,
+          "box_iou": 0.8761443689489194
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.8272746375288926,
+        "B0": 0.9018735362997659
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 20,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 25,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 45,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        }
+      ],
+      "scene": "motion",
+      "title_zh": "花滑者：滑行减速与姿态切换",
+      "rationale_zh": "t15–17 人体运动速度、腿部姿态与可见面积发生变化，且不存在同类前景交叠，补充相对干净的运动变化案例。",
+      "caveat_zh": "摄像机平移与人物运动混合；本例自动基线仍合格，是运动变化不必导致错误的反例，而不是预设重置会更好。",
+      "secondary_tags": [
+        "speed_change",
+        "articulation",
+        "camera_pan"
+      ],
+      "event_id": "E07",
+      "group_id": "visual-2924",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        20,
+        27,
+        37,
+        47
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\07-motion-2924-GT1-t17.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\07-motion-2924-GT1-t17-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 18,
+              "mask_iou": 0.7935498025449759
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.7970786516853933
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.7848332571950662
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.8472222222222222
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.8377535101404057
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.8505955986270947
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.8473915163334959
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.8852624011502516
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.8732467532467533
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.8547301587301588
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.8492002063983488
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.8382501260716086
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.8521739130434782
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.8677125291498834
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.8855365109180559
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8863277932791459
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8802685565087653
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.8730180426462548
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.830906148867314
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.8531866464339909
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.8850178831633329
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.8836255128683327
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.883585445625511
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.899351268841824
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.8831146106736658
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.8808908165818667
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.8492631925578332
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.864475201845444
+            },
+            {
+              "frame": 46,
+              "mask_iou": 0.852442996742671
+            },
+            {
+              "frame": 47,
+              "mask_iou": 0.8961154273029966
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 18,
+              "mask_iou": 0.8642125792296441
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.8869063237995277
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.894708854028184
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.9139125799573561
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.9150375939849624
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.9434177503992699
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.9352233985286201
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.9394323767242746
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.9260215053763441
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.9198532524340342
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.9162341407151096
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.9024700070571631
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.8960142772159428
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.9231037691949744
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.9255158530447911
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.9378292939936775
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.9237813089146243
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.9345934593459346
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.9156571078055513
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.9341035515618314
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.9374458249060965
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.9314824945295405
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.944142921754862
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.936649704019109
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.9388583019414662
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.9314830081524228
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.9125663069325041
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.9184171440695947
+            },
+            {
+              "frame": 46,
+              "mask_iou": 0.9232646090032939
+            },
+            {
+              "frame": 47,
+              "mask_iou": 0.9368307062928649
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 25,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 37,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 47,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "27cc802a20509df8e74408a654e83f66316d1b2615c144b905872c3784ba9a9c",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2924",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2922,
+      "gt_id": 1,
+      "category": "car",
+      "frame": 10,
+      "frames": 42,
+      "area": 3628,
+      "area_fraction": 0.019960387323943663,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 10,
+      "relative_acceleration": 0.046930074863151254,
+      "relative_speed": 0.17604550458035204,
+      "turn_angle": 1.695954712953285,
+      "background_flow": {
+        "shift": [
+          -22.981781005859375,
+          1.6156158447265625
+        ],
+        "features": 141
+      },
+      "same_class_gt_overlap": 0.021246458923512748,
+      "same_class_nearby": 1,
+      "area_ratio_to_prefix_median": 3.385907606159589,
+      "anchors": {
+        "A0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8433734939759037
+        },
+        "B0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.9391304347826087
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 10,
+          "visible_frames": 10,
+          "mean_fixed_id_iou": 0.9062909669546153
+        },
+        "B0": {
+          "qualified_frames": 10,
+          "visible_frames": 10,
+          "mean_fixed_id_iou": 0.943743378012646
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 1,
+          "category": "car",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            326.20429747221016,
+            120.18849346188102,
+            384.78372591266464,
+            159.66566176510895
+          ],
+          "mean": [
+            355.4940116924374,
+            139.927077613495,
+            1.4838812143388878,
+            39.47716830322791,
+            2.1954511151830847,
+            0.976457448674703,
+            3.5645218161453857e-07,
+            2.000429554817239
+          ],
+          "covariance_diagonal": [
+            2.2155236829814693,
+            2.2155236829814693,
+            0.000733023755554425,
+            2.2155236829814693,
+            0.36323169336344535,
+            0.36323169336344535,
+            9.999963983023534e-10,
+            0.36323169336344535
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 5
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 1,
+        "box": [
+          300.0801696777344,
+          120.12264251708984,
+          410.54638671875,
+          164.45089721679688
+        ],
+        "score": 0.6675556302070618,
+        "box_iou": 0.9552107908362557
+      },
+      "reference_correction": {
+        "box": [
+          300.0,
+          121.0,
+          412.0,
+          165.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 1,
+          "score": 0.6675556302070618,
+          "box_iou": 0.9552107908362557
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.9405888538380652,
+        "B0": 0.9582316246270681
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 15,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 1
+        },
+        {
+          "frame": 20,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 25,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 3
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 1
+        }
+      ],
+      "scene": "motion",
+      "title_zh": "漂移汽车：快速靠近与尺度增长",
+      "rationale_zh": "车在 t0 附近快速靠近并横向漂移，可见 mask 面积约为前 8 步中位数的 3.4 倍，补充非人体的尺度／速度变化机制。",
+      "caveat_zh": "不是严格孤立的瞬时急转：还存在漂移烟雾、透视与另一辆车；用运动／尺度变化解释，不夸称已证明运动模型失效。",
+      "secondary_tags": [
+        "rapid_scale_change",
+        "drift",
+        "smoke"
+      ],
+      "event_id": "E08",
+      "group_id": "visual-2922",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        20,
+        30,
+        40
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\08-motion-2922-GT1-t10.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\08-motion-2922-GT1-t10-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 20,
+          "values": [
+            {
+              "frame": 11,
+              "mask_iou": 0.9487228730555022
+            },
+            {
+              "frame": 12,
+              "mask_iou": 0.9555822328931572
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.9531621493105088
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.9558347237216606
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.9572368421052632
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.9610965076980849
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.9427537941338366
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.9609690444145357
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.9530364372469635
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.9380863039399625
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.9190588235294118
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.909433962264151
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.9214628297362111
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.9059139784946236
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.9211224876753887
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.8864123446206601
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.9386352479135984
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.9032786885245901
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.8051948051948052
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.7783985102420856
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.0
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 29,
+          "values": [
+            {
+              "frame": 11,
+              "mask_iou": 0.9499806126405583
+            },
+            {
+              "frame": 12,
+              "mask_iou": 0.9724180202267851
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.9616038882138518
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.9549647852395595
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.9732390810401413
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.9732245022503624
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.9417083035926719
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.967128866479201
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.9645581504518249
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.9576500557236108
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.9240536655486344
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.8398718975180144
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.8740090600226501
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.9333333333333333
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.9381120250685469
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.9418918918918919
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.9265285996055227
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.9145673603504929
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.9328039095907147
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.9080779944289693
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.9121298949379179
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.1527777777777778
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8253968253968254
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.9451754385964912
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.9237089201877934
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.9143222506393862
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.871313672922252
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.9075235109717869
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.874
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.6910994764397905
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 18,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 30,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 40,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "0a7d784bf8ec14711cdd8d3c97eacf2a8ea2ed8a93d896446d26bd08be1d00b8",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2922",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2694,
+      "gt_id": 7,
+      "category": "person",
+      "frame": 12,
+      "frames": 60,
+      "area": 236,
+      "area_fraction": 0.0017312206572769953,
+      "gap_before": 0,
+      "visible_followup": 27,
+      "prefix_visible": 12,
+      "relative_acceleration": 0.2572169637964484,
+      "relative_speed": 0.14245291994170833,
+      "turn_angle": 106.70758685649743,
+      "background_flow": {
+        "shift": [
+          7.3922119140625,
+          1.7060394287109375
+        ],
+        "features": 149
+      },
+      "same_class_gt_overlap": 0.24254090471607315,
+      "same_class_nearby": 2,
+      "area_ratio_to_prefix_median": 0.7866666666666666,
+      "anchors": {
+        "A0": {
+          "prediction_id": 4,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8936170212765957
+        },
+        "B0": {
+          "prediction_id": 4,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8619718309859155
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 9,
+          "visible_frames": 12,
+          "mean_fixed_id_iou": 0.5994818336683133
+        },
+        "B0": {
+          "qualified_frames": 11,
+          "visible_frames": 12,
+          "mean_fixed_id_iou": 0.7261413029946563
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 4,
+          "category": "person",
+          "state": 2,
+          "activated": true,
+          "box_xyxy": [
+            129.17637369292677,
+            98.77901627820917,
+            144.80737200420228,
+            144.36330718972738
+          ],
+          "mean": [
+            136.99187284856453,
+            121.57116173396828,
+            0.34290317999277814,
+            45.58429091151822,
+            0.4100534423566408,
+            -0.4540671924478841,
+            9.772165072069892e-08,
+            0.793655235751968
+          ],
+          "covariance_diagonal": [
+            9.4251615962394,
+            9.4251615962394,
+            0.0008689834548360983,
+            9.4251615962394,
+            0.7465444220950505,
+            0.7465444220950505,
+            1.1999944699392407e-09,
+            0.7465444220950505
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 5
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 3,
+        "box": [
+          132.25709533691406,
+          99.81813049316406,
+          148.8114776611328,
+          144.2322998046875
+        ],
+        "score": 0.4525691270828247,
+        "box_iou": 0.5227851539204713
+      },
+      "reference_correction": {
+        "box": [
+          134.0,
+          97.0,
+          143.0,
+          144.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 3,
+          "score": 0.4525691270828247,
+          "box_iou": 0.5227851539204713
+        },
+        {
+          "detector_index": 4,
+          "score": 0.3225272595882416,
+          "box_iou": 0.4749337840619195
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.358695652173913,
+        "B0": 0.46153846153846156
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 20,
+          "action": "refresh",
+          "id": 4,
+          "detector_index": 3
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 4,
+          "detector_index": 4
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 4,
+          "detector_index": 3
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 4,
+          "detector_index": 2
+        }
+      ],
+      "scene": "competition",
+      "title_zh": "飞盘场远处两人靠近：小目标关联竞争",
+      "rationale_zh": "指定远处人物与另一人接近，t12 实际有两个同类 YOLO 框可与该目标匹配（均达到提示置信度）；A0/B0 的旧 ID 已有足够前缀锚定。",
+      "caveat_zh": "目标很小，标注与像素量化误差显著，也混有部分遮挡；原来 t29 的返回事件缺少 YOLO 框，未拿它替代本例资格。",
+      "secondary_tags": [
+        "small_object",
+        "same_class_overlap",
+        "partial_occlusion"
+      ],
+      "event_id": "E09",
+      "group_id": "visual-2694",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        15,
+        22,
+        32,
+        42
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\09-competition-2694-GT7-t12.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\09-competition-2694-GT7-t12-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 27,
+          "GT_absent_steps": [
+            26,
+            27,
+            28
+          ],
+          "qualified_fixed_id_steps": 0,
+          "values": [
+            {
+              "frame": 13,
+              "mask_iou": 0.21532846715328466
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.0
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 27,
+          "GT_absent_steps": [
+            26,
+            27,
+            28
+          ],
+          "qualified_fixed_id_steps": 26,
+          "values": [
+            {
+              "frame": 13,
+              "mask_iou": 0.6150793650793651
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.6055776892430279
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.7441860465116279
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.8205128205128205
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.6024691358024692
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.6735159817351598
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.8389662027833003
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.8330170777988615
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.8444444444444444
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.8835443037974684
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.49361702127659574
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.8311688311688312
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.8426229508196721
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.6006006006006006
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.7831050228310502
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.7917570498915402
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.8446601941747572
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8240534521158129
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8140096618357487
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.8165374677002584
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.8301886792452831
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.8224852071005917
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.8590225563909775
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.8764845605700713
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.8088888888888889
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.7763636363636364
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.8653136531365314
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 20,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 32,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 42,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": false,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "7fd3ff947e645a4d4217302939bf90a8e352aa446e6a17ac07e213e2fba77454",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2694",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2920,
+      "gt_id": 5,
+      "category": "person",
+      "frame": 15,
+      "frames": 60,
+      "area": 1542,
+      "area_fraction": 0.008483714788732395,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 15,
+      "relative_acceleration": 0.26821555485310483,
+      "relative_speed": 0.20360752005022223,
+      "turn_angle": 179.7225128577066,
+      "background_flow": {
+        "shift": [
+          0.5605087280273438,
+          1.719430923461914
+        ],
+        "features": 150
+      },
+      "same_class_gt_overlap": 0.7001376699363276,
+      "same_class_nearby": 6,
+      "area_ratio_to_prefix_median": 1.205629397967162,
+      "anchors": {
+        "A0": {
+          "prediction_id": 7,
+          "anchor_frame": 0,
+          "anchor_iou": 0.7873831775700935
+        },
+        "B0": {
+          "prediction_id": 7,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8045977011494253
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 6,
+          "visible_frames": 15,
+          "mean_fixed_id_iou": 0.3262185206914549
+        },
+        "B0": {
+          "qualified_frames": 15,
+          "visible_frames": 15,
+          "mean_fixed_id_iou": 0.7549786166273181
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 7,
+          "category": "person",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            265.61621829024403,
+            101.66509834715566,
+            298.2025853898877,
+            227.1913391456597
+          ],
+          "mean": [
+            281.90940184006587,
+            164.42821874640768,
+            0.2595980481240702,
+            125.52624079850403,
+            -3.9249785716759806,
+            1.9863203812755728,
+            -4.852179518685499e-09,
+            0.7731243894277446
+          ],
+          "covariance_diagonal": [
+            26.918320761067427,
+            26.918320761067427,
+            0.0009928253704165168,
+            26.918320761067427,
+            5.275817898459854,
+            5.275817898459854,
+            1.499980990074636e-09,
+            5.275817898459854
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 10
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 1,
+        "box": [
+          261.5631408691406,
+          108.7912826538086,
+          349.4556884765625,
+          227.33468627929688
+        ],
+        "score": 0.6917389631271362,
+        "box_iou": 0.7512562417724129
+      },
+      "reference_correction": {
+        "box": [
+          272.0,
+          108.0,
+          351.0,
+          212.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 1,
+          "score": 0.6917389631271362,
+          "box_iou": 0.7512562417724129
+        },
+        {
+          "detector_index": 4,
+          "score": 0.4527681767940521,
+          "box_iou": 0.33603065653975783
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.06957398537937988,
+        "B0": 0.41715285880980163
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 25,
+          "action": "refresh",
+          "id": 7,
+          "detector_index": 6
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 7,
+          "detector_index": 6
+        },
+        {
+          "frame": 45,
+          "action": "refresh",
+          "id": 7,
+          "detector_index": 4
+        }
+      ],
+      "scene": "competition",
+      "title_zh": "体育馆多人交叠：多个真实人体与检测框竞争",
+      "rationale_zh": "指定人体在集体动作中与其他人体高度交叠，t15 GT 框最大同类 IoU 约 0.70，实际 YOLO 候选不止一个，固定原 ID 的两套 mask 质量均已下降。",
+      "caveat_zh": "检测竞争与遮挡不可分离，保留双标签；不把场景比较解释为单因素因果消融。",
+      "secondary_tags": [
+        "crowding",
+        "high_box_overlap",
+        "partial_occlusion"
+      ],
+      "event_id": "E10",
+      "group_id": "visual-2920",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        18,
+        25,
+        35,
+        45
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\10-competition-2920-GT5-t15.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\10-competition-2920-GT5-t15-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 0,
+          "values": [
+            {
+              "frame": 16,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.062329953005194165
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.014889529298751201
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.07709090909090908
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.1388744137571652
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.09441849028768133
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.06455592105263158
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.011509229098805645
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.01067902478339714
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.0
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 16,
+              "mask_iou": 0.5140893470790378
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.6831210191082803
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.6616314199395771
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.6573816155988857
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.6713441654357459
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.6909509202453987
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.5206451612903226
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.7021806853582554
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.8665893271461717
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.8415783274440518
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.7655430711610487
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.7356020942408377
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.6558978211870774
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.5846645367412141
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.7235023041474654
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.7952350289761752
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.7498470948012232
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.7336283185840708
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8412857860371673
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.8036187113857016
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.8208739617190322
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.7801140413399857
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.7768667642752562
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.644808743169399
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.8109468386284995
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.7969195664575014
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.6958796599084369
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.7505866577271203
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.8270042194092827
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.8633419689119171
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 23,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 35,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 45,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "d7bca69f1de0bb0665256b10fe691870dc2c9400a54253f46fe44a58deefbceb",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2920",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2750,
+      "gt_id": 2,
+      "category": "person",
+      "frame": 29,
+      "frames": 60,
+      "area": 9576,
+      "area_fraction": 0.05268485915492958,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 29,
+      "relative_acceleration": 0.02345568952977364,
+      "relative_speed": 0.016400014236915398,
+      "turn_angle": 72.81621634571012,
+      "background_flow": {
+        "shift": [
+          2.960235595703125,
+          1.24981689453125
+        ],
+        "features": 55
+      },
+      "same_class_gt_overlap": 0.0,
+      "same_class_nearby": 1,
+      "area_ratio_to_prefix_median": 0.9986963550086041,
+      "anchors": {
+        "A0": {
+          "prediction_id": 2,
+          "anchor_frame": 0,
+          "anchor_iou": 0.771395568623333
+        },
+        "B0": {
+          "prediction_id": 2,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8458665338645418
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 29,
+          "visible_frames": 29,
+          "mean_fixed_id_iou": 0.8260589708944692
+        },
+        "B0": {
+          "qualified_frames": 29,
+          "visible_frames": 29,
+          "mean_fixed_id_iou": 0.8830002487551133
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 2,
+          "category": "person",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            240.41735194239695,
+            55.90933371347127,
+            373.0736362443856,
+            288.8879926967035
+          ],
+          "mean": [
+            306.7454940933913,
+            172.3986632050874,
+            0.5693924279628382,
+            232.97865898323224,
+            -1.6883047254284853,
+            -0.46706635170585764,
+            1.2210011509246758e-07,
+            1.7233921601362194
+          ],
+          "covariance_diagonal": [
+            93.5365006217585,
+            93.5365006217585,
+            0.0009459141715731959,
+            93.5365006217585,
+            18.40326653725084,
+            18.40326653725084,
+            2.8997001910263633e-09,
+            18.40326653725084
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 25
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 1,
+        "box": [
+          249.46826171875,
+          76.00286102294922,
+          374.2872619628906,
+          292.4978942871094
+        ],
+        "score": 0.900611400604248,
+        "box_iou": 0.9577745722101787
+      },
+      "reference_correction": {
+        "box": [
+          249.0,
+          80.0,
+          372.0,
+          292.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 1,
+          "score": 0.900611400604248,
+          "box_iou": 0.9577745722101787
+        },
+        {
+          "detector_index": 2,
+          "score": 0.2126765102148056,
+          "box_iou": 0.21417544993586018
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.8602864459831168,
+        "B0": 0.9172483560950936
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 1
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 1
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 0
+        },
+        {
+          "frame": 45,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 1
+        },
+        {
+          "frame": 50,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 0
+        },
+        {
+          "frame": 55,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 0
+        }
+      ],
+      "scene": "competition",
+      "title_zh": "舞台人物重复框：高分整人框与低分局部框",
+      "rationale_zh": "指定舞者同时有高分整人框和约 0.21 置信度的重叠局部 person 框，可检查 ByteTrack 低置信度关联通道与 SAM 提示门槛的不同处理。",
+      "caveat_zh": "低分框低于 SAM 0.25 提示阈值，因此不是两套系统完全等价的提示竞争；这是预先记录的门控差异诊断，不改阈值凑出效果。两名舞者本身并未相互遮挡。",
+      "secondary_tags": [
+        "duplicate_detection",
+        "low_confidence_box",
+        "different_gates"
+      ],
+      "event_id": "E11",
+      "group_id": "visual-2750",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        26,
+        27,
+        28,
+        29,
+        30,
+        32,
+        39,
+        49,
+        59
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\11-competition-2750-GT2-t29.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\11-competition-2750-GT2-t29-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 30,
+              "mask_iou": 0.8945767866193614
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.8399841175302759
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.802479407604626
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.9032869785082175
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.820816509645581
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.8610117526826776
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.898326601269475
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.8889391540375481
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.8781667434362045
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.8739174732552216
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.832578660164867
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.8546014368799179
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.8927854528279608
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.8250683326825459
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.860072501294666
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.8379508625196027
+            },
+            {
+              "frame": 46,
+              "mask_iou": 0.7870080606922712
+            },
+            {
+              "frame": 47,
+              "mask_iou": 0.86753916319651
+            },
+            {
+              "frame": 48,
+              "mask_iou": 0.8945138741791994
+            },
+            {
+              "frame": 49,
+              "mask_iou": 0.9236747477090824
+            },
+            {
+              "frame": 50,
+              "mask_iou": 0.8644594449801779
+            },
+            {
+              "frame": 51,
+              "mask_iou": 0.8691062631949331
+            },
+            {
+              "frame": 52,
+              "mask_iou": 0.8922435573521981
+            },
+            {
+              "frame": 53,
+              "mask_iou": 0.8151349913552334
+            },
+            {
+              "frame": 54,
+              "mask_iou": 0.8585880327163151
+            },
+            {
+              "frame": 55,
+              "mask_iou": 0.7817196119459768
+            },
+            {
+              "frame": 56,
+              "mask_iou": 0.7806451612903226
+            },
+            {
+              "frame": 57,
+              "mask_iou": 0.8638483373884833
+            },
+            {
+              "frame": 58,
+              "mask_iou": 0.8450660611065235
+            },
+            {
+              "frame": 59,
+              "mask_iou": 0.9064553990610329
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 30,
+              "mask_iou": 0.922796091485021
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.9253250241753519
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.8778146273346134
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8804366221018785
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8806236498544191
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.9323572806718874
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.9455689953098001
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.944423997055576
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.9330113130799542
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.9349258649093904
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.8974161203239491
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.8892888171776095
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.9273872252923788
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.8850435357654579
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.9237002025658338
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.9041359773371105
+            },
+            {
+              "frame": 46,
+              "mask_iou": 0.8924216027874564
+            },
+            {
+              "frame": 47,
+              "mask_iou": 0.9127695921417894
+            },
+            {
+              "frame": 48,
+              "mask_iou": 0.9373932840068299
+            },
+            {
+              "frame": 49,
+              "mask_iou": 0.9453899840822824
+            },
+            {
+              "frame": 50,
+              "mask_iou": 0.9304667140488037
+            },
+            {
+              "frame": 51,
+              "mask_iou": 0.9349798387096774
+            },
+            {
+              "frame": 52,
+              "mask_iou": 0.931363071398978
+            },
+            {
+              "frame": 53,
+              "mask_iou": 0.9040788883908562
+            },
+            {
+              "frame": 54,
+              "mask_iou": 0.9175052656213433
+            },
+            {
+              "frame": 55,
+              "mask_iou": 0.8511892007713735
+            },
+            {
+              "frame": 56,
+              "mask_iou": 0.8979227161045343
+            },
+            {
+              "frame": 57,
+              "mask_iou": 0.9176758137984669
+            },
+            {
+              "frame": 58,
+              "mask_iou": 0.9354503464203233
+            },
+            {
+              "frame": 59,
+              "mask_iou": 0.8916923076923077
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 37,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 49,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 59,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "084c5c13babf84a6fa5e019e04d0dd7438a1e6579f1ea4d89ccb4d6e1a41215b",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2750",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2856,
+      "gt_id": 3,
+      "category": "car",
+      "frame": 11,
+      "frames": 42,
+      "area": 8735,
+      "area_fraction": 0.04805787852112676,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 11,
+      "relative_acceleration": 0.009311375318304333,
+      "relative_speed": 0.02304479925493558,
+      "turn_angle": 16.335681022739426,
+      "background_flow": {
+        "shift": [
+          9.404983520507812,
+          0.7864990234375
+        ],
+        "features": 84
+      },
+      "same_class_gt_overlap": 0.044372863528793056,
+      "same_class_nearby": 2,
+      "area_ratio_to_prefix_median": 0.86305701017686,
+      "anchors": {
+        "A0": {
+          "prediction_id": 3,
+          "anchor_frame": 0,
+          "anchor_iou": 0.942382432957637
+        },
+        "B0": {
+          "prediction_id": 2,
+          "anchor_frame": 0,
+          "anchor_iou": 0.9542313470205308
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 11,
+          "visible_frames": 11,
+          "mean_fixed_id_iou": 0.9476006450544553
+        },
+        "B0": {
+          "qualified_frames": 11,
+          "visible_frames": 11,
+          "mean_fixed_id_iou": 0.9532993269012846
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 3,
+          "category": "car",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            109.47668681963646,
+            65.50796868449677,
+            229.99064963642894,
+            168.0232374009164
+          ],
+          "mean": [
+            169.73366822803268,
+            116.76560304270659,
+            1.175570862035794,
+            102.51526871641961,
+            -1.2431766191325222,
+            -3.3593732821222293,
+            1.0817476720833939e-07,
+            -0.6862562968934859
+          ],
+          "covariance_diagonal": [
+            18.723797684162953,
+            18.723797684162953,
+            0.0007689739166498329,
+            18.723797684162953,
+            4.903925170565551,
+            4.903925170565551,
+            1.0999944699392406e-09,
+            4.903925170565551
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 10
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 2,
+        "box": [
+          127.38909912109375,
+          64.9864501953125,
+          249.9982452392578,
+          163.83761596679688
+        ],
+        "score": 0.7234320044517517,
+        "box_iou": 0.906172488076769
+      },
+      "reference_correction": {
+        "box": [
+          127.0,
+          57.0,
+          252.0,
+          164.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 2,
+          "score": 0.7234320044517517,
+          "box_iou": 0.906172488076769
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.9438798055678304,
+        "B0": 0.9571719918422842
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 15,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 1
+        },
+        {
+          "frame": 25,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 1
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 1
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 1
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 1
+        }
+      ],
+      "scene": "competition",
+      "title_zh": "冰雪场多车靠近：相似外观同类干扰",
+      "rationale_zh": "指定后车和近处深色车辆接近，外观相似且框边界开始相交；两套方法均已有足够旧 ID 状态与可用纠正框。",
+      "caveat_zh": "t11 同类 GT 框重叠仅约 0.04，是低强度近邻干扰，不等价于已确认的关联失败。作为强拥挤／重复框之外的轻度竞争对照。",
+      "secondary_tags": [
+        "similar_appearance",
+        "nearby_same_class",
+        "mild_competition"
+      ],
+      "event_id": "E12",
+      "group_id": "visual-2856",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        14,
+        21,
+        31,
+        41
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\12-competition-2856-GT3-t11.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\12-competition-2856-GT3-t11-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 8,
+          "values": [
+            {
+              "frame": 12,
+              "mask_iou": 0.9250433776749566
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.9330841121495327
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.9267494202700859
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.9225863858816551
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.9151158994449886
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.8531362516581391
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.8769392584801472
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.777306967984934
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.0
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 26,
+          "values": [
+            {
+              "frame": 12,
+              "mask_iou": 0.9539159503342884
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.9517644072099518
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.9378499440089586
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.9384146341463414
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.9485431930482194
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.8959054797311061
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.8119742701632855
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.637875101378751
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.2210446631339894
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.11051693404634581
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.03181118522319138
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.08262108262108261
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.6633165829145728
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.8955613577023499
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.9431818181818182
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.9354518371400199
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.9632931305715784
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.9437105112004595
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.9599230522603398
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.9561711079943899
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.939429012345679
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8987240829346093
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.9522184300341296
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.9568106312292359
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.9421487603305785
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.9386624455876533
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.9432048681541582
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.9260928346101848
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.9171413775245987
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.8903508771929824
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 19,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 31,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 41,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "087ad3d7852572afed93a63c63c49811f1df80674df06fd641afe6fb1f46220a",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2856",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2822,
+      "gt_id": 3,
+      "category": "person",
+      "frame": 18,
+      "frames": 54,
+      "area": 2691,
+      "area_fraction": 0.019740316901408452,
+      "gap_before": 0,
+      "visible_followup": 29,
+      "prefix_visible": 18,
+      "relative_acceleration": 0.5616204781108337,
+      "relative_speed": 0.16520779476412778,
+      "turn_angle": 156.7660285892911,
+      "background_flow": {
+        "shift": [
+          6.57171630859375,
+          4.916290283203125
+        ],
+        "features": 147
+      },
+      "same_class_gt_overlap": 0.0,
+      "same_class_nearby": 1,
+      "area_ratio_to_prefix_median": 0.6637069922308546,
+      "anchors": {
+        "A0": {
+          "prediction_id": 3,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8275051425213047
+        },
+        "B0": {
+          "prediction_id": 4,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8487318840579711
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 15,
+          "visible_frames": 18,
+          "mean_fixed_id_iou": 0.7184174784006134
+        },
+        "B0": {
+          "qualified_frames": 18,
+          "visible_frames": 18,
+          "mean_fixed_id_iou": 0.8493317871589333
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 3,
+          "category": "person",
+          "state": 2,
+          "activated": true,
+          "box_xyxy": [
+            200.58451924538588,
+            116.5914526605305,
+            260.498865558747,
+            271.2865976954545
+          ],
+          "mean": [
+            230.54169240206645,
+            193.93902517799248,
+            0.38730592546931514,
+            154.69514503492394,
+            7.040873329398105,
+            4.0678112971194285,
+            -3.2691091506148103e-07,
+            0.0
+          ],
+          "covariance_diagonal": [
+            337.39698965836135,
+            337.39698965836135,
+            0.0011650861654139586,
+            337.39698965836135,
+            12.071309980797858,
+            12.071309980797858,
+            1.7999786872409496e-09,
+            12.071309980797858
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 10
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 2,
+        "box": [
+          230.5465545654297,
+          155.0212860107422,
+          262.10101318359375,
+          280.37725830078125
+        ],
+        "score": 0.5813776850700378,
+        "box_iou": 0.7964398917564296
+      },
+      "reference_correction": {
+        "box": [
+          225.0,
+          158.0,
+          261.0,
+          279.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 2,
+          "score": 0.5813776850700378,
+          "box_iou": 0.7964398917564296
+        },
+        {
+          "detector_index": 7,
+          "score": 0.1644451767206192,
+          "box_iou": 0.47400261119691306
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.8879128601546029,
+        "B0": 0.8532410779315368
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 26,
+          "action": "retire",
+          "id": 4
+        }
+      ],
+      "scene": "occlusion",
+      "title_zh": "训犬场人物：被前景跳跃犬只遮挡后重新可见",
+      "rationale_zh": "t15–17 指定白衣人物主要被前景犬只挡住，t18 身体重新明显可见；原图和 GT 均可逐步核对，A0/B0 有可靠前缀身份和合格纠正框。",
+      "caveat_zh": "是严重部分遮挡而非完整 GT 消失，犬与人跨类别；GT 可见框在遮挡中收缩。不可误选左边已出画、只剩手臂的 GT4 作为遮挡恢复。",
+      "secondary_tags": [
+        "cross_class_occluder",
+        "partial_occlusion",
+        "reappearance"
+      ],
+      "event_id": "E13",
+      "group_id": "visual-2822",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        21,
+        28,
+        38,
+        48
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\13-occlusion-2822-GT3-t18.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\13-occlusion-2822-GT3-t18-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 29,
+          "GT_absent_steps": [
+            24
+          ],
+          "qualified_fixed_id_steps": 3,
+          "values": [
+            {
+              "frame": 19,
+              "mask_iou": 0.6284495735072755
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.6051660516605166
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.6148953087728598
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 46,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 47,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 48,
+              "mask_iou": 0.0
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 29,
+          "GT_absent_steps": [
+            24
+          ],
+          "qualified_fixed_id_steps": 6,
+          "values": [
+            {
+              "frame": 19,
+              "mask_iou": 0.8576589595375722
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.7470775770456961
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.7279507133592736
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.6666666666666666
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.8247787610619469
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.6334519572953736
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 46,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 47,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 48,
+              "mask_iou": 0.0
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 26,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": false
+        },
+        "20": {
+          "frame": 38,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 48,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": false,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "50edb1362fddee9ae5b917df14165929acc5147bdf64c95a719d4bb9ebd6c76e",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2822",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2807,
+      "gt_id": 2,
+      "category": "person",
+      "frame": 13,
+      "frames": 50,
+      "area": 7297,
+      "area_fraction": 0.04014634683098592,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 13,
+      "relative_acceleration": 0.03136211910232331,
+      "relative_speed": 0.03086979807522165,
+      "turn_angle": 0.0,
+      "background_flow": {
+        "shift": [
+          -0.162750244140625,
+          -0.05622100830078125
+        ],
+        "features": 150
+      },
+      "same_class_gt_overlap": 0.4441971157261598,
+      "same_class_nearby": 1,
+      "area_ratio_to_prefix_median": 1.1500394011032309,
+      "anchors": {
+        "A0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8814098641537144
+        },
+        "B0": {
+          "prediction_id": 1,
+          "anchor_frame": 0,
+          "anchor_iou": 0.9258506167818896
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 13,
+          "visible_frames": 13,
+          "mean_fixed_id_iou": 0.8804778427218085
+        },
+        "B0": {
+          "qualified_frames": 13,
+          "visible_frames": 13,
+          "mean_fixed_id_iou": 0.9286534509900825
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 1,
+          "category": "person",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            252.67254508727632,
+            29.748243025673744,
+            312.46391871898817,
+            263.95854150148926
+          ],
+          "mean": [
+            282.56823190313224,
+            146.8533922635815,
+            0.25528925935716656,
+            234.2102984758155,
+            -3.230271935909667,
+            -0.08880616153601376,
+            -4.8199844638067283e-08,
+            -0.040855988310656455
+          ],
+          "covariance_diagonal": [
+            90.2698351860972,
+            90.2698351860972,
+            0.000825282834941128,
+            90.2698351860972,
+            21.569760366442225,
+            21.569760366442225,
+            1.2999884598745015e-09,
+            21.569760366442225
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 10
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 0,
+        "box": [
+          251.18463134765625,
+          29.295408248901367,
+          386.70843505859375,
+          259.2415466308594
+        ],
+        "score": 0.8601416349411011,
+        "box_iou": 0.9517429371806441
+      },
+      "reference_correction": {
+        "box": [
+          251.0,
+          27.0,
+          382.0,
+          260.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 0,
+          "score": 0.8601416349411011,
+          "box_iou": 0.9517429371806441
+        },
+        {
+          "detector_index": 1,
+          "score": 0.7388514876365662,
+          "box_iou": 0.281786824812484
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.8609709204518144,
+        "B0": 0.9010284493121411
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 15,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 1
+        },
+        {
+          "frame": 20,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 1
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 1,
+          "detector_index": 0
+        }
+      ],
+      "scene": "occlusion",
+      "title_zh": "两位运动员：另一人的手臂穿过目标身体",
+      "rationale_zh": "指定后侧运动员在 t13 起被前侧同伴手臂局部遮挡，之后仍持续可见；可观察轻度同类遮挡下重置是否反而损伤本来正确的历史。",
+      "caveat_zh": "遮挡轻微、身体大部分始终可见，两套自动基线此刻均好；这是轻遮挡反例，不是完整消失后的重识别测试。",
+      "secondary_tags": [
+        "mild_occlusion",
+        "same_class_occluder",
+        "ceiling_case"
+      ],
+      "event_id": "E14",
+      "group_id": "visual-2807",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        16,
+        23,
+        33,
+        43
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\14-occlusion-2807-GT2-t13.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\14-occlusion-2807-GT2-t13-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 17,
+          "values": [
+            {
+              "frame": 14,
+              "mask_iou": 0.7262241054613936
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.8932698844323589
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.8805745554035568
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.8879117603219556
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.8778660105133654
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.8974968710888611
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.6034385886054613
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.8030089836562398
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.8692051075578051
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.888969596347411
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.8810669875651825
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.872986095784595
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.85140717789827
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.8628146646392971
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.7616742152116196
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.7363332093715136
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.5410237570413912
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.0
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 14,
+              "mask_iou": 0.8695845697329377
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.9058089436933591
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.9257794676806084
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.9389351081530782
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.9250964290158019
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.9169724147302623
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.827126321087066
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.9004427577482605
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.9216093445814406
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.9047237790232185
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.8714285714285714
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.9058536585365854
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.903534713420645
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.8463259977620291
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.7117101648351648
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.7849212034383954
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.7944091486658196
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.8368879543406428
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.7560751104565537
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8342047562826783
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.9061717484165562
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.9069767441860465
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.8961265051501524
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.8862508383635144
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.906062124248497
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.9007960080788879
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.8933446068365745
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.8817477096546864
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.8929476666169673
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.8782194848824189
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 21,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 33,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 43,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "f3e7dc6a15b14cbd025d6e4c65394ef2fb8e8bcfcab6565a2676ebd1feda51fc",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2807",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2895,
+      "gt_id": 2,
+      "category": "person",
+      "frame": 11,
+      "frames": 48,
+      "area": 2057,
+      "area_fraction": 0.011317121478873239,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 11,
+      "relative_acceleration": 0.010538424898635016,
+      "relative_speed": 0.01276973949827751,
+      "turn_angle": 54.08443543855097,
+      "background_flow": {
+        "shift": [
+          -2.658660888671875,
+          -5.177776336669922
+        ],
+        "features": 149
+      },
+      "same_class_gt_overlap": 0.10687960687960688,
+      "same_class_nearby": 2,
+      "area_ratio_to_prefix_median": 0.9767331433998101,
+      "anchors": {
+        "A0": {
+          "prediction_id": 2,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8092105263157895
+        },
+        "B0": {
+          "prediction_id": 2,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8770190895741556
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 11,
+          "visible_frames": 11,
+          "mean_fixed_id_iou": 0.8413690393812843
+        },
+        "B0": {
+          "qualified_frames": 11,
+          "visible_frames": 11,
+          "mean_fixed_id_iou": 0.9007483776577715
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 2,
+          "category": "person",
+          "state": 1,
+          "activated": true,
+          "box_xyxy": [
+            286.2850493734528,
+            131.54996983576922,
+            325.2267537735437,
+            226.3279350128367
+          ],
+          "mean": [
+            305.75590157349825,
+            178.93895242430295,
+            0.4108729737691526,
+            94.77796517706747,
+            -2.452023252467519,
+            -0.22252546659428757,
+            1.39647671103612e-07,
+            -1.568228091409837
+          ],
+          "covariance_diagonal": [
+            15.390275071803366,
+            15.390275071803366,
+            0.0007689739166498329,
+            15.390275071803366,
+            4.236482302401217,
+            4.236482302401217,
+            1.0999944699392406e-09,
+            4.236482302401217
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 10
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 2,
+        "box": [
+          283.1922912597656,
+          122.22425079345703,
+          321.20123291015625,
+          220.49212646484375
+        ],
+        "score": 0.8458913564682007,
+        "box_iou": 0.8680044786369069
+      },
+      "reference_correction": {
+        "box": [
+          279.0,
+          124.0,
+          321.0,
+          222.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 2,
+          "score": 0.8458913564682007,
+          "box_iou": 0.8680044786369069
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.8515825491873396,
+        "B0": 0.8688141923436041
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 15,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 3
+        },
+        {
+          "frame": 20,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 2
+        },
+        {
+          "frame": 25,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 2
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 3
+        },
+        {
+          "frame": 35,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 1
+        },
+        {
+          "frame": 40,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 0
+        }
+      ],
+      "scene": "occlusion",
+      "title_zh": "篮球白衣球员：防守者手臂与身体边缘交叠",
+      "rationale_zh": "白衣持球队员与黑衣防守者近身，局部手臂／身体边缘交叠，之后交叠与分离交替发生；旧 ID 与两种纠正框条件均可准备。",
+      "caveat_zh": "t11 只是轻度局部遮挡，主要人体仍可见，且混合同类检测竞争。不能将它当完全遮挡或新身份自动重识别的证据。",
+      "secondary_tags": [
+        "mild_occlusion",
+        "same_class_competition",
+        "body_contact"
+      ],
+      "event_id": "E15",
+      "group_id": "visual-2895",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        14,
+        21,
+        31,
+        41
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\15-occlusion-2895-GT2-t11.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\15-occlusion-2895-GT2-t11-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 26,
+          "values": [
+            {
+              "frame": 12,
+              "mask_iou": 0.8319148936170213
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.8467000835421888
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.8300165837479271
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.8158123370981755
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.8386482627320324
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.8002915451895044
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.8373101952277657
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.7651439920556107
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.7633161512027491
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.7513069454817027
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.8320486815415822
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.8310303987366758
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.8836206896551724
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.8848797250859106
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.8645299145299146
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.8716577540106952
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.7820605187319885
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8064163324826832
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8704119850187266
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.9118100524205982
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.8884120171673819
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.8629712999437253
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.7580452920143027
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.8514750762970499
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.7919168966076936
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.6908013398608606
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 12,
+              "mask_iou": 0.9132553606237817
+            },
+            {
+              "frame": 13,
+              "mask_iou": 0.8891444342226311
+            },
+            {
+              "frame": 14,
+              "mask_iou": 0.8949835911861228
+            },
+            {
+              "frame": 15,
+              "mask_iou": 0.913086913086913
+            },
+            {
+              "frame": 16,
+              "mask_iou": 0.90463645943098
+            },
+            {
+              "frame": 17,
+              "mask_iou": 0.8658468418110676
+            },
+            {
+              "frame": 18,
+              "mask_iou": 0.8831488314883149
+            },
+            {
+              "frame": 19,
+              "mask_iou": 0.8219978746014878
+            },
+            {
+              "frame": 20,
+              "mask_iou": 0.8932551319648094
+            },
+            {
+              "frame": 21,
+              "mask_iou": 0.8485342019543974
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.8420365535248042
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.8760139049826188
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.8591201186356896
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.8635755684351315
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.8607540702656384
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.8542629147417051
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.9232715008431703
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.9355742296918768
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.9231850117096019
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.9058098591549296
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.9121621621621622
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.878714859437751
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.9028275587415372
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.9141945773524721
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.9132684114424833
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.9105518496058217
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.9304785894206549
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.9213091922005571
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.8918057378586162
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.771546803652968
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 19,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 31,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 41,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "d2e9e72de6d011c3a5c90b9c2284872373ef24aa7dc3832b2ff4f98c2318949c",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2895",
+      "approved": false,
+      "H_R_run": false
+    },
+    {
+      "video_id": 2909,
+      "gt_id": 1,
+      "category": "dog",
+      "frame": 20,
+      "frames": 60,
+      "area": 580,
+      "area_fraction": 0.0031910211267605635,
+      "gap_before": 0,
+      "visible_followup": 30,
+      "prefix_visible": 20,
+      "relative_acceleration": 0.14440986533025443,
+      "relative_speed": 0.06086164159883674,
+      "turn_angle": 125.78461610951459,
+      "background_flow": {
+        "shift": [
+          5.81475830078125,
+          -5.050537109375
+        ],
+        "features": 146
+      },
+      "same_class_gt_overlap": 0.0,
+      "same_class_nearby": 0,
+      "area_ratio_to_prefix_median": 0.44891640866873067,
+      "anchors": {
+        "A0": {
+          "prediction_id": 2,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8284407167365612
+        },
+        "B0": {
+          "prediction_id": 2,
+          "anchor_frame": 0,
+          "anchor_iou": 0.8296146044624746
+        }
+      },
+      "prefix_quality": {
+        "A0": {
+          "qualified_frames": 15,
+          "visible_frames": 20,
+          "mean_fixed_id_iou": 0.6132022366852679
+        },
+        "B0": {
+          "qualified_frames": 20,
+          "visible_frames": 20,
+          "mean_fixed_id_iou": 0.7794058929602262
+        }
+      },
+      "retained_states": {
+        "A0": {
+          "id": 2,
+          "category": "dog",
+          "state": 2,
+          "activated": true,
+          "box_xyxy": [
+            282.8626496921479,
+            126.50391198019562,
+            309.492633769897,
+            161.83719330543053
+          ],
+          "mean": [
+            296.17764173102245,
+            144.17055264281308,
+            0.7536799040153124,
+            35.333281325234914,
+            -2.7211036408819145,
+            -2.6002342609501374,
+            8.691064144161644e-07,
+            -2.6619001822401875
+          ],
+          "covariance_diagonal": [
+            8.876239461845259,
+            8.876239461845259,
+            0.0011153686182264573,
+            8.876239461845259,
+            1.247254442542307,
+            1.247254442542307,
+            1.999947490073992e-09,
+            1.247254442542307
+          ]
+        },
+        "B0": {
+          "active_at_previous_step": true,
+          "last_accepted_prompt": 10
+        }
+      },
+      "eligibility_reasons": [],
+      "eligible_common_state": true,
+      "strong_prefix_both_ge3": true,
+      "yolo_correction": {
+        "detector_index": 1,
+        "box": [
+          295.91015625,
+          99.23621368408203,
+          324.25408935546875,
+          148.4215545654297
+        ],
+        "score": 0.5469813346862793,
+        "box_iou": 0.8210911915625767
+      },
+      "reference_correction": {
+        "box": [
+          296.0,
+          98.0,
+          320.0,
+          149.0
+        ]
+      },
+      "yolo_overlapping_boxes_iou_ge_01": [
+        {
+          "detector_index": 1,
+          "score": 0.5469813346862793,
+          "box_iou": 0.8210911915625767
+        },
+        {
+          "detector_index": 2,
+          "score": 0.5057342052459717,
+          "box_iou": 0.3491817129867657
+        }
+      ],
+      "baseline_fixed_id_mask_iou_at_correction": {
+        "A0": 0.0,
+        "B0": 0.57981220657277
+      },
+      "B0_future_target_actions": [
+        {
+          "frame": 25,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 1
+        },
+        {
+          "frame": 30,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 2
+        },
+        {
+          "frame": 45,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 2
+        },
+        {
+          "frame": 50,
+          "action": "refresh",
+          "id": 2,
+          "detector_index": 0
+        }
+      ],
+      "scene": "occlusion",
+      "title_zh": "泳池边犬只：主人俯身时人犬重叠",
+      "rationale_zh": "主人弯腰覆盖犬只一部分身体，t18–21 犬只可见范围缩小，随后人直起身、犬重新更完整可见；目标类别为 dog，可靠前缀和 YOLO 框均存在。",
+      "caveat_zh": "遮挡与犬只姿态变化混合，目标仍可见且较小；可见面积下降并不能全部归因于遮挡，不能冒称完整消失。",
+      "secondary_tags": [
+        "cross_class_occluder",
+        "pose_occlusion_mixture",
+        "small_dog"
+      ],
+      "event_id": "E16",
+      "group_id": "visual-2909",
+      "review_status": "both_prompt_conditions_ready",
+      "followup": 30,
+      "evidence_steps": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        23,
+        30,
+        40,
+        50
+      ],
+      "evidence_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\16-occlusion-2909-GT1-t20.jpg",
+      "detector_image": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\16-occlusion-2909-GT1-t20-detector.jpg",
+      "automatic_baseline_followup_NOT_HR": {
+        "A0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 0,
+          "values": [
+            {
+              "frame": 21,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 46,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 47,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 48,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 49,
+              "mask_iou": 0.0
+            },
+            {
+              "frame": 50,
+              "mask_iou": 0.0
+            }
+          ]
+        },
+        "B0": {
+          "GT_visible_steps": 30,
+          "GT_absent_steps": [],
+          "qualified_fixed_id_steps": 30,
+          "values": [
+            {
+              "frame": 21,
+              "mask_iou": 0.8024523160762943
+            },
+            {
+              "frame": 22,
+              "mask_iou": 0.7360931435963778
+            },
+            {
+              "frame": 23,
+              "mask_iou": 0.7837150127226463
+            },
+            {
+              "frame": 24,
+              "mask_iou": 0.7578796561604585
+            },
+            {
+              "frame": 25,
+              "mask_iou": 0.7503448275862069
+            },
+            {
+              "frame": 26,
+              "mask_iou": 0.8431635388739946
+            },
+            {
+              "frame": 27,
+              "mask_iou": 0.7302383939774153
+            },
+            {
+              "frame": 28,
+              "mask_iou": 0.8161668839634941
+            },
+            {
+              "frame": 29,
+              "mask_iou": 0.7508896797153025
+            },
+            {
+              "frame": 30,
+              "mask_iou": 0.7690447400241838
+            },
+            {
+              "frame": 31,
+              "mask_iou": 0.783180026281209
+            },
+            {
+              "frame": 32,
+              "mask_iou": 0.8302631578947368
+            },
+            {
+              "frame": 33,
+              "mask_iou": 0.8035230352303523
+            },
+            {
+              "frame": 34,
+              "mask_iou": 0.8467852257181943
+            },
+            {
+              "frame": 35,
+              "mask_iou": 0.789544235924933
+            },
+            {
+              "frame": 36,
+              "mask_iou": 0.711139896373057
+            },
+            {
+              "frame": 37,
+              "mask_iou": 0.823841059602649
+            },
+            {
+              "frame": 38,
+              "mask_iou": 0.7934224049331963
+            },
+            {
+              "frame": 39,
+              "mask_iou": 0.8273615635179153
+            },
+            {
+              "frame": 40,
+              "mask_iou": 0.8126888217522659
+            },
+            {
+              "frame": 41,
+              "mask_iou": 0.7995570321151716
+            },
+            {
+              "frame": 42,
+              "mask_iou": 0.6985981308411215
+            },
+            {
+              "frame": 43,
+              "mask_iou": 0.7724770642201835
+            },
+            {
+              "frame": 44,
+              "mask_iou": 0.7653142402545744
+            },
+            {
+              "frame": 45,
+              "mask_iou": 0.7890222984562607
+            },
+            {
+              "frame": 46,
+              "mask_iou": 0.7604078164825828
+            },
+            {
+              "frame": 47,
+              "mask_iou": 0.6976556184316896
+            },
+            {
+              "frame": 48,
+              "mask_iou": 0.7572078907435509
+            },
+            {
+              "frame": 49,
+              "mask_iou": 0.717219589257504
+            },
+            {
+              "frame": 50,
+              "mask_iou": 0.8108108108108109
+            }
+          ]
+        }
+      },
+      "observability_at_planned_readouts": {
+        "8": {
+          "frame": 28,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "20": {
+          "frame": 40,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        },
+        "30": {
+          "frame": 50,
+          "GT_visible_at_endpoint": true,
+          "GT_visible_in_last_3_steps": true
+        }
+      },
+      "complete_GT_visible_followup": true,
+      "readout_endpoint_limited": false,
+      "preflight_sha256": "7298bf58f25cbf714b6e46d094279876440cc7386382fbd54d4a61d6d6ef9210",
+      "baseline_folder": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-baselines-20261020-3080\\2909",
+      "approved": false,
+      "H_R_run": false
+    }
+  ],
+  "split_sha256": "60b0eb20a1f98e049f132dcb0b33808fddb94d288326a3c0466e52b4171616a9",
+  "queue_sha256": "372151fe7bf71955c0762d5c2671028944c04002eaa1007025f0ed6dbfd11a64",
+  "spec_sha256": "d9fd4b61592f708b076c9e171dcb5b61a9cb8cdcba643be93c860365c0b92b67",
+  "quarantines": [
+    {
+      "related_video_ids": [
+        2689,
+        2884
+      ],
+      "excluded_video_ids": [
+        2884
+      ],
+      "reason_zh": "自动稀疏帧重复检查将新编号 2884 与旧猫预实验 2689 归为同一视觉组；已在基线前修正队列 v2，原 v1 保留作废记录。"
+    },
+    {
+      "related_video_ids": [
+        2740,
+        2728
+      ],
+      "excluded_video_ids": [
+        2728
+      ],
+      "reason_zh": "人工 RGB 检查看到相同红色球场、赛事布景与拍摄位置，按可能同源场景保守处理；即使不同人物，也不把两段计成独立主事件。本批两段均未选入。"
+    },
+    {
+      "related_video_ids": [
+        2694,
+        2890
+      ],
+      "excluded_video_ids": [
+        2890
+      ],
+      "reason_zh": "人工看到相同草地飞盘场景、人物与视角；保留 2694，2890 不作为另一独立主事件。冻结划分未改变，两段原本均在开发集。"
+    }
+  ],
+  "nonselected_cases": [
+    {
+      "video_id": 2688,
+      "reason_zh": "部分 person GT 覆盖墙上人物照片（如 GT4），不是现场真人。原始 GT 不改写，但这些目标不作为本批人体遮挡机制样本。"
+    },
+    {
+      "video_id": 2756,
+      "reason_zh": "猫在 t10 后 30 步，A0 固定 ID 仅 8/30 合格，B0 30/30；不是双方法稳定对照。主要攀爬转变偏晚，42 步长度也限制纠正后 30 步窗口，先列边界例而不硬塞。"
+    },
+    {
+      "video_id": 2908,
+      "reason_zh": "GT4 有 7 步可见标注间隙，t19 返回时无合格 YOLO 框，A0 前缀仅 1 个合格锚定帧。可保留为参考框／弱锚定边界诊断，但不混入主对照。"
+    },
+    {
+      "video_id": 2936,
+      "reason_zh": "近处交叠犬只中有 A0 无前缀锚定或不足 3 个合格前缀帧的情况，未为凑检测竞争配额放宽资格。"
+    },
+    {
+      "video_id": 2740,
+      "reason_zh": "GT3 在 t9 缺失后 t10 恢复，但原图不能仅凭这一空 mask 就确认完全遮挡；保留候选，不把可见性缺口当机制证据。"
+    },
+    {
+      "video_id": 2735,
+      "reason_zh": "主近车 A0 前缀锚定较弱；后车可用但本批优先选视觉证据更明确的车辆事件。"
+    },
+    {
+      "video_id": 2886,
+      "reason_zh": "可用 t10/11 窗口尚未到明显搏斗交叠阶段，不将后面更晚的动作冒充纠正时刻的检测竞争。"
+    },
+    {
+      "video_id": 2716,
+      "reason_zh": "可用长窗起点动作较温和，主要下坡奔跑偏晚；保留候选而不虚构急转事件。"
+    },
+    {
+      "video_id": 2728,
+      "reason_zh": "可能与 2740 同源拍摄场景，按人工同源隔离记录处理。"
+    },
+    {
+      "video_id": 2691,
+      "reason_zh": "人物尺度／镜头变化存在但本批暂不选；不是不合格或模型失败的结论。"
+    },
+    {
+      "video_id": 2872,
+      "reason_zh": "门廊栏杆持续遮住人体，缺少清晰遮挡进入／解除事件，不作为这批恢复事件。"
+    },
+    {
+      "video_id": 2907,
+      "reason_zh": "主要接飞盘跳跃偏晚，t10/11 起点不足以代表纠正后的突变恢复；不以整段最终动作替代事件发生时刻。"
+    },
+    {
+      "video_id": 2890,
+      "reason_zh": "可能与 2694 同源飞盘场景，隔离为非独立候选。"
+    },
+    {
+      "video_id": 2844,
+      "reason_zh": "水面、反射、泳姿与身体可见性变化混合；暂不把水下外观变化直接归为普通前景遮挡。"
+    },
+    {
+      "video_id": 2964,
+      "reason_zh": "人物被栏杆持续部分遮挡，并有边界裁切；缺少明确恢复节点，暂不选。"
+    },
+    {
+      "video_id": 2705,
+      "reason_zh": "保留为健身房多人备选；本批已选更明确的高重叠、重复框及同类车辆竞争子类型。"
+    }
+  ],
+  "selection_policy": [
+    "先冻结 120/40/40 视频级划分与 32 段开发候选，再检查 RGB/GT 和原参数自动 A0/B0；没有查看任何新 H/R 结果，也没有为凑配额重抽划分。",
+    "每类 4 个场景候选，每段新视频只选 1 个主事件。场景层并非互斥、随机化的物理因素：保留次标签和混杂说明，不把层间差异直接解释为因果效应。",
+    "共同资格：纠正前至少 10 个导出步骤、纠正后完整 30 步；两套方法首次 IoU≥0.5 的前缀 ID 固定不换，各自至少 3 个合格前缀帧；t0 前旧状态仍可操作，t0 存在 score≥0.25 且与可见 GT 框 IoU≥0.3 的 YOLO 框。GT 参考框是可见 mask 外接框，不是被遮挡目标的完整身体框。",
+    "稳定对照指自动基线在随后 30 个 GT 可见步骤内两套方法的固定 ID mask IoU 均≥0.5，并不要求目标静止。运动突变层包含转向、速度变化和快速尺度变化，不以稀疏光流数值单独证明物理运动。",
+    "遮挡组目前是部分遮挡／局部交叠，其中轻度案例单独注明。它们不等价于完全消失后重现；后者没有凑够同样资格的四个新事件，不能宣称本批覆盖了该问题。",
+    "本批选中 person 12、car 3、dog 1，尚无 cat/horse 主事件。这是机制预实验，不是五类别均衡评测。新的猫 2756 是 ByteTrack 身份不稳定的边界案例，未冒充稳定对照；新的长 horse 视频不足，未来短窗扩展须单独预注册。",
+    "16 个候选都满足两套旧状态与两种纠正输入资格，但不等于每个长窗终点都可观察。E05 越栏目标在 t27 起出画，t0=14 后仅 12 个 GT 可见步骤；第 20/30 步的目标恢复状态标记为不可观察，不能当失败或延迟恢复证据。E09/E13 的短暂 GT 缺口也逐步列出。E05 若保留，应作为可见期恢复与出画边界案例，不混入完整长窗的延迟恢复统计。",
+    "保留原参数和旧结果，统一先观察 8/20/30 步；生命期删除、关联中断和 mask 质量下降分开记。SAM 跳过一次提示刷新子实验不随这份清单启动，须另选有真实目标刷新动作的事件。",
+    "只生成本地审阅包：没有 H/R、训练、学校服务器操作、Git 推送或学习网站更新。批准这份清单也不会自动触发运行。"
+  ],
+  "report_file": "D:\\0.Rutgers\\CS550\\Project\\CS550_Project\\experiments\\runs\\independent-selection-20261020\\review-v2\\REVIEW_ZH.html",
+  "category_counts": {
+    "car": 3,
+    "person": 12,
+    "dog": 1
+  },
+  "scene_counts": {
+    "stable": 4,
+    "motion": 4,
+    "competition": 4,
+    "occlusion": 4
+  },
+  "readiness_counts": {
+    "both_prompt_conditions_ready": 16
+  },
+  "source_sha256": "2afb8dcd9269d374f1245501e760b4d192b9e3a57d9f44a4f812d00f76a688f3",
+  "endpoint_limited_event_ids": [
+    "E05"
+  ],
+  "full_GT_visible_window_count": 13
+}

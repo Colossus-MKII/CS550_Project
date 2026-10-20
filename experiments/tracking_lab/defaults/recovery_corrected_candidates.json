@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "seed": 550,
+  "role": "draft_corrected_evidence_candidates_not_frozen_not_run",
+  "window": 8,
+  "mask_iou_threshold": 0.5,
+  "streak_required": 3,
+  "anchor_mask_iou": 0.5,
+  "correction_box_min_iou": 0.3,
+  "conditions": ["yolo", "reference"],
+  "events": [
+    {"name": "cat-stable-control", "video_id": 2689, "gt_id": 2, "category": "cat", "frame": 20, "purpose": "reliable-history control before detector gap; not a failure event"},
+    {"name": "cat-before-retirement", "video_id": 2689, "gt_id": 2, "category": "cat", "frame": 35, "purpose": "accurate SAM state before explicit lifecycle retirement; reference-box condition only if YOLO absent"},
+    {"name": "rider-duplicate", "video_id": 2686, "gt_id": 1, "category": "person", "frame": 7, "purpose": "fixed anchored target ID versus competing duplicate; not catastrophic segmentation drift"},
+    {"name": "equestrian-person-poor-mask", "video_id": 2718, "gt_id": 1, "category": "person", "frame": 14, "purpose": "genuine low mask overlap despite adequate diagnostic YOLO observation; horse is not the failed target"},
+    {"name": "dog-no-history-control", "video_id": 2744, "gt_id": 1, "category": "dog", "frame": 10, "purpose": "ineligible retained-history negative control; never manufacture an existing track"}
+  ]
+}

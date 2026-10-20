@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "CS550: preflight (no inference)",
+      "type": "process",
+      "command": "${command:python.interpreterPath}",
+      "windows": {
+        "command": "${config:python.defaultInterpreterPath}"
+      },
+      "args": ["-m", "tracking_lab.run", "--check", "--device", "cuda:0"],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {"CS550_EXPERIMENT_HOME": "${workspaceFolder}"}
+      },
+      "group": {"kind": "build", "isDefault": true},
+      "problemMatcher": [],
+      "presentation": {"reveal": "always", "panel": "dedicated"}
+    },
+    {
+      "label": "CS550: experiment unit tests",
+      "type": "process",
+      "command": "${command:python.interpreterPath}",
+      "windows": {
+        "command": "${config:python.defaultInterpreterPath}"
+      },
+      "args": ["-m", "pytest", "tests", "-q"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

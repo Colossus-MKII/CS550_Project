@@ -1,0 +1,10 @@
+# Runtime files are portable local resources, not source-controlled coursework.
+data/
+checkpoints/
+external/
+runs/
+.cache/
+.venv/
+*.egg-info/
+build/
+dist/

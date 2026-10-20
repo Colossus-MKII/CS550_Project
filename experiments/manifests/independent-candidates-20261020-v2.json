@@ -1,0 +1,489 @@
+{
+  "schema": 1,
+  "version": "independent-candidates-20261020-v2",
+  "status": "frozen_before_candidate_baseline_inference",
+  "split_sha256": "60b0eb20a1f98e049f132dcb0b33808fddb94d288326a3c0466e52b4171616a9",
+  "seed": 550,
+  "selection_information": "Development split, length, sparse visual group, audited categories and visibility gaps only; no H/R or model-quality ranking.",
+  "video_ids": [
+    2908,
+    2822,
+    2740,
+    2688,
+    2694,
+    2756,
+    2936,
+    2967,
+    2735,
+    2750,
+    2845,
+    2920,
+    2886,
+    2716,
+    2719,
+    2922,
+    2807,
+    2728,
+    2691,
+    2872,
+    2895,
+    2907,
+    2944,
+    2924,
+    2890,
+    2844,
+    2964,
+    2909,
+    2705,
+    2856,
+    2859,
+    2965
+  ],
+  "candidates": [
+    {
+      "video_id": 2908,
+      "group_id": "visual-2908",
+      "categories": [
+        "person"
+      ],
+      "frames": 62,
+      "focus": "person",
+      "early_visibility_gap_hint": true,
+      "target_tracks": 4
+    },
+    {
+      "video_id": 2822,
+      "group_id": "visual-2822",
+      "categories": [
+        "car",
+        "dog",
+        "person"
+      ],
+      "frames": 54,
+      "focus": "dog",
+      "early_visibility_gap_hint": true,
+      "target_tracks": 10
+    },
+    {
+      "video_id": 2740,
+      "group_id": "visual-2740",
+      "categories": [
+        "person"
+      ],
+      "frames": 50,
+      "focus": "person",
+      "early_visibility_gap_hint": true,
+      "target_tracks": 4
+    },
+    {
+      "video_id": 2688,
+      "group_id": "visual-2688",
+      "categories": [
+        "person"
+      ],
+      "frames": 45,
+      "focus": "person",
+      "early_visibility_gap_hint": true,
+      "target_tracks": 7
+    },
+    {
+      "video_id": 2694,
+      "group_id": "visual-2694",
+      "categories": [
+        "person"
+      ],
+      "frames": 60,
+      "focus": "person",
+      "early_visibility_gap_hint": true,
+      "target_tracks": 5
+    },
+    {
+      "video_id": 2756,
+      "group_id": "visual-2756",
+      "categories": [
+        "cat"
+      ],
+      "frames": 42,
+      "focus": "cat",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 1
+    },
+    {
+      "video_id": 2936,
+      "group_id": "visual-2936",
+      "categories": [
+        "dog",
+        "person"
+      ],
+      "frames": 48,
+      "focus": "dog",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 8
+    },
+    {
+      "video_id": 2967,
+      "group_id": "visual-2967",
+      "categories": [
+        "car",
+        "person"
+      ],
+      "frames": 45,
+      "focus": "car",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 4
+    },
+    {
+      "video_id": 2735,
+      "group_id": "visual-2735",
+      "categories": [
+        "car",
+        "person"
+      ],
+      "frames": 44,
+      "focus": "car",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 5
+    },
+    {
+      "video_id": 2750,
+      "group_id": "visual-2750",
+      "categories": [
+        "person"
+      ],
+      "frames": 60,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 2
+    },
+    {
+      "video_id": 2845,
+      "group_id": "visual-2845",
+      "categories": [
+        "person"
+      ],
+      "frames": 54,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 1
+    },
+    {
+      "video_id": 2920,
+      "group_id": "visual-2920",
+      "categories": [
+        "person"
+      ],
+      "frames": 60,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 7
+    },
+    {
+      "video_id": 2886,
+      "group_id": "visual-2886",
+      "categories": [
+        "person"
+      ],
+      "frames": 42,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 3
+    },
+    {
+      "video_id": 2716,
+      "group_id": "visual-2716",
+      "categories": [
+        "person"
+      ],
+      "frames": 42,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 3
+    },
+    {
+      "video_id": 2719,
+      "group_id": "visual-2719",
+      "categories": [
+        "car"
+      ],
+      "frames": 42,
+      "focus": "car",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 3
+    },
+    {
+      "video_id": 2922,
+      "group_id": "visual-2922",
+      "categories": [
+        "car",
+        "person"
+      ],
+      "frames": 42,
+      "focus": "car",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 7
+    },
+    {
+      "video_id": 2807,
+      "group_id": "visual-2807",
+      "categories": [
+        "person"
+      ],
+      "frames": 50,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 2
+    },
+    {
+      "video_id": 2728,
+      "group_id": "visual-2728",
+      "categories": [
+        "person"
+      ],
+      "frames": 50,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 4
+    },
+    {
+      "video_id": 2691,
+      "group_id": "visual-2691",
+      "categories": [
+        "person"
+      ],
+      "frames": 45,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 1
+    },
+    {
+      "video_id": 2872,
+      "group_id": "visual-2872",
+      "categories": [
+        "person"
+      ],
+      "frames": 60,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 1
+    },
+    {
+      "video_id": 2895,
+      "group_id": "visual-2895",
+      "categories": [
+        "person"
+      ],
+      "frames": 48,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 4
+    },
+    {
+      "video_id": 2907,
+      "group_id": "visual-2907",
+      "categories": [
+        "dog",
+        "person"
+      ],
+      "frames": 42,
+      "focus": "dog",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 2
+    },
+    {
+      "video_id": 2944,
+      "group_id": "visual-2944",
+      "categories": [
+        "person"
+      ],
+      "frames": 54,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 1
+    },
+    {
+      "video_id": 2924,
+      "group_id": "visual-2924",
+      "categories": [
+        "person"
+      ],
+      "frames": 48,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 1
+    },
+    {
+      "video_id": 2890,
+      "group_id": "visual-2890",
+      "categories": [
+        "person"
+      ],
+      "frames": 42,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 5
+    },
+    {
+      "video_id": 2844,
+      "group_id": "visual-2844",
+      "categories": [
+        "person"
+      ],
+      "frames": 60,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 1
+    },
+    {
+      "video_id": 2964,
+      "group_id": "visual-2964",
+      "categories": [
+        "person"
+      ],
+      "frames": 48,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 1
+    },
+    {
+      "video_id": 2909,
+      "group_id": "visual-2909",
+      "categories": [
+        "dog",
+        "person"
+      ],
+      "frames": 60,
+      "focus": "dog",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 3
+    },
+    {
+      "video_id": 2705,
+      "group_id": "visual-2705",
+      "categories": [
+        "person"
+      ],
+      "frames": 48,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 4
+    },
+    {
+      "video_id": 2856,
+      "group_id": "visual-2856",
+      "categories": [
+        "car",
+        "person"
+      ],
+      "frames": 42,
+      "focus": "car",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 4
+    },
+    {
+      "video_id": 2859,
+      "group_id": "visual-2859",
+      "categories": [
+        "person"
+      ],
+      "frames": 45,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 1
+    },
+    {
+      "video_id": 2965,
+      "group_id": "visual-2965",
+      "categories": [
+        "person"
+      ],
+      "frames": 60,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 1
+    }
+  ],
+  "reserves": [
+    {
+      "video_id": 2726,
+      "group_id": "visual-2726",
+      "categories": [
+        "person"
+      ],
+      "frames": 48,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 3
+    },
+    {
+      "video_id": 2830,
+      "group_id": "visual-2830",
+      "categories": [
+        "person"
+      ],
+      "frames": 50,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 2
+    },
+    {
+      "video_id": 2893,
+      "group_id": "visual-2893",
+      "categories": [
+        "dog"
+      ],
+      "frames": 48,
+      "focus": "dog",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 2
+    },
+    {
+      "video_id": 2816,
+      "group_id": "visual-2816",
+      "categories": [
+        "person"
+      ],
+      "frames": 60,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 5
+    },
+    {
+      "video_id": 2972,
+      "group_id": "visual-2972",
+      "categories": [
+        "person"
+      ],
+      "frames": 54,
+      "focus": "person",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 6
+    },
+    {
+      "video_id": 2923,
+      "group_id": "visual-2923",
+      "categories": [
+        "car",
+        "person"
+      ],
+      "frames": 48,
+      "focus": "car",
+      "early_visibility_gap_hint": false,
+      "target_tracks": 9
+    }
+  ],
+  "constraints": {
+    "new_videos_only": true,
+    "one_per_visual_group": true,
+    "minimum_prefix": 10,
+    "followup": 30
+  },
+  "H_R_permitted": false,
+  "excluded_old_visual_groups": [
+    "visual-2686",
+    "visual-2689",
+    "visual-2692",
+    "visual-2718",
+    "visual-2744"
+  ],
+  "validation_evaluation_access": "No image rendering or inference; duplicate hashes were computed during data-only grouping."
+}

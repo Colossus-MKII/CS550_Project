@@ -1,0 +1,89 @@
+16-EVENT LOCAL RETAIN/RESET COHORT -- CODE READING MAP
+
+中文速读（先看实验步骤对应哪个函数，不必先展开张量细节）：
+  1. recovery_cohort.prepare_plan：新版16段清单 -> 固定每段的配置、目标ID和纠正框。
+  2. recovery.execute：复现原基线与共同前缀 -> 复制同一份状态 -> 一次纠正 -> 四组往后跑。
+  3. ByteEngine.step / SamEngine.step：各自落实保留或重置；模型权重不变。
+  4. recovery_metrics.evaluate_recovery：固定原ID，排除纠正当帧，评价随后窗口。
+  5. recovery_report.build：校验评分与干预，生成四组视频和曲线。
+  6. recovery_cohort_report.per_event / aggregate：同一份预测截取8/20/30步，做同模型配对分析。
+  7. recovery_cohort_repeat.compare_verified：两段原配置复跑，逐项比较数值，不算新样本。
+  先区分“模型状态不同但输出相同”“换了新ID”“mask差”“状态已删除”，再看底层实现。
+
+Start with the experiment steps, not tensor-level details:
+
+1. Freeze the reviewed sample and route.
+   tracking_lab/recovery_cohort.py -> prepare_plan()
+   Input: independent-events-review-20261020-v3.json, baseline archives, RGB/GT.
+   Output: NEW cohort/configs/*.json and cohort.json. Sixteen primary events;
+   2967/BC01 is rejected. The frozen review JSON is not rewritten as approved;
+   the user's explicit run request is recorded in the NEW execution plan.
+
+2. Reproduce the unmodified baseline and the common prefix.
+   recovery.py -> execute(); recovery_events.py -> resolve_events().
+   Native A0 replay and synchronized native B0 replay must match saved masks,
+   boxes, IDs and scores. The first qualified prefix identity remains fixed.
+   No per-frame best-ID reselection and no new samples selected by H/R results.
+
+3. Fork the same state, then apply ONE box correction at t0.
+   recovery_engines.py -> ByteEngine.fork()/step(), SamEngine.fork()/step().
+   A-H: retain KF mean/covariance, predict and update with the supplied box.
+   A-R: initialize KF from the same box; same external ID/lifecycle metadata.
+   B-H: retain target prompt/memory history and add the supplied box.
+   B-R: clear only that target's old prompt/memory containers, then add the box.
+   Model weights, image features and other targets are not reset or trained.
+   recovery_state.py -> reset_sam_target() audits all five per-object stores.
+
+4. Feed 30 subsequent exported steps normally.
+   Same cached YOLO observations; no more controlled corrections, no skip-one.
+   Two box sources (YOLO and visible-GT reference) x four groups = eight
+   branches per event, 128 total. Reference boxes are a diagnostic condition,
+   not an automatic deployment claim. A's correction frame has no invented
+   mask and is excluded from scoring for ALL groups.
+
+5. Log what REALLY happened, not just what was scheduled.
+   ByteEngine trace.assignments: installed tracker's candidate costs/matches.
+   SamEngine trace.prompt_inputs: actual prompt box, detector index, score and
+   source (controlled_correction/native_refresh/native_discover).
+   Later detector inputs are identical, but actual accepted SAM prompts can
+   differ because mask-dependent association is part of the closed loop.
+   Do not claim future prompts were held fixed unless the trace proves it.
+
+6. Score fixed IDs, distinguish mechanisms, inspect video.
+   recovery_metrics.py -> evaluate_recovery(): mask IoU >= .5 for 3 successive
+   GT-visible steps; exclude t0. Invisible GT breaks the streak; separately
+   count output when GT is invisible. Never call invisibility itself failure.
+   recovery_report.py -> verify_recovery()/build(): independent rescoring,
+   reset audits, exact prefixes, four-group MP4 and curves for each box source.
+   recovery_cohort_report.py -> per_event()/branch_diagnostics()/aggregate():
+   8/20/30 prefixes of the SAME saved run, association/output/state deletion
+   distinctions, actual prompt comparisons, paired event-level summaries.
+
+7. Check independent numerical repeatability (not additional samples).
+   recovery_cohort_repeat.py -> execute()/compare_verified().
+   E09 and E13 were fixed before their primary outcomes were inspected. Run
+   the EXACT same configs/weights/inputs again into another new folder. Compare
+   every mask/box/ID/score, recovery curve, KF/assignment trace and SAM prompt
+   record. These 16 verification branches are not pooled with the primary128.
+
+How to read the findings:
+   - Already-correct controls test maintenance, not recovery from an error.
+   - Ever attaining 3 good steps does not mean tracking remains good at step30.
+   - Active poor masks are different from lost association or state deletion.
+   - Compare H/R within A and within B first, under the same correction source.
+   - Threshold-count ties may still have different contours or KF states.
+   - The independent sample size is 16 videos, not 128 branches/192 windows.
+   - The chosen strata are small, manual development samples, not population
+     frequencies or a five-class benchmark. Cat/horse are not in this cohort.
+
+Commands (from repository root with the reviewed Python environment):
+   python -m tracking_lab.recovery_cohort run --review <v3.json>
+     --baselines <independent-baselines-root> --data-root <lossless-export>
+     --output <NEW-cohort-root>
+   python -m tracking_lab.recovery_cohort render --output <NEW-cohort-root>
+   python -m tracking_lab.recovery_cohort_report --cohort <NEW-cohort-root>
+     --output <NEW-analysis-root>
+
+Run uses only the LOCAL RTX 3080 and refuses an existing output root. Render
+and analysis read saved predictions; no weights are loaded by these stages.
+The old results, learning website and Git remote are not modified or uploaded.

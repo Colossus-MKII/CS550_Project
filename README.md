@@ -21,6 +21,10 @@ The proposal and its LaTeX support files remain together in [docs/proposal](docs
 
 Both editions include an abstract, related work, experimental design, evaluation, and all three authors' names. Student ID lines are omitted at the team's request. The complete team-reviewed design is retained in the full edition: five English body pages plus one reference page, and four Chinese body pages plus one reference page. At the team's request, the concise edition allows up to three body pages, with references on a separate page. Content flows naturally without manual chapter breaks or stretched paragraph spacing, preserving headings, readable paragraphs and a four-group comparison table. The current English edition has three body pages; the Chinese edition has two. The original course-format source is recorded in [template provenance](docs/proposal/TEMPLATE-PROVENANCE.md); the current review format does not reinterpret that source. Coursework submission is performed by the human, never by an agent.
 
+## Independent experiment workspace
+
+Actual experiment code lives in [experiments](experiments/README.md), with an installable `tracking_lab` package, independent inputs/configuration, tests, and Windows/Linux entrypoints. It does not import `learning/` or use the teaching site's data paths. It runs automatic A0/B0 systems, scores class-aware masks with pinned official TrackEval, and generates saved-result figures/reports. See the [Chinese code guide](experiments/CODE_GUIDE.md). The first pilot covers five annotated videos, 207 exported steps. The teaching website only consumes saved results; it is not the experiment runtime. Data, checkpoints, third-party code and runs remain ignored. No school-server upload or coursework delivery is implied by this workspace.
+
 ## Build
 
 The Python builder uses the standard library and generates `docs/proposal/proposal.tex` from the Markdown content:
@@ -69,7 +73,7 @@ Actual YOLO boxes and annotation-derived current-frame reference boxes are separ
 
 Fix event selection, thresholds, observation windows, and any follow-up policy on development/validation data before held-out evaluation. Model weights stay fixed throughout the core study. A simple automatic policy is optional only if the controlled findings support it; the paired analysis remains a complete research result if no policy improves the systems.
 
-Short local inference has been verified on the RTX 3080 (10 GB), but the complete automatic SAM wrapper, paired state interventions, and benchmark evaluation still require implementation and pilots. School runs must observe current Rutgers access and scheduling rules; GPU availability is not assumed.
+Automatic A0/B0 inference, GT evaluation and paired state interventions have been verified locally on the RTX 3080 (10 GB). The latest development cohort contains 16 reviewed events, two corrective-box conditions and four H/R groups (128 main branches), with 8/20/30-step readouts from the same predictions. All 64 ByteTrack branches were independently replayed on CPU; two preselected events were rerun exactly on GPU. See the [cohort code guide](experiments/RECOVERY_COHORT_GUIDE.txt). These are development observations, not a held-out benchmark result. Linux entrypoints are prepared but not yet verified on school hardware. School runs must observe current Rutgers access and scheduling rules; GPU availability is not assumed.
 
 ## Pilot resources
 

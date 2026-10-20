@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "seed": 550,
+  "role": "local_development_paired_pilot_frozen_before_inference_not_formal_protocol",
+  "window": 8,
+  "mask_iou_threshold": 0.5,
+  "streak_required": 3,
+  "anchor_mask_iou": 0.5,
+  "correction_box_min_iou": 0.3,
+  "conditions": ["yolo", "reference"],
+  "events": [
+    {
+      "name": "equestrian-person-poor-mask",
+      "video_id": 2718,
+      "gt_id": 1,
+      "category": "person",
+      "frame": 14,
+      "purpose": "Low B0 mask overlap with an existing target and adequate diagnostic YOLO box; horse is not the failed target"
+    },
+    {
+      "name": "cat-stable-control",
+      "video_id": 2689,
+      "gt_id": 2,
+      "category": "cat",
+      "frame": 20,
+      "purpose": "Reliable SAM history control before a detector gap; not a failure event"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Stage 1: run / step through A0 + B0",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "tracking_lab.run",
+      "cwd": "${workspaceFolder}",
+      "python": "${command:python.interpreterPath}",
+      "windows": {
+        "python": "${config:python.defaultInterpreterPath}"
+      },
+      "args": ["--device", "cuda:0"],
+      "console": "internalConsole",
+      "justMyCode": true,
+      "stopOnEntry": true,
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "CS550_EXPERIMENT_HOME": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "Stage 1: preflight only (no model inference)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "tracking_lab.run",
+      "cwd": "${workspaceFolder}",
+      "python": "${command:python.interpreterPath}",
+      "windows": {
+        "python": "${config:python.defaultInterpreterPath}"
+      },
+      "args": ["--check", "--device", "cuda:0"],
+      "console": "internalConsole",
+      "justMyCode": true,
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "CS550_EXPERIMENT_HOME": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "Recovery: four groups / step through",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "tracking_lab.recovery",
+      "cwd": "${workspaceFolder}",
+      "python": "${command:python.interpreterPath}",
+      "windows": {"python": "${config:python.defaultInterpreterPath}"},
+      "args": ["--device", "cuda:0"],
+      "console": "internalConsole",
+      "justMyCode": true,
+      "stopOnEntry": true,
+      "env": {"PYTHONUNBUFFERED": "1", "CS550_EXPERIMENT_HOME": "${workspaceFolder}"}
+    },
+    {
+      "name": "Recovery: preflight only (no model inference)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "tracking_lab.recovery",
+      "cwd": "${workspaceFolder}",
+      "python": "${command:python.interpreterPath}",
+      "windows": {"python": "${config:python.defaultInterpreterPath}"},
+      "args": ["--check", "--device", "cuda:0"],
+      "console": "internalConsole",
+      "justMyCode": true,
+      "env": {"PYTHONUNBUFFERED": "1", "CS550_EXPERIMENT_HOME": "${workspaceFolder}"}
+    }
+  ]
+}

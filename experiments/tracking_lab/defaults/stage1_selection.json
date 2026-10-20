@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "purpose": "development_pilot_only",
+  "dataset": "YouTube-VIS 2021 via SlotCurri annotated export",
+  "video_ids": [2686, 2744, 2689, 2718, 2692],
+  "selection": "All five previously exported class-coverage samples, fixed before model scoring; not selected for favorable results.",
+  "held_out_rule": "Exclude these videos from the future held-out evaluation split.",
+  "source_timing": "Only exported frame order is available; no original FPS or timestamps."
+}

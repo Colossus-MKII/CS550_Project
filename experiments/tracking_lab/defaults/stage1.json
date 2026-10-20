@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "seed": 550,
+  "imgsz": 640,
+  "detector_conf": 0.1,
+  "detector_nms_iou": 0.7,
+  "discovery_interval": 5,
+  "sam_prompt_conf": 0.25,
+  "sam_match_iou": 0.3,
+  "sam_duplicate_iou": 0.7,
+  "sam_retention_steps": 15,
+  "browse_fps": 5,
+  "bytetrack": {
+    "track_high_thresh": 0.25,
+    "track_low_thresh": 0.1,
+    "new_track_thresh": 0.25,
+    "track_buffer": 30,
+    "match_thresh": 0.8,
+    "fuse_score": true
+  }
+}

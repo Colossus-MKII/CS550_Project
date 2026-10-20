@@ -1,0 +1,1962 @@
+{
+  "schema": 1,
+  "version": "ytvis2021-200-seed550-v1",
+  "status": "frozen_before_candidate_baseline_inference",
+  "created_utc": "2026-10-20T19:34:59.971598+00:00",
+  "seed": 550,
+  "audit_sha256": "b97166e0e2998a5fb8f64055cb8e94d265bdcf74b89f1f745e530881cd4031b2",
+  "archive_sha256": "b0708de42d7f7277998527fb23098062039323c4043d62d83d2146d2444d2d20",
+  "duplicate_screen_sha256": "13a6380bfe33665d270863c3c3470ea5b16f7d9dd5e479f56a79cd0a2eb1adb3",
+  "old_development_videos": [
+    2686,
+    2744,
+    2689,
+    2718,
+    2692
+  ],
+  "selected_video_count": 200,
+  "splits": {
+    "development": [
+      {
+        "video_id": 2686,
+        "group_id": "visual-2686",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2688,
+        "group_id": "visual-2688",
+        "categories": [
+          "person"
+        ],
+        "frames": 45
+      },
+      {
+        "video_id": 2689,
+        "group_id": "visual-2689",
+        "categories": [
+          "cat"
+        ],
+        "frames": 54
+      },
+      {
+        "video_id": 2690,
+        "group_id": "visual-2690",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2691,
+        "group_id": "visual-2691",
+        "categories": [
+          "person"
+        ],
+        "frames": 45
+      },
+      {
+        "video_id": 2692,
+        "group_id": "visual-2692",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 15
+      },
+      {
+        "video_id": 2694,
+        "group_id": "visual-2694",
+        "categories": [
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2702,
+        "group_id": "visual-2702",
+        "categories": [
+          "person"
+        ],
+        "frames": 29
+      },
+      {
+        "video_id": 2703,
+        "group_id": "visual-2703",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2705,
+        "group_id": "visual-2705",
+        "categories": [
+          "person"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2708,
+        "group_id": "visual-2708",
+        "categories": [
+          "person"
+        ],
+        "frames": 19
+      },
+      {
+        "video_id": 2713,
+        "group_id": "visual-2713",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2714,
+        "group_id": "visual-2714",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2716,
+        "group_id": "visual-2716",
+        "categories": [
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2717,
+        "group_id": "visual-2717",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2718,
+        "group_id": "visual-2718",
+        "categories": [
+          "horse",
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2719,
+        "group_id": "visual-2719",
+        "categories": [
+          "car"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2721,
+        "group_id": "visual-2721",
+        "categories": [
+          "person"
+        ],
+        "frames": 20
+      },
+      {
+        "video_id": 2722,
+        "group_id": "visual-2722",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2726,
+        "group_id": "visual-2726",
+        "categories": [
+          "person"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2728,
+        "group_id": "visual-2728",
+        "categories": [
+          "person"
+        ],
+        "frames": 50
+      },
+      {
+        "video_id": 2734,
+        "group_id": "visual-2734",
+        "categories": [
+          "person"
+        ],
+        "frames": 40
+      },
+      {
+        "video_id": 2735,
+        "group_id": "visual-2735",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 44
+      },
+      {
+        "video_id": 2736,
+        "group_id": "visual-2736",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2738,
+        "group_id": "visual-2738",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2740,
+        "group_id": "visual-2740",
+        "categories": [
+          "person"
+        ],
+        "frames": 50
+      },
+      {
+        "video_id": 2741,
+        "group_id": "visual-2741",
+        "categories": [
+          "person"
+        ],
+        "frames": 35
+      },
+      {
+        "video_id": 2742,
+        "group_id": "visual-2742",
+        "categories": [
+          "car"
+        ],
+        "frames": 31
+      },
+      {
+        "video_id": 2743,
+        "group_id": "visual-2743",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2744,
+        "group_id": "visual-2744",
+        "categories": [
+          "dog"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2745,
+        "group_id": "visual-2745",
+        "categories": [
+          "person"
+        ],
+        "frames": 23
+      },
+      {
+        "video_id": 2747,
+        "group_id": "visual-2747",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2750,
+        "group_id": "visual-2750",
+        "categories": [
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2751,
+        "group_id": "visual-2751",
+        "categories": [
+          "person"
+        ],
+        "frames": 35
+      },
+      {
+        "video_id": 2752,
+        "group_id": "visual-2752",
+        "categories": [
+          "person"
+        ],
+        "frames": 35
+      },
+      {
+        "video_id": 2755,
+        "group_id": "visual-2755",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2756,
+        "group_id": "visual-2756",
+        "categories": [
+          "cat"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2757,
+        "group_id": "visual-2757",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2758,
+        "group_id": "visual-2758",
+        "categories": [
+          "person"
+        ],
+        "frames": 35
+      },
+      {
+        "video_id": 2761,
+        "group_id": "visual-2761",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2762,
+        "group_id": "visual-2762",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2764,
+        "group_id": "visual-2764",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2765,
+        "group_id": "visual-2765",
+        "categories": [
+          "horse",
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2770,
+        "group_id": "visual-2770",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2775,
+        "group_id": "visual-2775",
+        "categories": [
+          "horse",
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2778,
+        "group_id": "visual-2778",
+        "categories": [
+          "person"
+        ],
+        "frames": 29
+      },
+      {
+        "video_id": 2782,
+        "group_id": "visual-2782",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2785,
+        "group_id": "visual-2785",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2786,
+        "group_id": "visual-2786",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2795,
+        "group_id": "visual-2795",
+        "categories": [
+          "person"
+        ],
+        "frames": 15
+      },
+      {
+        "video_id": 2801,
+        "group_id": "visual-2801",
+        "categories": [
+          "person"
+        ],
+        "frames": 15
+      },
+      {
+        "video_id": 2803,
+        "group_id": "visual-2803",
+        "categories": [
+          "car",
+          "dog",
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2807,
+        "group_id": "visual-2807",
+        "categories": [
+          "person"
+        ],
+        "frames": 50
+      },
+      {
+        "video_id": 2813,
+        "group_id": "visual-2813",
+        "categories": [
+          "car"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2815,
+        "group_id": "visual-2815",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2816,
+        "group_id": "visual-2816",
+        "categories": [
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2821,
+        "group_id": "visual-2821",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2822,
+        "group_id": "visual-2822",
+        "categories": [
+          "car",
+          "dog",
+          "person"
+        ],
+        "frames": 54
+      },
+      {
+        "video_id": 2828,
+        "group_id": "visual-2828",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2829,
+        "group_id": "visual-2829",
+        "categories": [
+          "person"
+        ],
+        "frames": 35
+      },
+      {
+        "video_id": 2830,
+        "group_id": "visual-2830",
+        "categories": [
+          "person"
+        ],
+        "frames": 50
+      },
+      {
+        "video_id": 2833,
+        "group_id": "visual-2833",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2836,
+        "group_id": "visual-2836",
+        "categories": [
+          "person"
+        ],
+        "frames": 18
+      },
+      {
+        "video_id": 2843,
+        "group_id": "visual-2843",
+        "categories": [
+          "person"
+        ],
+        "frames": 20
+      },
+      {
+        "video_id": 2844,
+        "group_id": "visual-2844",
+        "categories": [
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2845,
+        "group_id": "visual-2845",
+        "categories": [
+          "person"
+        ],
+        "frames": 54
+      },
+      {
+        "video_id": 2847,
+        "group_id": "visual-2847",
+        "categories": [
+          "person"
+        ],
+        "frames": 34
+      },
+      {
+        "video_id": 2850,
+        "group_id": "visual-2850",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2851,
+        "group_id": "visual-2851",
+        "categories": [
+          "car"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2852,
+        "group_id": "visual-2852",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2856,
+        "group_id": "visual-2856",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2859,
+        "group_id": "visual-2859",
+        "categories": [
+          "person"
+        ],
+        "frames": 45
+      },
+      {
+        "video_id": 2861,
+        "group_id": "visual-2861",
+        "categories": [
+          "car"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2864,
+        "group_id": "visual-2864",
+        "categories": [
+          "dog",
+          "person"
+        ],
+        "frames": 40
+      },
+      {
+        "video_id": 2869,
+        "group_id": "visual-2869",
+        "categories": [
+          "person"
+        ],
+        "frames": 20
+      },
+      {
+        "video_id": 2870,
+        "group_id": "visual-2870",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2872,
+        "group_id": "visual-2872",
+        "categories": [
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2874,
+        "group_id": "visual-2874",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2884,
+        "group_id": "visual-2689",
+        "categories": [
+          "cat"
+        ],
+        "frames": 54
+      },
+      {
+        "video_id": 2886,
+        "group_id": "visual-2886",
+        "categories": [
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2887,
+        "group_id": "visual-2887",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2890,
+        "group_id": "visual-2890",
+        "categories": [
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2892,
+        "group_id": "visual-2892",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2893,
+        "group_id": "visual-2893",
+        "categories": [
+          "dog"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2894,
+        "group_id": "visual-2894",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2895,
+        "group_id": "visual-2895",
+        "categories": [
+          "person"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2897,
+        "group_id": "visual-2897",
+        "categories": [
+          "horse",
+          "person"
+        ],
+        "frames": 20
+      },
+      {
+        "video_id": 2899,
+        "group_id": "visual-2899",
+        "categories": [
+          "person"
+        ],
+        "frames": 23
+      },
+      {
+        "video_id": 2901,
+        "group_id": "visual-2901",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2905,
+        "group_id": "visual-2905",
+        "categories": [
+          "dog",
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2907,
+        "group_id": "visual-2907",
+        "categories": [
+          "dog",
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2908,
+        "group_id": "visual-2908",
+        "categories": [
+          "person"
+        ],
+        "frames": 62
+      },
+      {
+        "video_id": 2909,
+        "group_id": "visual-2909",
+        "categories": [
+          "dog",
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2913,
+        "group_id": "visual-2913",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2914,
+        "group_id": "visual-2914",
+        "categories": [
+          "person"
+        ],
+        "frames": 35
+      },
+      {
+        "video_id": 2916,
+        "group_id": "visual-2916",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2919,
+        "group_id": "visual-2714",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2920,
+        "group_id": "visual-2920",
+        "categories": [
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2922,
+        "group_id": "visual-2922",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2923,
+        "group_id": "visual-2923",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2924,
+        "group_id": "visual-2924",
+        "categories": [
+          "person"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2932,
+        "group_id": "visual-2932",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2933,
+        "group_id": "visual-2933",
+        "categories": [
+          "horse",
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2935,
+        "group_id": "visual-2935",
+        "categories": [
+          "car"
+        ],
+        "frames": 35
+      },
+      {
+        "video_id": 2936,
+        "group_id": "visual-2936",
+        "categories": [
+          "dog",
+          "person"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2943,
+        "group_id": "visual-2943",
+        "categories": [
+          "person"
+        ],
+        "frames": 18
+      },
+      {
+        "video_id": 2944,
+        "group_id": "visual-2944",
+        "categories": [
+          "person"
+        ],
+        "frames": 54
+      },
+      {
+        "video_id": 2948,
+        "group_id": "visual-2948",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2956,
+        "group_id": "visual-2956",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2962,
+        "group_id": "visual-2962",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2964,
+        "group_id": "visual-2964",
+        "categories": [
+          "person"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2965,
+        "group_id": "visual-2965",
+        "categories": [
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2967,
+        "group_id": "visual-2967",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 45
+      },
+      {
+        "video_id": 2968,
+        "group_id": "visual-2968",
+        "categories": [
+          "car"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2972,
+        "group_id": "visual-2972",
+        "categories": [
+          "person"
+        ],
+        "frames": 54
+      },
+      {
+        "video_id": 2975,
+        "group_id": "visual-2975",
+        "categories": [
+          "horse",
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2977,
+        "group_id": "visual-2977",
+        "categories": [
+          "car"
+        ],
+        "frames": 35
+      },
+      {
+        "video_id": 2982,
+        "group_id": "visual-2982",
+        "categories": [
+          "dog",
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2983,
+        "group_id": "visual-2983",
+        "categories": [
+          "horse",
+          "person"
+        ],
+        "frames": 20
+      },
+      {
+        "video_id": 2985,
+        "group_id": "visual-2985",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      }
+    ],
+    "validation": [
+      {
+        "video_id": 2701,
+        "group_id": "visual-2701",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2704,
+        "group_id": "visual-2704",
+        "categories": [
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2711,
+        "group_id": "visual-2711",
+        "categories": [
+          "car"
+        ],
+        "frames": 40
+      },
+      {
+        "video_id": 2712,
+        "group_id": "visual-2712",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2729,
+        "group_id": "visual-2729",
+        "categories": [
+          "person"
+        ],
+        "frames": 35
+      },
+      {
+        "video_id": 2733,
+        "group_id": "visual-2733",
+        "categories": [
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2739,
+        "group_id": "visual-2739",
+        "categories": [
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2759,
+        "group_id": "visual-2759",
+        "categories": [
+          "car"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2763,
+        "group_id": "visual-2763",
+        "categories": [
+          "car"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2771,
+        "group_id": "visual-2771",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2772,
+        "group_id": "visual-2772",
+        "categories": [
+          "dog",
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2777,
+        "group_id": "visual-2777",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2783,
+        "group_id": "visual-2783",
+        "categories": [
+          "cat"
+        ],
+        "frames": 54
+      },
+      {
+        "video_id": 2790,
+        "group_id": "visual-2790",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2792,
+        "group_id": "visual-2792",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2793,
+        "group_id": "visual-2793",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2806,
+        "group_id": "visual-2806",
+        "categories": [
+          "person"
+        ],
+        "frames": 54
+      },
+      {
+        "video_id": 2820,
+        "group_id": "visual-2820",
+        "categories": [
+          "person"
+        ],
+        "frames": 20
+      },
+      {
+        "video_id": 2834,
+        "group_id": "visual-2834",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2840,
+        "group_id": "visual-2840",
+        "categories": [
+          "person"
+        ],
+        "frames": 40
+      },
+      {
+        "video_id": 2846,
+        "group_id": "visual-2846",
+        "categories": [
+          "person"
+        ],
+        "frames": 18
+      },
+      {
+        "video_id": 2848,
+        "group_id": "visual-2848",
+        "categories": [
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2858,
+        "group_id": "visual-2858",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2875,
+        "group_id": "visual-2875",
+        "categories": [
+          "person"
+        ],
+        "frames": 18
+      },
+      {
+        "video_id": 2877,
+        "group_id": "visual-2877",
+        "categories": [
+          "horse",
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2891,
+        "group_id": "visual-2891",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2902,
+        "group_id": "visual-2902",
+        "categories": [
+          "dog"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2912,
+        "group_id": "visual-2912",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 20
+      },
+      {
+        "video_id": 2926,
+        "group_id": "visual-2926",
+        "categories": [
+          "person"
+        ],
+        "frames": 34
+      },
+      {
+        "video_id": 2937,
+        "group_id": "visual-2937",
+        "categories": [
+          "person"
+        ],
+        "frames": 34
+      },
+      {
+        "video_id": 2939,
+        "group_id": "visual-2939",
+        "categories": [
+          "dog",
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2946,
+        "group_id": "visual-2946",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2951,
+        "group_id": "visual-2951",
+        "categories": [
+          "person"
+        ],
+        "frames": 39
+      },
+      {
+        "video_id": 2953,
+        "group_id": "visual-2953",
+        "categories": [
+          "car"
+        ],
+        "frames": 35
+      },
+      {
+        "video_id": 2954,
+        "group_id": "visual-2954",
+        "categories": [
+          "car",
+          "person"
+        ],
+        "frames": 50
+      },
+      {
+        "video_id": 2959,
+        "group_id": "visual-2959",
+        "categories": [
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2961,
+        "group_id": "visual-2961",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2966,
+        "group_id": "visual-2966",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2974,
+        "group_id": "visual-2974",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2980,
+        "group_id": "visual-2980",
+        "categories": [
+          "horse",
+          "person"
+        ],
+        "frames": 30
+      }
+    ],
+    "evaluation": [
+      {
+        "video_id": 2695,
+        "group_id": "visual-2695",
+        "categories": [
+          "person"
+        ],
+        "frames": 45
+      },
+      {
+        "video_id": 2699,
+        "group_id": "visual-2699",
+        "categories": [
+          "person"
+        ],
+        "frames": 15
+      },
+      {
+        "video_id": 2706,
+        "group_id": "visual-2706",
+        "categories": [
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2715,
+        "group_id": "visual-2715",
+        "categories": [
+          "person"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2720,
+        "group_id": "visual-2720",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2754,
+        "group_id": "visual-2754",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2768,
+        "group_id": "visual-2768",
+        "categories": [
+          "cat"
+        ],
+        "frames": 54
+      },
+      {
+        "video_id": 2769,
+        "group_id": "visual-2769",
+        "categories": [
+          "dog"
+        ],
+        "frames": 20
+      },
+      {
+        "video_id": 2788,
+        "group_id": "visual-2788",
+        "categories": [
+          "car"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2789,
+        "group_id": "visual-2789",
+        "categories": [
+          "person"
+        ],
+        "frames": 20
+      },
+      {
+        "video_id": 2791,
+        "group_id": "visual-2791",
+        "categories": [
+          "car"
+        ],
+        "frames": 35
+      },
+      {
+        "video_id": 2796,
+        "group_id": "visual-2796",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2802,
+        "group_id": "visual-2802",
+        "categories": [
+          "person"
+        ],
+        "frames": 43
+      },
+      {
+        "video_id": 2808,
+        "group_id": "visual-2808",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2812,
+        "group_id": "visual-2812",
+        "categories": [
+          "car"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2814,
+        "group_id": "visual-2814",
+        "categories": [
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2838,
+        "group_id": "visual-2838",
+        "categories": [
+          "dog",
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2842,
+        "group_id": "visual-2842",
+        "categories": [
+          "person"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2854,
+        "group_id": "visual-2854",
+        "categories": [
+          "person"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2855,
+        "group_id": "visual-2855",
+        "categories": [
+          "car"
+        ],
+        "frames": 40
+      },
+      {
+        "video_id": 2862,
+        "group_id": "visual-2862",
+        "categories": [
+          "car"
+        ],
+        "frames": 20
+      },
+      {
+        "video_id": 2867,
+        "group_id": "visual-2867",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2873,
+        "group_id": "visual-2873",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2878,
+        "group_id": "visual-2878",
+        "categories": [
+          "person"
+        ],
+        "frames": 21
+      },
+      {
+        "video_id": 2881,
+        "group_id": "visual-2881",
+        "categories": [
+          "car",
+          "horse",
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2896,
+        "group_id": "visual-2896",
+        "categories": [
+          "person"
+        ],
+        "frames": 54
+      },
+      {
+        "video_id": 2903,
+        "group_id": "visual-2903",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2911,
+        "group_id": "visual-2911",
+        "categories": [
+          "person"
+        ],
+        "frames": 47
+      },
+      {
+        "video_id": 2918,
+        "group_id": "visual-2918",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2927,
+        "group_id": "visual-2927",
+        "categories": [
+          "horse",
+          "person"
+        ],
+        "frames": 40
+      },
+      {
+        "video_id": 2931,
+        "group_id": "visual-2931",
+        "categories": [
+          "person"
+        ],
+        "frames": 18
+      },
+      {
+        "video_id": 2934,
+        "group_id": "visual-2934",
+        "categories": [
+          "cat"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2942,
+        "group_id": "visual-2942",
+        "categories": [
+          "person"
+        ],
+        "frames": 27
+      },
+      {
+        "video_id": 2957,
+        "group_id": "visual-2957",
+        "categories": [
+          "dog",
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2958,
+        "group_id": "visual-2958",
+        "categories": [
+          "dog",
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2969,
+        "group_id": "visual-2969",
+        "categories": [
+          "person"
+        ],
+        "frames": 33
+      },
+      {
+        "video_id": 2971,
+        "group_id": "visual-2971",
+        "categories": [
+          "person"
+        ],
+        "frames": 54
+      },
+      {
+        "video_id": 2973,
+        "group_id": "visual-2973",
+        "categories": [
+          "person"
+        ],
+        "frames": 40
+      },
+      {
+        "video_id": 2979,
+        "group_id": "visual-2979",
+        "categories": [
+          "car"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2981,
+        "group_id": "visual-2981",
+        "categories": [
+          "horse",
+          "person"
+        ],
+        "frames": 36
+      }
+    ],
+    "excluded": [
+      {
+        "video_id": 2687,
+        "group_id": "visual-2687",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2697,
+        "group_id": "visual-2697",
+        "categories": [
+          "person"
+        ],
+        "frames": 40
+      },
+      {
+        "video_id": 2700,
+        "group_id": "visual-2700",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2710,
+        "group_id": "visual-2710",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2723,
+        "group_id": "visual-2723",
+        "categories": [
+          "person"
+        ],
+        "frames": 48
+      },
+      {
+        "video_id": 2724,
+        "group_id": "visual-2724",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2725,
+        "group_id": "visual-2725",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2727,
+        "group_id": "visual-2727",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2737,
+        "group_id": "visual-2737",
+        "categories": [
+          "person"
+        ],
+        "frames": 24
+      },
+      {
+        "video_id": 2748,
+        "group_id": "visual-2748",
+        "categories": [
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2767,
+        "group_id": "visual-2767",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2780,
+        "group_id": "visual-2780",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2784,
+        "group_id": "visual-2784",
+        "categories": [
+          "person"
+        ],
+        "frames": 15
+      },
+      {
+        "video_id": 2809,
+        "group_id": "visual-2809",
+        "categories": [
+          "person"
+        ],
+        "frames": 53
+      },
+      {
+        "video_id": 2818,
+        "group_id": "visual-2818",
+        "categories": [
+          "person"
+        ],
+        "frames": 34
+      },
+      {
+        "video_id": 2825,
+        "group_id": "visual-2825",
+        "categories": [
+          "person"
+        ],
+        "frames": 18
+      },
+      {
+        "video_id": 2839,
+        "group_id": "visual-2839",
+        "categories": [
+          "person"
+        ],
+        "frames": 36
+      },
+      {
+        "video_id": 2841,
+        "group_id": "visual-2841",
+        "categories": [
+          "person"
+        ],
+        "frames": 60
+      },
+      {
+        "video_id": 2863,
+        "group_id": "visual-2863",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2865,
+        "group_id": "visual-2865",
+        "categories": [
+          "person"
+        ],
+        "frames": 42
+      },
+      {
+        "video_id": 2880,
+        "group_id": "visual-2880",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2900,
+        "group_id": "visual-2900",
+        "categories": [
+          "person"
+        ],
+        "frames": 59
+      },
+      {
+        "video_id": 2945,
+        "group_id": "visual-2945",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2949,
+        "group_id": "visual-2949",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      },
+      {
+        "video_id": 2952,
+        "group_id": "visual-2952",
+        "categories": [
+          "person"
+        ],
+        "frames": 25
+      },
+      {
+        "video_id": 2976,
+        "group_id": "visual-2976",
+        "categories": [
+          "person"
+        ],
+        "frames": 30
+      }
+    ]
+  },
+  "policy": {
+    "sizes": {
+      "development": 120,
+      "validation": 40,
+      "evaluation": 40,
+      "excluded": 26
+    },
+    "rare_class_exact_quotas_dev_val_eval": {
+      "dog": [
+        10,
+        3,
+        4
+      ],
+      "cat": [
+        3,
+        1,
+        2
+      ],
+      "horse": [
+        7,
+        2,
+        3
+      ],
+      "car": [
+        20,
+        6,
+        7
+      ]
+    },
+    "minimum_videos_with_41_steps_dev_val_eval": [
+      38,
+      12,
+      12
+    ],
+    "group_unit": "exact/strong sparse-frame visual-duplicate component",
+    "solver": "scipy.optimize.milp; optimal seeded objective",
+    "selection_information": "Only audited categories, lengths, old pilot membership and RGB duplicate fingerprints. No predictions or H/R outcomes.",
+    "held_out_rule": "Do not render, score or inspect validation/evaluation predictions during candidate exploration.",
+    "new_duplicate_rule": "Quarantine later-discovered related candidates; do not reshuffle held-out groups after seeing outcomes."
+  },
+  "counts": {
+    "development": {
+      "videos": 120,
+      "classes": {
+        "person": 107,
+        "cat": 3,
+        "car": 20,
+        "horse": 7,
+        "dog": 10
+      },
+      "at_least_41_steps": 42
+    },
+    "validation": {
+      "videos": 40,
+      "classes": {
+        "person": 34,
+        "car": 6,
+        "dog": 3,
+        "cat": 1,
+        "horse": 2
+      },
+      "at_least_41_steps": 12
+    },
+    "evaluation": {
+      "videos": 40,
+      "classes": {
+        "person": 31,
+        "cat": 2,
+        "dog": 4,
+        "car": 7,
+        "horse": 3
+      },
+      "at_least_41_steps": 14
+    },
+    "excluded": {
+      "videos": 26,
+      "classes": {
+        "person": 26
+      },
+      "at_least_41_steps": 6
+    }
+  },
+  "grouping_limitations": [
+    "Sparse perceptual hashes cannot prove source-video independence.",
+    "No original source URLs are included in the export; new obvious near duplicates must be quarantined, not moved across frozen splits."
+  ]
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "File": "yolo11s-seg.pt",
+    "Bytes": 20669228,
+    "SHA256": "1caa81c0195412efa411b632bcfb8c184939dddb6ae41f6a80c41b211ff257c3",
+    "Source": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-seg.pt"
+  },
+  {
+    "File": "sam2.1_hiera_tiny.pt",
+    "Bytes": 156008466,
+    "SHA256": "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69",
+    "Source": "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_tiny.pt"
+  }
+]
