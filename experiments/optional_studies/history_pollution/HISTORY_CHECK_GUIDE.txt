@@ -1,0 +1,80 @@
+四段历史污染／重置：先看实验步骤，再看函数
+
+目的：实现检查，不是完整192分支，也不是新模型训练。
+固定四段：E01稳定车辆、E09小人物竞争、E15篮球人物、E13训犬场人物。
+范围：40条当前框H/R分支 + 16条无当前纠正N对照，共56条。
+四段都使用准确当前框；仅E09额外检查半框宽水平偏移。
+
+1. 固定输入和干预，不看新结果再挑框。
+   history_check.py -> prepare_plan()
+   输入：已完成16段批次、冻结原ID、RGB/GT、YOLO检测缓存。
+   输出：新目录plan.json，包含每个框坐标、源文件与代码SHA256。
+   历史干预时刻固定为t0-5；准确框来自可见GT外接框。
+   污染框优先使用最近的另一同类GT目标框；无人可选才平移一框宽。
+   这是GT辅助的错误关联/错误提示诊断，不是自动算法或自然错误频率。
+
+2. 复现共同前史，保留两个检查点。
+   history_check.py -> native_prefix()
+   原始A0/B0到t0-1逐帧与旧预测完全一致，才继续。
+   t0-6保留早期检查点：从这里分出准确历史/污染历史。
+
+3. 改一次历史框，观察系统能否自己消化。
+   history_check.py -> construct_histories()
+   在t0-5给同一ID一次准确/错误框，权重与干预次数相同。
+   两者都正常传播到t0-1，期间保留原生检测/刷新规则。
+   记录纠正前mask和状态位置：污染框不保证真的造成持续错误。
+   A在历史干预当步只改状态、没有制造mask，不能用那一帧判污染成败。
+
+4. 只把指定目标的历史带到同一个正式分叉点。
+   history_check_state.py -> transplant_history()
+   A：仅复制KF mean/covariance；外部ID、生命周期、分数及其他轨迹不复制。
+   B：仅复制五个单对象提示/输出/时间历史容器；不复制图像特征、权重、
+      其他对象或wrapper管理信息。源状态与移植后非目标状态均做哈希验证。
+   这是明确标记的诊断状态移植，不是声称现实中存在这种自动操作。
+
+5. 同一当前框，比较H、R和N。
+   history_check.py -> run_branch()
+   H保留处理后的目标历史；R清除/初始化；N不作当前纠正。
+   所有当前/历史纠正分数固定1.0，路由一致；不输入GT mask。
+   ByteTrack仍收到全部YOLO检测及竞争对象。
+   history_check_state.py -> diagnostic_sam_step()
+   SAM后续30步不再刷新、不发现新目标、不触发TTL删除；整个检查点对象集合
+   固定存活。这不是原B0，不能把这里分数直接减去旧B0分数作为提升。
+
+6. 优先验证重置清除，而不是挑胜者。
+   history_check.py -> run_event()
+   同一当前框下，准确/污染历史经过R后，t0状态和随后30步全部对象的输出、
+   状态记录必须逐项一致。否则先查漏清状态，不推进正式矩阵。
+   A检查速度归零、ID不变；B检查五容器已清空、其他对象历史未被重置。
+   这只验证已定义的重置语义，不证明保留/重置哪一个总是更好。
+
+7. 独立重评分并看真实图像。
+   history_check_report.py -> check_saved() / build()
+   重新加载保存的mask，独立核对全部56分支评分；验证SAM没有偷偷刷新或删除。
+   固定原ID，排除t0；IoU>=0.5连续3个GT可见步骤为曾达标，不保证末尾还成功。
+   生成10段四组视频、10张曲线、4张同帧历史对照图与本地中文HTML。
+   N是同一历史、同一诊断设置下的无当前纠正续跑，不是原生A0/B0基线。
+
+8. 保护与复现。
+   新输出根目录必须不存在；拒绝覆盖和就地续跑。
+   开始与结束对所有旧runs目录逐文件哈希，记录old-results-integrity.json。
+   本批代码快照保存在新run/code；模型只用本地RTX3080、固定SAM2.1 Tiny BF16。
+   不使用学校服务器、不改学习网站、不进行Git操作或课程交付。
+
+9. 神经记忆变化不能只看提示坐标哈希。
+   history_check_audit.py -> execute() / summarize_history()
+   仅在同样四段重放原前史与准确/污染处理，不追加30步实验分支。
+   核对重放历史与原批次完全一致；分别记录五容器、mask-memory特征、
+   object pointer、预测mask等实际编码输出的哈希。
+   “神经编码不同”仍不等于“历史质量变坏”：还要看纠正前的真实定位表现。
+
+运行入口（使用已配置的本地Python环境）：
+  python -m tracking_lab.history_check --output <NEW_RUN_DIRECTORY>
+  # 完成全部56条分支计算后，先做同四段的前史审计，再生成报告：
+  python -m tracking_lab.history_check_audit --run <RUN_DIRECTORY>
+    --output <RUN_DIRECTORY>/memory-audit
+  python -m tracking_lab.history_check_report --run <RUN_DIRECTORY>
+    --output <NEW_ANALYSIS_DIRECTORY>
+
+解释顺序：污染处理是否改变状态 -> 是否真的损坏纠正前表现 -> R是否清干净
+-> 同一框下H/R差异 -> 准确框/偏移框差异 -> 再决定能否扩展矩阵。

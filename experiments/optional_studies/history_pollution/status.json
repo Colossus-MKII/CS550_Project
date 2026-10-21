@@ -1,0 +1,14 @@
+{
+  "status": "shelved_by_user",
+  "date": "2026-10-21",
+  "in_mainline_analysis": false,
+  "in_default_runtime_package": false,
+  "in_default_test_suite": false,
+  "resume_requires_user_direction": true,
+  "retained_run_roots_relative_to_experiments": [
+    "runs/history-check-four-20261020-3080",
+    "runs/history-check-four-20261020-analysis"
+  ],
+  "excluded_scope": "Entire 56-branch artificial-history diagnostic, including accurate-history arms, no-current-correction controls and prefix-only memory audit. No branch is silently relabeled as native mainline evidence.",
+  "results_moved_or_deleted": false
+}

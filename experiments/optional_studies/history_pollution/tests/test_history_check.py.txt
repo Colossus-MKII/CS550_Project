@@ -1,0 +1,357 @@
+"""Implementation gates BEFORE new GPU inference. No coursework uploads."""
+
+import copy
+import json
+from pathlib import Path
+from types import SimpleNamespace
+
+import numpy as np
+import pytest
+
+from tracking_lab import PACKAGE_ROOT, ROOT
+from tracking_lab.common import Instance, mask_box
+from tracking_lab.history_check import EVENT_IDS, prepare_plan
+from tracking_lab.history_check_state import (
+    diagnostic_sam_step,
+    historical_boxes,
+    shifted_box,
+    transplant_history,
+    history_hash,
+    outside_history_hash,
+)
+from tracking_lab.recovery_engines import ByteEngine, Correction, SamEngine
+from tracking_lab.recovery_state import SAM_TARGET_KEYS, clone_tree, state_digest
+from tracking_lab.sam_baseline import Target
+
+
+CONFIG = json.loads((PACKAGE_ROOT / "defaults/stage1.json").read_text())
+
+
+def obj(identity, x, category="person"):
+    mask = np.zeros((30, 70), bool)
+    mask[5:20, x : x + 8] = True
+    return Instance(identity, category, mask_box(mask), mask, 0.9)
+
+
+def test_historical_rule_uses_nearest_same_class_not_future_or_other_class():
+    rows = [obj(1, 8), obj(2, 18, "dog"), obj(3, 32), obj(4, 20)]
+    boxes = historical_boxes(rows, 1, 70)
+    assert boxes["distractor_gt_id"] == 4
+    assert boxes["polluted"] == obj(4, 20).box.tolist()
+    assert boxes["polluted_reference_box_iou"] == 0
+
+
+def test_shift_preserves_shape_and_refuses_clipping():
+    box = np.array([10, 5, 30, 20], np.float32)
+    shifted = shifted_box(box, 70, 0.5)
+    np.testing.assert_array_equal(shifted, [20, 5, 40, 20])
+    from tracking_lab.common import box_iou
+
+    assert box_iou(box, shifted) == pytest.approx(1 / 3)
+    with pytest.raises(ValueError):
+        shifted_box(np.array([5, 5, 65, 20]), 70, 0.5)
+
+
+def test_byte_target_only_transplant_and_R_collapses_different_histories():
+    common = ByteEngine(CONFIG, True)
+    for t in range(6):
+        common.step(t, [obj(0, 8 + t), obj(1, 45)])
+    donor = common.fork()
+    donor.find(1)[1].mean[:2] += [18, -3]
+    donor.find(1)[1].mean[4] = 15
+    donor.find(2)[1].mean[0] += 500  # Deliberate OUTSIDE pollution must NOT be copied.
+    good, _ = transplant_history(common, common, 1, "A")
+    bad, audit = transplant_history(common, donor, 1, "A")
+    assert audit["outside_target_unchanged"]
+    assert outside_history_hash(good, 1, "A") == outside_history_hash(bad, 1, "A")
+    assert history_hash(good, 1, "A") != history_hash(bad, 1, "A")
+    states = []
+    for engine in (good, bad):
+        _, trace = engine.step(
+            6,
+            [obj(0, 14), obj(1, 45)],
+            Correction(1, "person", obj(0, 14).box, 1.0, 0, True),
+        )
+        states.append(trace["intervention"]["after"])
+    assert states[0] == states[1]
+    assert states[0]["mean"][4:] == [0, 0, 0, 0]
+
+
+def fake_sam():
+    import torch
+
+    engine = object.__new__(SamEngine)
+    loader = SimpleNamespace(paths=[Path("test.png")] * 8, image_size=32, accessed=[0])
+    engine.loader = loader
+    engine.state = {
+        "images": loader,
+        "obj_id_to_idx": {11: 0, 22: 1},
+        "obj_idx_to_id": {0: 11, 1: 22},
+        "obj_ids": [11, 22],
+        "cached_features": {0: torch.ones(2)},
+        "constants": {"x": 1},
+    }
+    for key in SAM_TARGET_KEYS:
+        engine.state[key] = {
+            i: (
+                {
+                    "cond_frame_outputs": {0: {"tensor": torch.ones(2) * (i + 1)}},
+                    "non_cond_frame_outputs": {},
+                }
+                if key in {"output_dict_per_obj", "temp_output_dict_per_obj"}
+                else {0: {"v": i + 1}}
+            )
+            for i in (0, 1)
+        }
+    engine.targets = {
+        11: Target(11, "person", obj(1, 8).box, 0, 0.9),
+        22: Target(22, "person", obj(2, 45).box, 0, 0.9),
+    }
+    engine.next_id, engine.frame, engine.config = 23, 0, CONFIG
+    engine.predictor, engine.skip_refresh = SimpleNamespace(), None
+    return engine
+
+
+def test_sam_transplant_copies_five_stores_but_never_other_targets_or_features():
+    common = fake_sam()
+    donor = common.fork()
+    for key in SAM_TARGET_KEYS:
+        donor.state[key][0].clear()
+        donor.state[key][0].update(
+            {"cond_frame_outputs": {}, "non_cond_frame_outputs": {}}
+            if key in {"output_dict_per_obj", "temp_output_dict_per_obj"}
+            else {}
+        )
+    donor.targets[22].score = 0.001
+    donor.state["cached_features"][0] *= 50
+    before = outside_history_hash(common, 11, "B")
+    branch, _ = transplant_history(common, donor, 11, "B")
+    assert outside_history_hash(branch, 11, "B") == before
+    assert history_hash(branch, 11, "B") == history_hash(donor, 11, "B")
+    assert history_hash(common, 11, "B") != history_hash(branch, 11, "B")
+
+
+def test_sam_diagnostic_never_calls_detector_or_deletes_expired_targets(monkeypatch):
+    import torch
+    import tracking_lab.history_check_state as module
+
+    engine = fake_sam()
+    engine.frame = 99
+    engine.loader.accessed = []
+    monkeypatch.setattr(
+        module, "propagate_one", lambda *args: {11: obj(1, 8).mask, 22: obj(2, 45).mask}
+    )
+    calls = []
+
+    def add(state, frame_idx, obj_id, box):
+        calls.append((frame_idx, obj_id))
+        idx = state["obj_id_to_idx"][obj_id]
+        assert all(
+            not store
+            for key in SAM_TARGET_KEYS
+            for store in (
+                state[key][idx].values()
+                if key in {"output_dict_per_obj", "temp_output_dict_per_obj"}
+                else [state[key][idx]]
+            )
+        )
+        state["point_inputs_per_obj"][idx][frame_idx] = {"box": box.copy()}
+        state["output_dict_per_obj"][idx]["cond_frame_outputs"][frame_idx] = {
+            "tensor": torch.ones(1)
+        }
+        return frame_idx, [11, 22], torch.ones((2, 1, 30, 70))
+
+    engine.predictor = SimpleNamespace(
+        add_new_points_or_box=add, propagate_in_video_preflight=lambda state: None
+    )
+    _, trace = diagnostic_sam_step(
+        engine, 100, Correction(11, "person", obj(1, 8).box, 1, None, True)
+    )
+    assert calls == [(100, 11)]
+    assert trace["active_ids"] == [11, 22]  # last_detection=0 would otherwise expire.
+    assert trace["intervention"]["clear"]["other_targets_unchanged"]
+    _, following = diagnostic_sam_step(engine, 101)
+    assert following["prompt_inputs"] == [] and len(calls) == 1
+
+
+def test_gate_refuses_existing_output_before_opening_data(tmp_path):
+    with pytest.raises(FileExistsError):
+        prepare_plan(tmp_path, tmp_path / "missing", tmp_path / "missing-data")
+    assert EVENT_IDS == ("E01", "E09", "E15", "E13")
+
+
+def test_neural_memory_audit_excludes_prompt_coordinate_only_changes():
+    from tracking_lab.history_check_audit import neural_memory, summarize_history
+
+    history = {
+        "point_inputs_per_obj": {3: {"box": [1, 2, 3, 4]}},
+        "mask_inputs_per_obj": {},
+        "temp_output_dict_per_obj": {
+            "cond_frame_outputs": {},
+            "non_cond_frame_outputs": {},
+        },
+        "frames_tracked_per_obj": {3: {"reverse": False}},
+        "output_dict_per_obj": {
+            "cond_frame_outputs": {
+                3: {"maskmem_features": np.ones((2, 3)), "obj_ptr": np.zeros(3)}
+            },
+            "non_cond_frame_outputs": {4: {"pred_masks": np.ones((2, 3))}},
+        },
+    }
+    original = state_digest(neural_memory(history))
+    history["point_inputs_per_obj"][3]["box"][0] = 999
+    assert state_digest(neural_memory(history)) == original
+    history["output_dict_per_obj"]["cond_frame_outputs"][3]["maskmem_features"][
+        0, 0
+    ] += 1
+    assert state_digest(neural_memory(history)) != original
+    report = summarize_history(history, 3, 5)
+    assert set(report["encoded_fields"]) == {
+        "maskmem_features",
+        "obj_ptr",
+        "pred_masks",
+    }
+
+
+def test_frozen_plan_has_56_not_192_branches(tmp_path):
+    output = tmp_path / "new-four-check"
+    plan = prepare_plan(
+        output,
+        ROOT / "runs/recovery-independent-20261020-3080",
+        ROOT / "data/independent-dev-20261020",
+    )
+    assert plan["expected_branches_total"] == 56
+    assert plan["expected_corrected_branches"] == 40
+    assert [e["event_id"] for e in plan["events"]] == list(EVENT_IDS)
+    assert all(e["history_step"] == e["t0"] - 5 for e in plan["events"])
+    assert {e["video_id"] for e in plan["events"]} == {2719, 2694, 2895, 2822}
+    assert all(
+        set(e["current_boxes"])
+        == ({"reference", "shift_half"} if e["event_id"] == "E09" else {"reference"})
+        for e in plan["events"]
+    )
+
+
+ACTUAL_RUN = ROOT / "runs/history-check-four-20261020-3080"
+ACTUAL_ANALYSIS = ROOT / "runs/history-check-four-20261020-analysis"
+
+
+def test_actual_four_video_gate_and_all_reset_negative_controls():
+    if not (ACTUAL_RUN / "summary.json").is_file():
+        pytest.skip("Local four-video artifacts are not distributed with source")
+    from tracking_lab.history_check import read, CORE_FILES
+    from tracking_lab.common import digest
+
+    summary, plan = read(ACTUAL_RUN / "summary.json"), read(ACTUAL_RUN / "plan.json")
+    assert summary["status"] == "inference_completed"
+    assert len(summary["branches"]) == 56
+    assert sum(r["group"] == "N" for r in summary["branches"]) == 16
+    assert sum(r["group"] != "N" for r in summary["branches"]) == 40
+    assert summary["old_results_unchanged"]
+    assert {e["event_id"] for e in plan["events"]} == set(EVENT_IDS)
+    for name in CORE_FILES:
+        assert digest(PACKAGE_ROOT / name) == plan["core_source_sha256"][name]
+        assert (
+            digest(ACTUAL_RUN / "code" / (name + ".txt"))
+            == plan["core_source_sha256"][name]
+        )
+    pairs = 0
+    for event in plan["events"]:
+        proof = read(ACTUAL_RUN / event["event_id"] / "verification.json")
+        assert proof["status"] == "passed" and proof["native_prefix_exact"]
+        assert all(
+            a["transplant"]["outside_target_unchanged"]
+            for a in proof["history_and_target_only_transplant"]
+        )
+        for model in ("A", "B"):
+            for condition in event["current_boxes"]:
+                records = [
+                    next(
+                        r
+                        for r in summary["branches"]
+                        if r["event_id"] == event["event_id"]
+                        and r["model"] == model
+                        and r["history"] == h
+                        and r["condition"] == condition
+                        and r["group"] == "R"
+                    )
+                    for h in ("accurate", "polluted")
+                ]
+                assert (
+                    records[0]["post_t0_fingerprints"]
+                    == records[1]["post_t0_fingerprints"]
+                )
+                pairs += 1
+    assert pairs == 10
+
+
+def test_actual_neural_memory_audit_is_not_just_a_prompt_log():
+    path = ACTUAL_RUN / "memory-audit/memory-audit.json"
+    if not path.is_file():
+        pytest.skip("Local neural-memory audit not distributed with source")
+    from tracking_lab.history_check import read
+
+    audit = read(path)
+    assert audit["status"] == "passed" and len(audit["events"]) == 4
+    for row in audit["events"]:
+        assert row["original_history_exactly_reproduced"]
+        for h in ("accurate", "polluted"):
+            assert {"maskmem_features", "obj_ptr"}.issubset(
+                row["SAM"][h]["encoded_fields"]
+            )
+        assert row["comparison"]["encoded_outputs_changed"]
+
+
+def test_actual_analysis_media_and_independent_replays():
+    if not (ACTUAL_ANALYSIS / "verification.json").is_file():
+        pytest.skip("Local offline report not distributed with source")
+    from html.parser import HTMLParser
+    from urllib.parse import urlsplit, unquote
+    from tracking_lab.history_check import read
+
+    verification = read(ACTUAL_ANALYSIS / "verification.json")
+    assert verification["status"] == "passed" and verification["branches"] == 56
+    assert verification["R_cross_history_pairs"] == 10
+    assert (
+        sum(
+            e["independent_Byte_CPU_replay"]["branches"] for e in verification["events"]
+        )
+        == 28
+    )
+    assert (
+        sum(
+            e["independent_Byte_CPU_replay"]["branch_frames_checked"]
+            for e in verification["events"]
+        )
+        == 28 * 31
+    )
+
+    class Page(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.videos, self.images, self.refs, self.ids = 0, 0, [], []
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            self.videos += tag == "video"
+            self.images += tag == "img"
+            if attrs.get("id"):
+                self.ids.append(attrs["id"])
+            if tag == "video":
+                assert attrs["preload"] == "none"
+            for key in ("href", "src"):
+                if attrs.get(key):
+                    self.refs.append(attrs[key])
+
+    page = Page()
+    page.feed((ACTUAL_ANALYSIS / "RESULTS_ZH.html").read_text(encoding="utf-8"))
+    assert page.videos == 10 and page.images == 18
+    assert len(page.ids) == len(set(page.ids))
+    for ref in page.refs:
+        url = urlsplit(ref)
+        assert not url.scheme and not url.netloc
+        if url.path:
+            path = (ACTUAL_ANALYSIS / unquote(url.path)).resolve()
+            assert path.is_relative_to(ACTUAL_ANALYSIS.resolve()) and path.is_file()
+        else:
+            assert url.fragment in page.ids

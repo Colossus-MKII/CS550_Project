@@ -265,20 +265,23 @@ def render_target_zoom(video, gt, loaded, event, condition, path):
 
 
 def replay_byte_branches(detections, event, records, loaded, config):
-    """Recompute ALL A-H/R branches on CPU from frozen observations, not GT.
+    """Recompute ALL available A-H/R branches on CPU, without GT inputs.
 
     This verifies even one-step association differences independently of the
-    saved scores. No additional samples, detector calls or GPU inference.
+    saved scores. A separately labelled single-source study has two A branches,
+    not four; never synthesize the missing correction source. No additional
+    samples, detector calls or GPU inference.
     """
     from .recovery_engines import ByteEngine, Correction
 
+    conditions = tuple(dict.fromkeys(condition for condition, _ in records))
     engine = ByteEngine(config, association_diagnostics=True)
     t = event["frame"]
     for frame in range(t):
         objects, _ = engine.step(frame, detections[frame])
-        assert_same_predictions(objects, loaded[("yolo", "A-H")][0][frame])
+        assert_same_predictions(objects, loaded[(conditions[0], "A-H")][0][frame])
     checked = 0
-    for condition in ("yolo", "reference"):
+    for condition in conditions:
         for reset in (False, True):
             key = (condition, "A-R" if reset else "A-H")
             rec = records[key]
@@ -304,7 +307,7 @@ def replay_byte_branches(detections, event, records, loaded, config):
                 checked += 1
     return {
         "status": "passed",
-        "branches": 4,
+        "branches": 2 * len(conditions),
         "branch_frames_checked": checked,
         "prefix_frames": t,
         "comparison": "all objects, masks, IDs, boxes, scores, KF states and assignment traces exact; no GT fed to replay",
@@ -316,7 +319,7 @@ def per_event(row, plan, reviewed, zoom_output=None):
     summary, videos, truths, source, verification = verify_recovery(
         root, Path(plan["data_root"])
     )
-    if len(summary["events"]) != 1 or len(summary["branches"]) != 8:
+    if len(summary["events"]) != 1 or len(summary["branches"]) != 4 * len(plan["conditions"]):
         raise AssertionError("Incomplete per-event run")
     event = summary["events"][0]
     assert event["video_id"] == row["video_id"] and event["video_id"] != 2967

@@ -1,0 +1,584 @@
+"""Read-only verification and visuals for the four-event implementation gate.
+
+No inference is performed. build() reloads all masks, independently rescores,
+checks actual reset/prompt traces and then renders local HTML/videos. It refuses
+an existing analysis folder; the primary inference archive is never rewritten.
+"""
+
+import argparse
+from html import escape
+import json
+from pathlib import Path
+
+import numpy as np
+
+from .common import digest, load_predictions, mask_iou, write_json
+from .recovery import assert_same_predictions
+from .recovery_engines import ByteEngine, Correction
+from .history_check_state import transplant_history, history_hash
+from .dataset import read_manifest, load_ground_truth
+from .history_check_state import prediction_hash
+from .recovery_metrics import evaluate_recovery
+from .recovery_report import plot_curves, write_csv
+from .render import VideoWriter, label, overlay
+
+
+def read(path):
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def table(headers, rows):
+    return (
+        '<div class="scroll"><table><thead><tr>'
+        + "".join("<th>" + escape(str(x)) + "</th>" for x in headers)
+        + "</tr></thead><tbody>"
+        + "".join(
+            "<tr>" + "".join("<td>" + escape(str(x)) + "</td>" for x in row) + "</tr>"
+            for row in rows
+        )
+        + "</tbody></table></div>"
+    )
+
+
+def local_video(path, output):
+    return f'<video controls preload="none" src="{path.relative_to(output).as_posix()}"></video>'
+
+
+def frame_quality(objects, gt, pid, gt_id):
+    truth = next((o for o in gt if o.identity == gt_id), None)
+    found = next((o for o in objects if o.identity == pid), None)
+    return (
+        mask_iou(truth.mask, found.mask) if truth and found else (0 if truth else None)
+    )
+
+
+def check_saved(run, row, event, gt):
+    """Verify scores and masks independently from the executing Python process."""
+    folder = run / row["folder"]
+    frames = load_predictions(folder)
+    trace = read(folder / "state-trace.json")
+    result = evaluate_recovery(
+        gt[: len(frames)],
+        frames,
+        row["identity"],
+        event["gt_id"],
+        event["t0"],
+        30,
+        0.5,
+        3,
+        trace,
+    )
+    assert result == read(folder / "recovery.json")
+    assert all(row[k] == v for k, v in result["summary"].items())
+    assert len(frames) == event["t0"] + 31
+    for fp in row["post_t0_fingerprints"]:
+        assert prediction_hash(frames[fp["frame"]]) == fp["predictions"]
+    if row["model"] == "B":
+        for t in range(event["t0"], len(frames)):
+            assert trace[t]["mode"] == "open_loop_no_refresh_no_discovery_no_TTL"
+            assert trace[t]["active_ids"] == trace[event["t0"]]["active_ids"]
+            assert trace[t]["actions"] == []
+            assert len(trace[t]["prompt_inputs"]) == int(
+                t == event["t0"] and row["group"] != "N"
+            )
+        if row["group"] == "R":
+            cleared = trace[event["t0"]]["intervention"]["clear"]
+            assert cleared["other_targets_unchanged"]
+            assert all(
+                not v for k, v in cleared["after_clear"].items() if k != "sha256"
+            )
+            after = trace[event["t0"]]["intervention"]["after"]
+            assert all(
+                frame >= event["t0"]
+                for key, values in after.items()
+                if key != "sha256"
+                for frame in values
+            )
+        elif row["group"] == "H":
+            audit = trace[event["t0"]]["intervention"]
+            for key in (
+                "point_frames",
+                "mask_frames",
+                "conditioning_frames",
+                "nonconditioning_frames",
+                "tracked_frames",
+            ):
+                assert {f for f in audit["before"][key] if f < event["t0"]}.issubset(
+                    audit["after"][key]
+                ), (row["folder"], key)
+    elif row["group"] in {"H", "R"}:
+        intervention = trace[event["t0"]]["intervention"]
+        from ultralytics.trackers.utils.kalman_filter import KalmanFilterXYAH
+
+        kf = KalmanFilterXYAH()
+        box = np.asarray(event["current_boxes"][row["condition"]], np.float32)
+        xyah = np.array(
+            [
+                (box[0] + box[2]) / 2,
+                (box[1] + box[3]) / 2,
+                (box[2] - box[0]) / (box[3] - box[1]),
+                box[3] - box[1],
+            ]
+        )
+        if row["group"] == "R":
+            mean, covariance = kf.initiate(xyah)
+            np.testing.assert_array_equal(
+                intervention["after"]["mean"][4:], np.zeros(4)
+            )
+        else:
+            mean, covariance = np.asarray(intervention["before"]["mean"]), np.asarray(
+                intervention["before"]["covariance"]
+            )
+            if intervention["before"]["state"] != 1:
+                mean[7] = 0
+            mean, covariance = kf.predict(mean, covariance)
+            mean, covariance = kf.update(mean, covariance, xyah)
+        np.testing.assert_array_equal(intervention["after"]["mean"], mean)
+        np.testing.assert_array_equal(intervention["after"]["covariance"], covariance)
+    return frames, trace, result
+
+
+def replay_byte(event, rows, loaded):
+    """Independent CPU replay from frozen detector/box inputs; NO GT supplied.
+
+    Rebuild both historical cue paths, transplant only KF state, and reproduce
+    every saved A branch including all competing objects and assignment logs.
+    This is additional verification, not an additional experimental sample.
+    """
+    source = Path(event["baseline"]) / str(event["video_id"])
+    det = load_predictions(source / "YOLO")
+    reference = load_predictions(source / "A0")
+    native = ByteEngine(event["configuration"], True)
+    early = None
+    t0, tc = event["t0"], event["history_step"]
+    pid = event["anchors"]["A0"]["prediction_id"]
+    for t in range(t0):
+        actual, _ = native.step(t, det[t])
+        assert_same_predictions(reference[t], actual)
+        if t == tc - 1:
+            early = native.fork()
+    checked = 0
+    for history in ("accurate", "polluted"):
+        donor = early.fork()
+        for t in range(tc, t0):
+            cue = (
+                Correction(
+                    pid,
+                    event["category"],
+                    np.asarray(event["history_boxes"][history], np.float32),
+                    1.0,
+                    event["history_detector_index"],
+                    False,
+                )
+                if t == tc
+                else None
+            )
+            donor.step(t, det[t], cue)
+        ready, _ = transplant_history(native, donor, pid, "A")
+        for row in rows:
+            if row["model"] != "A" or row["history"] != history:
+                continue
+            assert history_hash(ready, pid, "A") == row["before_history_sha256"]
+            branch = ready.fork()
+            cue = (
+                None
+                if row["group"] == "N"
+                else Correction(
+                    pid,
+                    event["category"],
+                    np.asarray(event["current_boxes"][row["condition"]], np.float32),
+                    1.0,
+                    event["current_detector_index"],
+                    row["group"] == "R",
+                )
+            )
+            frames, traces, _ = loaded[row["folder"]]
+            for t in range(t0, t0 + 31):
+                actual, trace = branch.step(t, det[t], cue if t == t0 else None)
+                assert_same_predictions(frames[t], actual)
+                assert traces[t] == trace, (
+                    event["event_id"],
+                    history,
+                    row["condition"],
+                    row["group"],
+                    t,
+                )
+                checked += 1
+    return {
+        "status": "passed",
+        "branches": sum(r["model"] == "A" for r in rows),
+        "branch_frames_checked": checked,
+        "method": "independent CPU replay: all objects, masks, boxes, scores, KF states and assignment traces exact; no GT supplied",
+    }
+
+
+def history_figure(video, gt, event, history_frames, output):
+    """Use the SAME last pre-correction frame, never a result-selected frame."""
+    import cv2
+
+    t = event["t0"] - 1
+    rgb = cv2.imread(str(video.rgb_paths[t]))
+    truth = [o for o in gt[t] if o.identity == event["gt_id"]]
+    panels = [
+        label(rgb, f"RGB | before current correction | step {t}"),
+        label(overlay(rgb, truth), f'GT target {event["gt_id"]}'),
+    ]
+    for letter in ("A", "B"):
+        pid = event["anchors"][letter + "0"]["prediction_id"]
+        for history in ("accurate", "polluted"):
+            found = [
+                o for o in history_frames[(letter, history)][t] if o.identity == pid
+            ]
+            iou = frame_quality(found, gt[t], pid, event["gt_id"])
+            panels.append(
+                label(
+                    overlay(rgb, found),
+                    (
+                        f"{letter} {history} history | original ID {pid} | IoU {iou:.3f}"
+                        if iou is not None
+                        else f"{letter} {history} GT invisible"
+                    ),
+                )
+            )
+    canvas = np.concatenate(
+        [np.concatenate(panels[i : i + 2], axis=1) for i in (0, 2, 4)], axis=0
+    )
+    path = output / f'{event["event_id"]}-history-before-t0.png'
+    cv2.imwrite(str(path), canvas)
+    return path
+
+
+def cue_figure(video, event, output):
+    """Show the frozen spatial interventions, not just opaque labels."""
+    import cv2
+
+    panels = []
+    for history in ("accurate", "polluted"):
+        rgb = cv2.imread(str(video.rgb_paths[event["history_step"]]))
+        box = np.rint(event["history_boxes"][history]).astype(int)
+        color = (65, 220, 75) if history == "accurate" else (50, 80, 255)
+        cv2.rectangle(rgb, tuple(box[:2]), tuple(box[2:]), color, 2)
+        panels.append(label(rgb, f'Past cue at {event["history_step"]}: {history}'))
+    path = output / f'{event["event_id"]}-historical-cues.png'
+    cv2.imwrite(str(path), np.concatenate(panels, axis=1))
+    return path
+
+
+def render_condition(video, gt, event, history, condition, rows, loaded, output):
+    import cv2
+
+    eid, t0 = event["event_id"], event["t0"]
+    stem = f"{eid}-{history}-{condition}"
+    select = {
+        r["model"] + "-" + r["group"]: r
+        for r in rows
+        if r["history"] == history and r["condition"] == condition
+    }
+    scores = {group: loaded[row["folder"]][2] for group, row in select.items()}
+    controls = {
+        m: next(
+            r
+            for r in rows
+            if r["history"] == history and r["model"] == m and r["group"] == "N"
+        )
+        for m in ("A", "B")
+    }
+    baseline = {m: loaded[row["folder"]][2] for m, row in controls.items()}
+    curve = output / (stem + "-curves.png")
+    plot_curves(
+        curve, scores, baseline, stem + " | N = same-history no current correction", 0.5
+    )
+    path = output / (stem + "-four-groups.mp4")
+    writer = VideoWriter(path, (video.width * 2, (video.height + 32) * 3), 5)
+    try:
+        for t in range(t0, t0 + 31):
+            rgb = cv2.imread(str(video.rgb_paths[t]))
+            truth = [o for o in gt[t] if o.identity == event["gt_id"]]
+            cue = rgb.copy()
+            box = np.rint(event["current_boxes"][condition]).astype(int)
+            cv2.rectangle(cue, tuple(box[:2]), tuple(box[2:]), (0, 220, 255), 2)
+            panels = [
+                label(
+                    cue,
+                    f"{history} history | {condition} | step {t} | "
+                    + ("t0 EXCLUDED" if t == t0 else f"+{t-t0}"),
+                ),
+                label(overlay(rgb, truth), f'GT target {event["gt_id"]}'),
+            ]
+            for group in ("A-H", "A-R", "B-H", "B-R"):
+                row = select[group]
+                frame = loaded[row["folder"]][0][t]
+                found = [o for o in frame if o.identity == row["identity"]]
+                quality = frame_quality(frame, gt[t], row["identity"], event["gt_id"])
+                panels.append(
+                    label(
+                        overlay(rgb, found),
+                        (
+                            f'{group} ID {row["identity"]} | IoU {quality:.3f}'
+                            if quality is not None
+                            else f"{group} GT invisible"
+                        ),
+                    )
+                )
+            writer.write(
+                np.concatenate(
+                    [np.concatenate(panels[i : i + 2], axis=1) for i in (0, 2, 4)],
+                    axis=0,
+                )
+            )
+    finally:
+        writer.close()
+    return path, curve
+
+
+def build(run, output):
+    run, output = Path(run), Path(output)
+    if output.exists():
+        raise FileExistsError("Choose a NEW analysis folder")
+    summary, plan = read(run / "summary.json"), read(run / "plan.json")
+    assert summary["status"] == "inference_completed" and len(summary["branches"]) == 56
+    assert summary["plan_sha256"] == digest(run / "plan.json")
+    assert summary["old_results_unchanged"]
+    memory_audit = read(run / "memory-audit/memory-audit.json")
+    assert memory_audit["status"] == "passed" and len(memory_audit["events"]) == 4
+    output.mkdir(parents=True)
+    checks, history_rows, score_rows, blocks = [], [], [], []
+    videos, records, _ = read_manifest(
+        Path(plan["data_root"]), [e["video_id"] for e in plan["events"]]
+    )
+    for event, video, record in zip(plan["events"], videos, records):
+        gt = load_ground_truth(plan["data_root"], record)
+        rows = [r for r in summary["branches"] if r["event_id"] == event["event_id"]]
+        verification = read(run / event["event_id"] / "verification.json")
+        assert verification["status"] == "passed"
+        loaded = {r["folder"]: check_saved(run, r, event, gt) for r in rows}
+        cpu_verification = replay_byte(event, rows, loaded)
+        history_frames = {}
+        for m in ("A", "B"):
+            for h in ("accurate", "polluted"):
+                folder = run / event["event_id"] / "history" / (m + "-" + h)
+                history_frames[(m, h)] = load_predictions(folder)
+                audit = read(folder / "audit.json")
+                last = [
+                    x
+                    for x in audit["observations"]
+                    if x["frame"] >= event["t0"] - 3 and x["GT_visible"]
+                ]
+                history_rows.append(
+                    {
+                        "event_id": event["event_id"],
+                        "model": m,
+                        "history": h,
+                        "history_sha256": audit["transplant"]["history_sha256"],
+                        "pre_t0_last3_mean_mask_iou": (
+                            sum(x["mask_iou"] for x in last) / len(last)
+                            if last
+                            else None
+                        ),
+                        "pre_t0_last3_mean_state_box_iou": (
+                            sum(x["state_box_iou"] for x in last) / len(last)
+                            if last
+                            and all(x["state_box_iou"] is not None for x in last)
+                            else None
+                        ),
+                        "pre_t0_last_mask_iou": audit["observations"][-1]["mask_iou"],
+                    }
+                )
+        reset_rows = []
+        for m in ("A", "B"):
+            for c in event["current_boxes"]:
+                rs = [
+                    next(
+                        r
+                        for r in rows
+                        if r["model"] == m
+                        and r["condition"] == c
+                        and r["history"] == h
+                        and r["group"] == "R"
+                    )
+                    for h in ("accurate", "polluted")
+                ]
+                assert rs[0]["post_t0_fingerprints"] == rs[1]["post_t0_fingerprints"]
+                reset_rows.append(
+                    {"model": m, "condition": c, "exact_output_and_state_frames": 31}
+                )
+        for row in rows:
+            score_rows.append(
+                {
+                    k: row[k]
+                    for k in (
+                        "event_id",
+                        "model",
+                        "history",
+                        "condition",
+                        "group",
+                        "correct_visible_steps",
+                        "visible_steps",
+                        "mean_visible_mask_iou",
+                        "recovery_confirmed_offset",
+                        "longest_correct_streak",
+                        "relapses",
+                    )
+                }
+            )
+        image = history_figure(video, gt, event, history_frames, output)
+        cues = cue_figure(video, event, output)
+        body = f'<section id="{event["event_id"]}"><h2>{event["event_id"]} · video {event["video_id"]} · GT{event["gt_id"]}</h2>'
+        body += f'<p>历史干预 t={event["history_step"]}；当前纠正 t={event["t0"]}。污染来源：{escape(event["history_boxes"]["pollution_rule"])}；历史框所指竞争GT：{event["history_boxes"]["distractor_gt_id"]}。</p>'
+        body += f'<img loading="lazy" src="{cues.name}" alt="Frozen accurate and wrong historical boxes at the same frame">'
+        body += table(
+            [
+                "模型",
+                "历史处理",
+                "纠正前最后3步平均mask IoU",
+                "最后1步mask IoU",
+                "最后3步KF框IoU",
+            ],
+            [
+                [
+                    r["model"],
+                    r["history"],
+                    (
+                        f'{r["pre_t0_last3_mean_mask_iou"]:.3f}'
+                        if r["pre_t0_last3_mean_mask_iou"] is not None
+                        else "N/A"
+                    ),
+                    (
+                        f'{r["pre_t0_last_mask_iou"]:.3f}'
+                        if r["pre_t0_last_mask_iou"] is not None
+                        else "N/A"
+                    ),
+                    (
+                        f'{r["pre_t0_last3_mean_state_box_iou"]:.3f}'
+                        if r["pre_t0_last3_mean_state_box_iou"] is not None
+                        else "N/A"
+                    ),
+                ]
+                for r in history_rows
+                if r["event_id"] == event["event_id"]
+            ],
+        )
+        body += f'<img loading="lazy" src="{image.name}" alt="Same last pre-correction frame, two history treatments">'
+        body += "<p>上述历史处理是输入条件，不保证污染处理一定造成持续错误。状态哈希不同也不等于可靠性已分出高低；需结合纠正前输出与状态几何偏差。</p>"
+        for condition in event["current_boxes"]:
+            body += (
+                "<h3>当前框："
+                + escape(condition)
+                + f'（与参考框IoU {event["current_box_ious"][condition]:.3f}）</h3>'
+            )
+            comparison = []
+            for history in ("accurate", "polluted"):
+                for model in ("A", "B"):
+
+                    def get(group):
+                        return next(
+                            r
+                            for r in rows
+                            if r["history"] == history
+                            and r["model"] == model
+                            and r["group"] == group
+                            and (group == "N" or r["condition"] == condition)
+                        )
+
+                    n, h, r = [get(g) for g in ("N", "H", "R")]
+                    comparison.append(
+                        [
+                            model,
+                            history,
+                            str(h["visible_steps"]),
+                            n["correct_visible_steps"],
+                            h["correct_visible_steps"],
+                            r["correct_visible_steps"],
+                            f'{h["mean_visible_mask_iou"]:.3f} / {r["mean_visible_mask_iou"]:.3f}',
+                        ]
+                    )
+            body += table(
+                [
+                    "模型",
+                    "历史",
+                    "可见步",
+                    "N正确步",
+                    "H正确步",
+                    "R正确步",
+                    "平均IoU H / R",
+                ],
+                comparison,
+            )
+            for history in ("accurate", "polluted"):
+                video_path, curve = render_condition(
+                    video, gt, event, history, condition, rows, loaded, output
+                )
+                body += (
+                    f"<details><summary>{history}历史：四组视频与曲线</summary>"
+                    + local_video(video_path, output)
+                    + f'<img loading="lazy" src="{curve.name}" alt="IoU curves with same-history no-correction controls"></details>'
+                )
+        body += "<p>重置跨前史一致性：" + escape(str(reset_rows)) + "</p></section>"
+        blocks.append(body)
+        checks.append(
+            {
+                "event_id": event["event_id"],
+                "branches_independently_rescored": len(rows),
+                "reset_cross_history": reset_rows,
+                "independent_Byte_CPU_replay": cpu_verification,
+            }
+        )
+        print(
+            "Verified and rendered",
+            event["event_id"],
+            len(rows),
+            "branches",
+            flush=True,
+        )
+    write_csv(output / "history-quality.csv", history_rows)
+    write_csv(output / "scores.csv", score_rows)
+    verification = {
+        "status": "passed",
+        "events": checks,
+        "branches": 56,
+        "R_cross_history_pairs": sum(len(c["reset_cross_history"]) for c in checks),
+        "old_results_integrity": read(run / "old-results-integrity.json")["status"],
+        "inference_summary_sha256": digest(run / "summary.json"),
+        "prefix_only_neural_memory_audit": memory_audit["status"],
+        "report_source_sha256": digest(Path(__file__)),
+    }
+    write_json(output / "memory-audit.json", memory_audit)
+    write_json(output / "verification.json", verification)
+    write_json(
+        output / "results.json",
+        {
+            "verification": verification,
+            "history_quality": history_rows,
+            "scores": score_rows,
+        },
+    )
+    html = (
+        '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>四段历史污染与重置：实现检查</title><style>body{font:16px/1.65 system-ui,sans-serif;max-width:1160px;margin:2rem auto;padding:0 1rem;background:#101820;color:#e5edf2}a{color:#90dfca}section{border-top:1px solid #44535c;margin-top:2rem;padding-top:1rem}table{border-collapse:collapse;width:100%}th,td{padding:.6rem;border-bottom:1px solid #44535c;text-align:left}.scroll{overflow-x:auto}img,video{max-width:100%;height:auto}details{padding:1rem;margin:1rem 0;border:1px solid #44535c}summary{cursor:pointer}nav{display:flex;gap:1rem;flex-wrap:wrap}</style><h1>四段历史污染与重置：实现检查</h1><p>本地RTX3080；40条纠正分支＋16条无当前纠正对照，未运行完整192分支。A=ByteTrack运动状态，B=SAM目标历史；accurate/polluted为历史框处理，H/R为保留/重置，N为同一历史但不作当前纠正。</p><p>SAM后续无刷新、无发现、无TTL删除，固定整个检查点对象集合；ByteTrack仍接收全部检测和竞争。此处是分模型机制诊断，不是原B0或A/B整体排名，不应直接与此前16段的原生流程分数相减。</p><p>GT只用于指定目标、构造诊断框与评分；不把GT mask输入模型。只评价原ID，纠正当步排除。所有时间为导出步骤。</p><nav>'
+        + "".join(
+            f'<a href="#{e["event_id"]}">{e["event_id"]}</a>' for e in plan["events"]
+        )
+        + '</nav><p><a href="history-quality.csv">历史质量CSV</a> · <a href="scores.csv">评分CSV</a> · <a href="verification.json">独立复核</a></p>'
+        + '<h2>真实神经记忆与提示日志分开审计</h2><p>另外仅对同样四段重放前史，没有新增30步实验分支。每段处理后的历史逐项复现，再单独比较mask memory、object pointer、低分辨率mask等编码张量；不同的提示坐标记录本身不算神经记忆改变。<a href="memory-audit.json">逐容器与逐帧哈希</a></p>'
+        + table(
+            ["事件", "实际编码输出是否变化", "纠正前最后步编码是否变化"],
+            [
+                [
+                    e["event_id"],
+                    e["comparison"]["encoded_outputs_changed"],
+                    e["comparison"]["last_pre_t0_encoded_outputs_changed"],
+                ]
+                for e in memory_audit["events"]
+            ],
+        )
+        + "".join(blocks)
+        + "</html>"
+    )
+    (output / "RESULTS_ZH.html").write_text(html, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--run", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    build(args.run, args.output)

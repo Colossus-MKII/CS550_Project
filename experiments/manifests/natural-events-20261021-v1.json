@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "version": "natural-events-20261021-v1",
+  "role": "portable_export_of_preinference_frozen_events_not_a_submission_bundle",
+  "export_note": "This portable index is exported after the runs. It preserves the membership and routing of the earlier frozen local manifests identified below; it does not pretend this export existed before inference.",
+  "split": "ytvis2021-200-seed550-v1.json",
+  "split_sha256": "60b0eb20a1f98e049f132dcb0b33808fddb94d288326a3c0466e52b4171616a9",
+  "seed": 550,
+  "window": 30,
+  "report_windows": [8, 20, 30],
+  "mask_iou_threshold": 0.5,
+  "streak_required": 3,
+  "groups": ["A-H", "A-R", "B-H", "B-R"],
+  "main_branches": 52,
+  "repeat_only_branches": 20,
+  "history_pollution_included": false,
+  "held_out_evaluation": false,
+  "selection": {
+    "earlier_correct_streak": 3,
+    "consecutive_visible_failures_ending_at_t0": 3,
+    "followup_GT_visible_steps": 30,
+    "common_retained_state": true,
+    "routing": "first prefix IoU-qualified prediction ID; no later per-frame re-selection",
+    "exclude_video_ids": [2967],
+    "outcome_information": "native prefix and future GT visibility, never H/R winner",
+    "box_sources": "report separately; unavailable YOLO source is missing, not a zero score"
+  },
+  "source_manifests": [
+    {"batch": "main", "sha256": "7c13cb4560181e401125e588cea3391316bb6834cf2c8d7280929dbb127328ce"},
+    {"batch": "reserve", "sha256": "5132e086af6adf18c5aa9c87df9bd282fb89388d824f3463e722c7774520c07c"},
+    {"batch": "reference", "sha256": "48888df3d9da0a065fc993e56171b39bc50e35d40d610a584471f374a1937134"}
+  ],
+  "events": [
+    {"key": "main-N01", "video_id": 2844, "gt_id": 1, "category": "person", "frame": 20, "conditions": ["yolo", "reference"], "A0_label": "persistent_failure", "B0_label": "maintenance", "reused_video_from_16": false},
+    {"key": "main-N02", "video_id": 2890, "gt_id": 1, "category": "person", "frame": 9, "conditions": ["yolo", "reference"], "A0_label": "persistent_failure", "B0_label": "maintenance", "reused_video_from_16": false},
+    {"key": "main-N03", "video_id": 2694, "gt_id": 4, "category": "person", "frame": 14, "conditions": ["yolo", "reference"], "A0_label": "persistent_failure", "B0_label": "maintenance", "reused_video_from_16": true},
+    {"key": "main-N04", "video_id": 2822, "gt_id": 4, "category": "person", "frame": 19, "conditions": ["yolo", "reference"], "A0_label": "persistent_failure", "B0_label": "maintenance", "reused_video_from_16": true},
+    {"key": "reserve-N01", "video_id": 2816, "gt_id": 5, "category": "person", "frame": 7, "conditions": ["yolo", "reference"], "A0_label": "persistent_failure", "B0_label": "maintenance", "reused_video_from_16": false},
+    {"key": "reserve-N02", "video_id": 2893, "gt_id": 2, "category": "dog", "frame": 13, "conditions": ["yolo", "reference"], "A0_label": "persistent_failure", "B0_label": "recently_unstable", "reused_video_from_16": false},
+    {"key": "reference-S01", "video_id": 2920, "gt_id": 1, "category": "person", "frame": 16, "conditions": ["reference"], "A0_label": "persistent_failure", "B0_label": "persistent_failure", "reused_video_from_16": true, "YOLO_correction": "unavailable_under_frozen_thresholds"}
+  ],
+  "repeat_events_frozen_before_outcomes": ["main-N01", "reserve-N01", "reference-S01"],
+  "limitations": [
+    "Development mechanism sample, not random failure prevalence or a balanced five-class benchmark.",
+    "Four videos are new relative to the earlier 16-event cohort; reused videos remain correlated across cohorts.",
+    "Natural prefix quality is an observed history proxy, not manipulated history reliability.",
+    "Reference-only results must not be pooled as a balanced two-source comparison.",
+    "Full local prediction/mask/video archives and machine-specific paths are intentionally not included."
+  ]
+}

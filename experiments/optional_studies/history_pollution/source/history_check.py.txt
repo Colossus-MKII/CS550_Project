@@ -1,0 +1,628 @@
+"""FOUR-event implementation gate, NOT the full 192-branch experiment.
+
+Reading map: prepare_plan -> run_event -> construct_histories -> run_branch.
+Output: 40 corrected branches + 16 no-current-correction controls, each 30
+future exported steps. No network, detector inference, training, site update
+or Git operation. Old outputs are fingerprinted before AND after the run.
+"""
+
+import argparse
+from datetime import datetime, timezone
+import gc
+from hashlib import sha256
+import json
+from pathlib import Path
+import shutil
+import time
+import traceback
+
+import numpy as np
+
+from . import ROOT, PACKAGE_ROOT, configure_runtime
+from .common import (
+    box_iou,
+    digest,
+    load_predictions,
+    mask_iou,
+    save_predictions,
+    write_json,
+)
+from .dataset import read_manifest, load_ground_truth
+from .history_check_state import (
+    byte_history,
+    diagnostic_sam_step,
+    historical_boxes,
+    history_hash,
+    outside_history_hash,
+    prediction_hash,
+    shifted_box,
+    transplant_history,
+)
+from .recovery import assert_same_predictions
+from .recovery_engines import ByteEngine, SamEngine, Correction
+from .recovery_metrics import evaluate_recovery
+from .recovery_state import sam_history_summary, state_digest, synchronized_sam_offload
+from .runtime import checked_weight, environment
+
+EVENT_IDS = ("E01", "E09", "E15", "E13")
+CORE_FILES = (
+    "history_check.py",
+    "history_check_state.py",
+    "recovery_engines.py",
+    "recovery_state.py",
+    "sam_io.py",
+    "sam_baseline.py",
+    "recovery_metrics.py",
+    "common.py",
+    "bytetrack.py",
+    "association_trace.py",
+)
+
+
+def read(path):
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def old_fingerprints(runs, exclude):
+    """Hash old result FILE BYTES, not mtimes; do not modify any old archive."""
+    records = []
+    for root in sorted(Path(runs).iterdir()):
+        if not root.is_dir() or root.resolve() == Path(exclude).resolve():
+            continue
+        h, count, size = sha256(), 0, 0
+        for path in sorted(p for p in root.rglob("*") if p.is_file()):
+            h.update(path.relative_to(root).as_posix().encode())
+            h.update(bytes.fromhex(digest(path)))
+            count += 1
+            size += path.stat().st_size
+        records.append(
+            {"name": root.name, "files": count, "bytes": size, "sha256": h.hexdigest()}
+        )
+    return records
+
+
+def prepare_plan(output, cohort, data_root):
+    """Freeze only E01/E09/E15/E13 and every box BEFORE any new inference."""
+    output, cohort, data_root = map(Path, (output, cohort, data_root))
+    if output.exists():
+        raise FileExistsError("Choose a fresh output; no resume or overwrite")
+    source = read(cohort / "cohort.json")
+    if source["status"] != "completed" or source["actual_branches"] != 128:
+        raise ValueError("Require the verified completed 16-event source")
+    videos, rows, _ = read_manifest(
+        data_root,
+        [
+            next(r["video_id"] for r in source["events"] if r["event_id"] == e)
+            for e in EVENT_IDS
+        ],
+    )
+    records = []
+    for eid, video, row in zip(EVENT_IDS, videos, rows):
+        original = next(r for r in source["events"] if r["event_id"] == eid)
+        spec = read(original["config_file"])["events"][0]
+        gt = load_ground_truth(data_root, row)
+        t0, tc = spec["frame"], spec["frame"] - 5
+        if tc < 1 or t0 + 30 >= len(gt):
+            raise ValueError(
+                "Need a five-step history treatment and thirty-step follow-up"
+            )
+        old = read(Path(original["folder"]) / "summary.json")
+        anchors = original["anchors"]
+        if any(anchors[m]["anchor_frame"] >= tc for m in ("A0", "B0")):
+            raise ValueError("The old ID must be anchored BEFORE history treatment")
+        boxes = historical_boxes(gt[tc], spec["gt_id"], video.width)
+        current = next(o for o in gt[t0] if o.identity == spec["gt_id"])
+        corrections = {"reference": current.box.tolist()}
+        if eid == "E09":
+            corrections["shift_half"] = shifted_box(
+                current.box, video.width, 0.5
+            ).tolist()
+        baseline = Path(original["baseline"])
+        det = load_predictions(baseline / str(video.video_id) / "YOLO")
+        truth_past = next(o for o in gt[tc] if o.identity == spec["gt_id"])
+        candidates = [o for o in det[tc] if o.category == current.category]
+        routed = max(
+            candidates,
+            key=lambda o: (box_iou(o.box, truth_past.box), o.score),
+            default=None,
+        )
+        records.append(
+            {
+                "event_id": eid,
+                "video_id": video.video_id,
+                "gt_id": spec["gt_id"],
+                "category": spec["category"],
+                "t0": t0,
+                "history_step": tc,
+                "baseline": str(baseline.resolve()),
+                "baseline_summary_sha256": digest(baseline / "summary.json"),
+                "configuration": old["baseline_configuration"],
+                "anchors": anchors,
+                "history_boxes": boxes,
+                "current_boxes": corrections,
+                "current_box_ious": {
+                    k: box_iou(current.box, v) for k, v in corrections.items()
+                },
+                "history_detector_index": (
+                    routed.identity if routed is not None else None
+                ),
+                "current_detector_index": original["corrections"]["reference"][
+                    "detector_index"
+                ],
+                "source_prediction_files": {
+                    p.relative_to(baseline).as_posix(): digest(p)
+                    for method in ("YOLO", "A0", "B0")
+                    for p in sorted((baseline / str(video.video_id) / method).glob("*"))
+                    if p.suffix in {".json", ".npz"}
+                },
+            }
+        )
+    output.mkdir(parents=True)
+    plan = {
+        "status": "prepared",
+        "created_utc": datetime.now(timezone.utc).isoformat(),
+        "authorization": "User requested ONLY four implementation checks on local3080, not the full192.",
+        "events": records,
+        "data_root": str(data_root.resolve()),
+        "data_manifest_sha256": digest(data_root / "manifest.json"),
+        "source_cohort_sha256": digest(cohort / "cohort.json"),
+        "window": 30,
+        "seed": 550,
+        "expected_corrected_branches": 40,
+        "expected_no_current_correction_controls": 16,
+        "expected_branches_total": 56,
+        "boundary_case_2967_run": False,
+        "score": {
+            "mask_iou_threshold": 0.5,
+            "consecutive_visible_steps": 3,
+            "exclude_t0": True,
+        },
+        "history_treatment": "one accurate vs nearest-same-class wrong historical BOX at t0-5; native propagation to t0-1; no outcome-based retry",
+        "transplant": "target KF mean/covariance (A), five per-object stores (B); all other state from common native t0-1 checkpoint",
+        "SAM_followup": "open-loop; checkpoint object set kept alive; no future prompt/discovery/TTL for any object",
+        "Byte_followup": "native detector-cache-driven association with all competing detections",
+        "fixed_score_for_all_corrections": 1.0,
+        "interpretation": "assigned accurate/polluted CUE conditions, not assumed latent-memory reliability; implementation diagnostics only",
+        "core_source_sha256": {
+            name: digest(PACKAGE_ROOT / name) for name in CORE_FILES
+        },
+    }
+    for name in CORE_FILES:
+        (output / "code").mkdir(exist_ok=True)
+        shutil.copy2(PACKAGE_ROOT / name, output / "code" / (name + ".txt"))
+    write_json(output / "plan.json", plan)
+    return plan
+
+
+def native_prefix(video, det, reference, config, t0, tc, predictor):
+    """Replay native A0/B0 exactly, and save an earlier shared checkpoint."""
+    a, b = ByteEngine(config, True), SamEngine(predictor, video, config)
+    predictions = {"A": [], "B": []}
+    traces = {"A": [], "B": []}
+    early = None
+    for t in range(t0):
+        for letter, engine in (("A", a), ("B", b)):
+            objects, trace = engine.step(t, det[t])
+            assert_same_predictions(reference[letter][t], objects)
+            predictions[letter].append(objects)
+            traces[letter].append(trace)
+        if t == tc - 1:
+            early = {"A": a.fork(), "B": b.fork()}
+    return {"A": a, "B": b}, early, predictions, traces
+
+
+def target_observation(objects, truth, pid, engine, letter):
+    obj = next((o for o in objects if o.identity == pid), None)
+    state_box = (
+        engine.find(pid)[1].xyxy if letter == "A" and engine.eligible(pid) else None
+    )
+    return {
+        "GT_visible": truth is not None,
+        "output_present": obj is not None,
+        "mask_iou": (
+            mask_iou(truth.mask, obj.mask)
+            if truth and obj
+            else (0.0 if truth else None)
+        ),
+        "state_box_iou": (
+            box_iou(truth.box, state_box) if truth and state_box is not None else None
+        ),
+        "state_alive": engine.eligible(pid),
+    }
+
+
+def construct_histories(
+    event, common, early, base_predictions, base_traces, det, gt, output
+):
+    """Change a past cue, let it propagate, then isolate its target-state effect."""
+    histories, reports = {}, []
+    tc, t0 = event["history_step"], event["t0"]
+    for letter in ("A", "B"):
+        pid = event["anchors"][letter + "0"]["prediction_id"]
+        for history in ("accurate", "polluted"):
+            donor = early[letter].fork()
+            predictions = list(base_predictions[letter][:tc])
+            traces = list(base_traces[letter][:tc])
+            observations = []
+            for t in range(tc, t0):
+                correction = (
+                    Correction(
+                        pid,
+                        event["category"],
+                        np.asarray(event["history_boxes"][history], np.float32),
+                        1.0,
+                        event["history_detector_index"],
+                        False,
+                    )
+                    if t == tc
+                    else None
+                )
+                objects, trace = donor.step(t, det[t], correction)
+                predictions.append(objects)
+                traces.append(trace)
+                truth = next((o for o in gt[t] if o.identity == event["gt_id"]), None)
+                observations.append(
+                    {
+                        "frame": t,
+                        **target_observation(objects, truth, pid, donor, letter),
+                    }
+                )
+            if not donor.eligible(pid):
+                raise ValueError(
+                    "Historical treatment removed target: report implementation gate failure, do not silently recreate it"
+                )
+            ready, transplant_audit = transplant_history(
+                common[letter], donor, pid, letter
+            )
+            report = {
+                "event_id": event["event_id"],
+                "model": letter,
+                "history": history,
+                "identity": pid,
+                "observations": observations,
+                "transplant": transplant_audit,
+                "history_state": (
+                    ByteEngine.snapshot(ready.find(pid)[1])
+                    if letter == "A"
+                    else sam_history_summary(ready.state, pid)
+                ),
+            }
+            folder = output / event["event_id"] / "history" / (letter + "-" + history)
+            save_predictions(folder, predictions, (gt_shape(gt)))
+            write_json(folder / "state-trace.json", traces)
+            write_json(folder / "audit.json", report)
+            histories[(letter, history)] = (ready, predictions, traces)
+            reports.append(report)
+            del donor
+    for letter in ("A", "B"):
+        hashes = [
+            r["transplant"]["history_sha256"] for r in reports if r["model"] == letter
+        ]
+        assert hashes[0] != hashes[1], "Historical cue did not even change target state"
+    write_json(output / event["event_id"] / "history-audit.json", reports)
+    return histories, reports
+
+
+def gt_shape(gt):
+    return next(obj.mask.shape for frame in gt for obj in frame)
+
+
+def run_branch(
+    event,
+    model,
+    history,
+    ready,
+    prefix,
+    prefix_traces,
+    condition,
+    group,
+    det,
+    gt,
+    output,
+):
+    """One fixed-ID path; GT is used here ONLY for post-hoc scoring."""
+    import torch
+
+    pid, t0 = event["anchors"][model + "0"]["prediction_id"], event["t0"]
+    before = history_hash(ready, pid, model)
+    engine = ready.fork()
+    correction = (
+        None
+        if group == "N"
+        else Correction(
+            pid,
+            event["category"],
+            np.asarray(event["current_boxes"][condition], np.float32),
+            1.0,
+            event["current_detector_index"],
+            group == "R",
+        )
+    )
+    predictions, traces = list(prefix), list(prefix_traces)
+    fingerprints = []
+    after_history = None
+    for t in range(t0, t0 + 31):
+        cue = correction if t == t0 else None
+        objects, trace = (
+            engine.step(t, det[t], cue)
+            if model == "A"
+            else diagnostic_sam_step(engine, t, cue)
+        )
+        predictions.append(objects)
+        traces.append(trace)
+        if t == t0:
+            after_history = history_hash(engine, pid, model)
+            if group == "R" and model == "A":
+                track = engine.find(pid)[1]
+                np.testing.assert_array_equal(track.mean[4:], np.zeros(4))
+                audit = trace["intervention"]["after"]
+                assert (
+                    audit["internal_id"]
+                    == trace["intervention"]["before"]["internal_id"]
+                )
+            if group in {"H", "R"}:
+                assert trace["intervention"]["correction_updates"] == 1
+            state = {
+                "target_history": after_history,
+                "outside": outside_history_hash(engine, pid, model),
+            }
+        else:
+            state = trace
+        fingerprints.append(
+            {
+                "frame": t,
+                "predictions": prediction_hash(objects),
+                "state": state_digest(state),
+            }
+        )
+    assert history_hash(ready, pid, model) == before, "Fork mutated source history"
+    folder = (
+        output / event["event_id"] / "branches" / model / history / condition / group
+    )
+    save_predictions(folder, predictions, gt_shape(gt))
+    write_json(folder / "state-trace.json", traces)
+    scores = evaluate_recovery(
+        gt[: len(predictions)], predictions, pid, event["gt_id"], t0, 30, 0.5, 3, traces
+    )
+    write_json(folder / "recovery.json", scores)
+    write_json(folder / "fingerprints.json", fingerprints)
+    record = {
+        "event_id": event["event_id"],
+        "video_id": event["video_id"],
+        "model": model,
+        "history": history,
+        "condition": condition,
+        "group": group,
+        "identity": pid,
+        "folder": folder.relative_to(output).as_posix(),
+        "before_history_sha256": before,
+        "after_t0_history_sha256": after_history,
+        "post_t0_fingerprints": fingerprints,
+        **scores["summary"],
+    }
+    print(
+        "Complete",
+        event["event_id"],
+        model,
+        history,
+        condition,
+        group,
+        f'{record["correct_visible_steps"]}/{record["visible_steps"]}',
+        flush=True,
+    )
+    del engine
+    gc.collect()
+    torch.cuda.empty_cache()
+    return record
+
+
+def run_event(event, plan, predictor, output):
+    import torch
+
+    data = Path(plan["data_root"])
+    video_list, rows, _ = read_manifest(data, [event["video_id"]])
+    video = video_list[0]
+    gt = load_ground_truth(data, rows[0])
+    source = Path(event["baseline"])
+    if digest(source / "summary.json") != event["baseline_summary_sha256"]:
+        raise ValueError("Frozen baseline changed")
+    for name, sha in event["source_prediction_files"].items():
+        assert digest(source / name) == sha
+    det = load_predictions(source / str(video.video_id) / "YOLO")
+    reference = {
+        m: load_predictions(source / str(video.video_id) / (m + "0"))
+        for m in ("A", "B")
+    }
+    common, early, prefix, traces = native_prefix(
+        video,
+        det,
+        reference,
+        event["configuration"],
+        event["t0"],
+        event["history_step"],
+        predictor,
+    )
+    histories, audit = construct_histories(
+        event, common, early, prefix, traces, det, gt, output
+    )
+    results = []
+    for (model, history), (ready, past, past_trace) in histories.items():
+        results.append(
+            run_branch(
+                event,
+                model,
+                history,
+                ready,
+                past,
+                past_trace,
+                "no_current_correction",
+                "N",
+                det,
+                gt,
+                output,
+            )
+        )
+        for condition in event["current_boxes"]:
+            for group in ("H", "R"):
+                results.append(
+                    run_branch(
+                        event,
+                        model,
+                        history,
+                        ready,
+                        past,
+                        past_trace,
+                        condition,
+                        group,
+                        det,
+                        gt,
+                        output,
+                    )
+                )
+    checks = []
+    for model in ("A", "B"):
+        for condition in event["current_boxes"]:
+            pair = [
+                next(
+                    r
+                    for r in results
+                    if r["model"] == model
+                    and r["condition"] == condition
+                    and r["group"] == "R"
+                    and r["history"] == h
+                )
+                for h in ("accurate", "polluted")
+            ]
+            assert (
+                pair[0]["post_t0_fingerprints"] == pair[1]["post_t0_fingerprints"]
+            ), "R failed to erase cross-history path differences"
+            checks.append(
+                {
+                    "model": model,
+                    "condition": condition,
+                    "same_R_state_at_t0_and_future_outputs_traces": True,
+                    "frames_checked": 31,
+                    "after_t0_history_sha256": pair[0]["after_t0_history_sha256"],
+                }
+            )
+    verification = {
+        "status": "passed",
+        "native_prefix_exact": True,
+        "history_and_target_only_transplant": audit,
+        "R_cross_history_checks": checks,
+        "branches": len(results),
+    }
+    write_json(output / event["event_id"] / "verification.json", verification)
+    del histories, common, early
+    gc.collect()
+    torch.cuda.empty_cache()
+    return results, verification
+
+
+def execute(output, cohort, data_root):
+    """Bounded local run. Any failed invariant stops, preserving its artifacts."""
+    import torch
+    from sam2.build_sam import build_sam2_video_predictor
+
+    if not torch.cuda.is_available() or "3080" not in torch.cuda.get_device_name(0):
+        raise RuntimeError("ONLY local RTX3080 is authorized for this batch")
+    configure_runtime()
+    env = environment("cuda:0", 550)
+    weight, weight_sha = checked_weight("sam2.1_hiera_tiny.pt")
+    plan = prepare_plan(output, cohort, data_root)
+    output = Path(output)
+    summary = {
+        "status": "running",
+        "environment": env,
+        "weight_sha256": weight_sha,
+        "plan_sha256": digest(output / "plan.json"),
+        "branches": [],
+        "events": [],
+    }
+    print("Fingerprint old results", flush=True)
+    before = old_fingerprints(ROOT / "runs", output)
+    write_json(output / "old-results-before.json", before)
+    write_json(output / "summary.json", summary)
+    started = time.perf_counter()
+    try:
+        predictor = build_sam2_video_predictor(
+            "configs/sam2.1/sam2.1_hiera_t.yaml",
+            str(weight),
+            device="cuda:0",
+            apply_postprocessing=True,
+        )
+        predictor.fill_hole_area = 0
+        predictor.add_all_frames_to_correct_as_cond = True
+        assert (
+            not predictor.non_overlap_masks
+        ), "Review multi-object output coupling before diagnostic transplant"
+        torch.cuda.reset_peak_memory_stats()
+        with torch.inference_mode(), torch.autocast(
+            "cuda", dtype=torch.bfloat16
+        ), synchronized_sam_offload(predictor):
+            for event in plan["events"]:
+                assert all(
+                    digest(PACKAGE_ROOT / n) == h
+                    for n, h in plan["core_source_sha256"].items()
+                )
+                print(
+                    "START",
+                    event["event_id"],
+                    "history treatment",
+                    event["history_step"],
+                    "correction",
+                    event["t0"],
+                    flush=True,
+                )
+                branches, check = run_event(event, plan, predictor, output)
+                summary["branches"] += branches
+                summary["events"].append(
+                    {
+                        "event_id": event["event_id"],
+                        "status": check["status"],
+                        "branches": check["branches"],
+                    }
+                )
+                write_json(output / "summary.json", summary)
+        assert len(summary["branches"]) == 56
+        assert sum(r["group"] != "N" for r in summary["branches"]) == 40
+        summary.update(
+            status="inference_completed",
+            wall_seconds=time.perf_counter() - started,
+            peak_process_allocated_mib=torch.cuda.max_memory_allocated() / 2**20,
+        )
+    except Exception:
+        summary.update(status="failed", error=traceback.format_exc())
+        raise
+    finally:
+        print("Recheck old result fingerprints", flush=True)
+        after = old_fingerprints(ROOT / "runs", output)
+        integrity = {
+            "status": "passed" if before == after else "failed",
+            "roots": len(before),
+            "files": sum(r["files"] for r in before),
+            "before": before,
+            "after": after,
+        }
+        write_json(output / "old-results-integrity.json", integrity)
+        summary["old_results_unchanged"] = before == after
+        write_json(output / "summary.json", summary)
+        assert before == after, "Old result archive changed"
+    print("Inference completed:", output, flush=True)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--cohort", type=Path, default=ROOT / "runs/recovery-independent-20261020-3080"
+    )
+    parser.add_argument(
+        "--data-root", type=Path, default=ROOT / "data/independent-dev-20261020"
+    )
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args(argv)
+    execute(args.output, args.cohort, args.data_root)
+
+
+if __name__ == "__main__":
+    main()

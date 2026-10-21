@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "version": "natural-reserves-20261021-v1",
+  "status": "frozen_before_reserve_baseline_inference",
+  "purpose": "Check all six previously listed development reserves after the original 32 clips supplied no SAM event meeting the unchanged persistent-failure and 30-visible-step criteria.",
+  "split_sha256": "60b0eb20a1f98e049f132dcb0b33808fddb94d288326a3c0466e52b4171616a9",
+  "parent_queue_sha256": "372151fe7bf71955c0762d5c2671028944c04002eaa1007025f0ed6dbfd11a64",
+  "seed": 550,
+  "video_ids": [2726, 2830, 2893, 2816, 2972, 2923],
+  "candidates": [
+    {"video_id": 2726, "group_id": "visual-2726", "categories": ["person"], "frames": 48, "focus": "person"},
+    {"video_id": 2830, "group_id": "visual-2830", "categories": ["person"], "frames": 50, "focus": "person"},
+    {"video_id": 2893, "group_id": "visual-2893", "categories": ["dog"], "frames": 48, "focus": "dog"},
+    {"video_id": 2816, "group_id": "visual-2816", "categories": ["person"], "frames": 60, "focus": "person"},
+    {"video_id": 2972, "group_id": "visual-2972", "categories": ["person"], "frames": 54, "focus": "person"},
+    {"video_id": 2923, "group_id": "visual-2923", "categories": ["car", "person"], "frames": 48, "focus": "car"}
+  ],
+  "H_R_permitted": false,
+  "selection_information": "All six reserves, unchanged order and membership from the old queue; no new H/R outcomes or reserve model outputs used for membership.",
+  "stopping_rule": "Screen these six reserves only; do not keep expanding or relax event criteria to obtain a desired result."
+}

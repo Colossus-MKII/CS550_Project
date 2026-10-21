@@ -1,0 +1,269 @@
+"""Target-only history interventions for the FOUR-video implementation check.
+
+This module does not replace either baseline. Read in this order:
+  historical_boxes() -> transplant_history() -> diagnostic_sam_step().
+GT supplies diagnostic BOXES only, never masks to a neural model.
+"""
+
+from dataclasses import asdict
+import numpy as np
+
+from .common import Instance, box_iou, mask_box
+from .recovery_state import (
+    SAM_TARGET_KEYS,
+    clone_tree,
+    reset_sam_target,
+    sam_history_summary,
+    state_digest,
+    target_history,
+)
+from .sam_baseline import propagate_one
+
+
+def historical_boxes(truths, gt_id, width):
+    """Freeze a wrong-person/car cue BEFORE seeing intervention outcomes.
+
+    Prefer the nearest *other* GT instance of the same class (center distance,
+    GT-ID tie break). If none exists, translate by one box width without resizing.
+    The assigned treatment is 'wrong historical cue', NOT proven bad memory.
+    """
+    target = next(o for o in truths if o.identity == gt_id)
+    center = (target.box[:2] + target.box[2:]) / 2
+    others = [
+        o for o in truths if o.identity != gt_id and o.category == target.category
+    ]
+    if others:
+        wrong = min(
+            others,
+            key=lambda o: (
+                float(np.linalg.norm((o.box[:2] + o.box[2:]) / 2 - center)),
+                o.identity,
+            ),
+        )
+        bad, source, distractor = (
+            wrong.box.copy(),
+            "nearest_same_class_GT_box",
+            wrong.identity,
+        )
+    else:
+        bad = shifted_box(target.box, width, 1.0)
+        source, distractor = "one_width_horizontal_shift", None
+    if np.array_equal(target.box, bad):
+        raise ValueError("Historical good/wrong boxes must actually differ")
+    return {
+        "accurate": target.box.tolist(),
+        "polluted": bad.tolist(),
+        "pollution_rule": source,
+        "distractor_gt_id": distractor,
+        "polluted_reference_box_iou": box_iou(target.box, bad),
+    }
+
+
+def shifted_box(box, image_width, fraction):
+    """Translate horizontally, preserving size; refuse instead of clipping.
+
+    Positive direction is fixed first; use negative only if positive hits the
+    image boundary. No direction is chosen using H/R outcomes.
+    """
+    box = np.asarray(box, np.float32)
+    distance = float(box[2] - box[0]) * fraction
+    for sign in (1, -1):
+        shifted = box + np.array([sign * distance, 0, sign * distance, 0], np.float32)
+        if shifted[0] >= 0 and shifted[2] <= image_width:
+            return shifted
+    raise ValueError("Cannot realize prespecified full-width-preserving shift")
+
+
+def byte_history(engine, identity):
+    track = engine.find(identity)[1]
+    return {"mean": track.mean.copy(), "covariance": track.covariance.copy()}
+
+
+def history_hash(engine, identity, model):
+    value = (
+        byte_history(engine, identity)
+        if model == "A"
+        else target_history(engine.state, identity)
+    )
+    return state_digest(value)
+
+
+def outside_history_hash(engine, identity, model):
+    """Fingerprint everything relevant OUTSIDE the target's treatment stores.
+
+    ByteTrack: every other trajectory and target non-KF metadata are included.
+    SAM: all other objects, wrapper metadata, image features/constants and ID
+    maps are included. The lazy image-loader object is represented by paths,
+    size and accesses, not a Python object-address repr.
+    """
+    if model == "A":
+        rows = []
+        for category, tracker in engine.trackers.items():
+            for slot in ("tracked_stracks", "lost_stracks", "removed_stracks"):
+                for track in getattr(tracker, slot):
+                    pid = engine.external.get((category, int(track.track_id)))
+                    item = (
+                        engine.snapshot(track)
+                        if track.mean is not None
+                        else {"id": int(track.track_id)}
+                    )
+                    if pid == identity:
+                        for key in ("mean", "covariance", "box_xyxy"):
+                            item.pop(key, None)
+                    item.update(
+                        category=category,
+                        slot=slot,
+                        score=float(track.score),
+                        public_id=pid,
+                    )
+                    rows.append(item)
+        return state_digest(
+            {
+                "rows": rows,
+                "frame": engine.frame,
+                "counter": engine.counter,
+                "external": engine.external,
+                "next_id": engine.next_id,
+            }
+        )
+    idx = engine.state["obj_id_to_idx"][identity]
+    rest = {
+        k: v for k, v in engine.state.items() if k not in {*SAM_TARGET_KEYS, "images"}
+    }
+    rest["other_histories"] = {
+        key: {i: value for i, value in engine.state[key].items() if i != idx}
+        for key in SAM_TARGET_KEYS
+    }
+    rest["wrapper"] = {key: asdict(value) for key, value in engine.targets.items()}
+    rest["frame"] = engine.frame
+    rest["next_id"] = engine.next_id
+    rest["loader"] = {
+        "paths": [str(p) for p in engine.loader.paths],
+        "image_size": engine.loader.image_size,
+        "accessed": engine.loader.accessed,
+    }
+    return state_digest(rest)
+
+
+def transplant_history(common, donor, identity, model):
+    """Start from ONE native checkpoint; replace ONLY target history.
+
+    A: copy KF mean/covariance, NOT score, ID, activation or lifecycle.
+    B: copy five per-object prompt/output/temporal stores, NOT wrapper metadata,
+       other objects, image features or model weights.
+    This is an explicit diagnostic state transplant, not an automatic tracker.
+    """
+    before = outside_history_hash(common, identity, model)
+    original = history_hash(common, identity, model)
+    branch = common.fork()
+    if model == "A":
+        destination, source = branch.find(identity)[1], donor.find(identity)[1]
+        destination.mean = source.mean.copy()
+        destination.covariance = source.covariance.copy()
+    else:
+        dst = branch.state["obj_id_to_idx"][identity]
+        src = donor.state["obj_id_to_idx"][identity]
+        for key in SAM_TARGET_KEYS:
+            branch.state[key][dst] = clone_tree(donor.state[key][src])
+    assert outside_history_hash(branch, identity, model) == before
+    assert history_hash(common, identity, model) == original
+    assert history_hash(branch, identity, model) == history_hash(donor, identity, model)
+    return branch, {
+        "outside_target_unchanged": True,
+        "common_source_unchanged": True,
+        "donor_history_exact": True,
+        "history_sha256": history_hash(branch, identity, model),
+    }
+
+
+def diagnostic_sam_step(engine, t, correction=None):
+    """SAM-only OPEN-LOOP diagnostic, not ordinary B0.
+
+    Keep the checkpoint's object set alive, propagate RGB, and optionally accept
+    ONE current box. No later YOLO prompts, discovery or TTL deletion for ANY
+    object. This fixes those feedback channels identically across all pairs.
+    ByteTrack still uses native per-frame detections in its own experiment.
+    """
+    if t != engine.frame + 1:
+        raise ValueError("Diagnostic SAM requires consecutive steps")
+    predictor, state = engine.predictor, engine.state
+    masks = propagate_one(predictor, state, t)
+    for key, mask in masks.items():
+        if mask.any():
+            engine.targets[key].box = mask_box(mask)
+    audit, prompts = None, []
+    if correction:
+        key = correction.identity
+        audit = {"before": sam_history_summary(state, key), "reset": correction.reset}
+        if correction.reset:
+            audit["clear"] = reset_sam_target(state, key)
+            cleared = audit["clear"]["after_clear"]
+            assert not any(
+                cleared[k]
+                for k in (
+                    "point_frames",
+                    "mask_frames",
+                    "conditioning_frames",
+                    "nonconditioning_frames",
+                    "tracked_frames",
+                )
+            )
+        target = engine.targets[key]
+        target.box, target.last_detection, target.score = (
+            correction.box.copy(),
+            t,
+            correction.score,
+        )
+        _, ids, logits = predictor.add_new_points_or_box(
+            state, frame_idx=t, obj_id=key, box=correction.box.astype(np.float32)
+        )
+        masks = {int(i): m for i, m in zip(ids, (logits > 0).cpu().numpy()[:, 0])}
+        predictor.propagate_in_video_preflight(state)
+        prompts = [
+            {
+                "id": key,
+                "source": "controlled_correction",
+                "box_xyxy": correction.box.tolist(),
+            }
+        ]
+        audit.update(
+            after=sam_history_summary(state, key), correction_updates=1, external_id=key
+        )
+    objects = [
+        Instance(
+            key,
+            engine.targets[key].category,
+            mask_box(mask),
+            mask,
+            engine.targets[key].score,
+        )
+        for key, mask in masks.items()
+        if key in engine.targets and mask.any()
+    ]
+    if engine.loader.accessed and max(engine.loader.accessed) > t:
+        raise AssertionError("Future RGB encoded")
+    engine.frame = t
+    return objects, {
+        "frame": t,
+        "active_ids": list(engine.targets),
+        "output_ids": [o.identity for o in objects],
+        "actions": [],
+        "prompt_inputs": prompts,
+        "intervention": audit,
+        "mode": "open_loop_no_refresh_no_discovery_no_TTL",
+    }
+
+
+def prediction_hash(objects):
+    return state_digest(
+        [
+            {
+                "id": o.identity,
+                "class": o.category,
+                "box": o.box,
+                "mask": o.mask,
+                "score": o.score,
+            }
+            for o in sorted(objects, key=lambda o: o.identity)
+        ]
+    )

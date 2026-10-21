@@ -1,0 +1,93 @@
+NATURAL PERSISTENT-FAILURE FOLLOW-UP -- 21 October 2026
+
+中文：按实验步骤读代码
+
+1. 从原生自动基线找事件，不看H/R谁赢。
+   tracking_lab/natural_events.py
+     fixed_id_curve(): 首次IoU达标时锚定预测ID，之后不换ID。
+     failure_label(): 曾连续3步正确，当前连续3个可见步骤IoU<0.5。
+     scan(): 同时检查两系统旧状态、YOLO纠正框、后续30步GT完整可见。
+     choose_events(): 确定性选样；每视频至多一个新事件；优先未进旧16段的视频。
+   输出policy.json、完整candidates.json和frozen-events.json。
+   policy在扫描前写入，事件清单在新H/R推理前冻结；不是事后人工审批记录。
+
+2. 从同一份原生前史做四组对照。
+   tracking_lab/natural_recovery.py -> prepare()/execute()
+   复用recovery.execute()，不改原来的H/R引擎：
+     同事件/同模型/同框，复制相同前史，纠正一次，随后正常闭环运行。
+     YOLO/参考两种框来源，各运行A-H/A-R/B-H/B-R，每事件8分支。
+     原生SAM同步重放必须与筛选时的B0逐帧一致；前缀必须完全一致。
+   仅本地3080；不调用学校服务器，不训练，不抑制正常刷新，不改TTL。
+
+3. 独立复核评分、状态和视频。
+   recovery_report.build(): 重评分、重置审计、6面板视频与IoU曲线。
+   natural_report.verify_selection(): 从原生输出重新计算选样前史标签。
+   recovery_cohort_report.per_event(): 读取8/20/30窗口，复核SAM实际提示，
+     独立CPU重放全部ByteTrack分支，区分关联丢失、低IoU和状态删除。
+   natural_report.build(): 将持续失败与维持对照分组报告，加入未纠正基线。
+   不把同一事件两个框或三个窗口当成独立样本。
+
+4. 数值复跑。
+   冻结清单中的repeat_event_id在H/R结果出来前已指定。
+   用相同配置另跑8个验证分支；逐项比较ID、框、分数、mask和评分曲线。
+   复跑只是验证，不增加样本量；ByteTrack全部分支另有状态/关联日志复核。
+
+为什么同一事件有不同标签？
+   一个目标可以在A中已丢失，在B中仍正确。四组仍用同一事件/时刻对照，
+   但分别回答A的恢复问题、B的维持/重置代价问题，不假装两边同时出错。
+
+主要读数
+   N=原生未纠正，H=保留，R=重置。
+   比较N/H：一次显式纠正相对自然运行的效果。
+   比较H/R：同一纠正条件下重置相对保留的额外效果。
+   先看正确步数与平均IoU，再看首次连续3步确认、窗口末状态和复发。
+   GT辅助目标路由是诊断干预，不是自动重识别或部署算法的提升。
+
+样本范围与停止规则
+   第一轮仅扫描原开发队列32段；2967边界整段排除，实际扫描31段。
+   若无两种纠正框同时可用的SAM合格事件，额外检查旧队列全部6段reserve。
+   reserve顺序/成员不按模型结果选择；先导出并跑原生A0/B0，再用同一规则筛选。
+   检查完6段即停止，不为了凑够SAM失败数继续换数据或降低门槛。
+   30步可见的约束偏向较早、可持续观测的失败，筛不到不代表SAM不会失败。
+   首轮4个事件中有2个视频也出现在旧16段，但目标/时刻不同；不得跨批当新独立视频。
+
+单参考框补充层
+   natural_coverage.inspect_queue(): 对原生SAM持续失败逐层审计，找出筛选缺口。
+   natural_reference.freeze()/execute(): 当旧状态、失败前史和30步可见都合格，
+     只是没有YOLO纠正框时，按proposal“两种框来源分别报告”冻结单参考框事件。
+   仍跑A-H/A-R/B-H/B-R四组；不制造检测框，不改失败阈值或缩短窗口。
+   recovery_cohort_report.per_event()/replay_byte_branches()现在支持实际可用的
+     来源数，单来源独立复核2个A分支；原双来源16段报告逻辑不变。
+   该层单独报告，不能装作完整两来源矩阵或自动部署纠正结果。
+
+已完成总量
+   6段双来源48主分支 + 1段单参考框4主分支 = 52主分支。
+   三批预指定数值复跑共20分支，不是新增独立样本。
+   总读数：NATURAL_FOLLOWUP_RESULTS_ZH.txt。
+
+命令（仓库根目录，已有项目Python环境）
+   python -m tracking_lab.natural_events --queue <queue.json> --split <split.json>
+     --baselines <native-baselines> --data-root <RGB-GT> --previous <old16-review.json>
+     --output <NEW-selection>
+   python -m tracking_lab.natural_recovery --frozen <NEW-selection/frozen-events.json>
+     --output <NEW-cohort>
+   python -m tracking_lab.natural_report --cohort <NEW-cohort> --output <NEW-analysis>
+
+当前批次
+   runs/natural-selection-20261021/frozen-events.json
+   runs/recovery-natural-20261021-3080/
+   runs/recovery-natural-20261021-analysis/
+   manifests/natural-reserves-20261021-v1.json
+   runs/natural-reserve-baselines-20261021-3080/
+   runs/natural-reserve-selection-20261021/
+   runs/recovery-natural-reserves-20261021-3080/
+   runs/recovery-natural-reserves-20261021-analysis/
+   runs/recovery-natural-reference-20261021-3080/
+   runs/recovery-natural-reference-20261021-analysis/
+
+隔离范围
+   人为历史污染的代码和全部56分支仍被搁置；没有读入本轮筛选、评分或结论。
+   原始旧结果保留；正式validation/evaluation集未用于找事件。
+   实验运行器不修改proposal/学习网站，不Git提交/推送，不上传或提交课程作业。
+   用户另行授权的协作同步只共享实验源码、事件索引与分析文档；网站和视频留本地。
+   可移植索引：manifests/natural-events-20261021-v1.json（不含机器路径或原始预测）。
