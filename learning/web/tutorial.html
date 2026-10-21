@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CS550 项目文档：YOLO、ByteTrack、SAM 2.1 的原理、代码、视频结果、评估指标与 proposal。">
+  <title>CS550 · 目标检测、分割与跟踪</title>
+  <link rel="icon" href="favicon.ico?v=1" sizes="16x16 32x32 48x48">
+  <link rel="icon" href="favicon-32.png?v=1" type="image/png" sizes="32x32">
+  <link rel="icon" href="favicon.svg?v=1" type="image/svg+xml" sizes="any">
+  <style>@@CSS@@</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到正文</a>
+<header class="topbar"><a class="brand" href="#overview"><span class="brand-mark">550</span><span>CS550 Tracking Lab</span></a><div class="top-actions"><a id="language-toggle" href="index.en.html" lang="en" hreflang="en" aria-label="切换到英文，保留学习进度">English</a><button id="theme-toggle" aria-label="切换明暗主题">切换主题</button><button id="menu-toggle" aria-expanded="false" aria-controls="sidebar">课程目录</button></div></header>
+<div class="layout">
+<aside id="sidebar" class="sidebar" aria-label="课程导航">
+  <div class="sidebar-inner"><p class="nav-label">目录</p>
+  <form id="search-form" role="search"><label class="sr-only" for="search-input">搜索教程</label><input id="search-input" type="search" placeholder="搜索：置信度、记忆、HOTA…" autocomplete="off"><button type="submit" aria-label="查找下一处">查找</button></form><p id="search-status" class="small" aria-live="polite"></p>
+  <nav id="course-nav"><span class="nav-group">1 · 模型与视频</span><a href="#overview">概述与模型职责</a><a href="#chapter-1">YOLO · 目标检测</a><a href="#chapter-2">YOLO · 实例分割</a><a href="#chapter-3">ByteTrack · 多目标跟踪</a><a href="#chapter-4">SAM 2.1 · 视频分割</a><span class="nav-group">2 · 研究与实验</span><a id="experiment-nav-link" href="experiments.html">实验流程 · 四组对照 →</a><a id="dataset-nav-link" href="dataset.html">数据与真实样本 →</a><a id="results-nav-link" href="results.html">真实实验结果 →</a><a href="#chapter-7">项目实验设计</a><a href="#chapter-6">IoU、IDF1、HOTA</a><a href="#proposal">Proposal 与下载</a><a href="#evidence">逐帧证据</a><span class="nav-group">3 · 数学与实现</span><a href="#deep-study">选择深入主题</a><a href="math.html">数学与实现</a><span class="nav-group">参考资料</span><a href="research.html">技术脉络与来源</a><a href="#chapter-5">DeAOT · 背景知识</a><a href="#run-record">源码与运行记录</a></nav>
+  <div class="reading-progress"><span id="progress-label">已读 0 / 7 章</span><progress id="course-progress" value="0" max="7" aria-label="阅读进度"></progress><p>阅读进度保存在当前浏览器。</p></div>
+</div>
+</aside>
+<main id="main">
+<section id="overview" class="chapter hero" data-title="全景 检测 分割 跟踪 运动检测">
+  <h1>目标检测、分割与跟踪</h1>
+  <p class="lead">用同一段演示视频理解“找到目标 → 描出像素 → 维持身份”。每课末尾都能查看它在真实实验中的对应环节。</p>
+  <div class="hero-actions"><a id="start-learning-link" class="button primary" href="#chapter-1">从 YOLO 开始学习 →</a><a class="button secondary" href="#learning-route">按主题选择</a></div>
+  <ol class="reading-route" id="learning-route">
+    <li><span class="route-number">01</span><div><a href="#chapter-1">模型各自做什么</a><p>YOLO 找目标并预测 mask；ByteTrack 关联检测框；SAM 2.1 利用提示与视觉记忆传播 mask。</p></div></li>
+    <li><span class="route-number">02</span><div><a href="#chapter-6">怎样判断结果好坏</a><p>先理解 IoU、IDF1、HOTA，再到<a href="results.html">真实评分</a>核对；<a href="dataset.html#samples">原图与 GT 标注</a>解释评分依据。</p></div></li>
+    <li><span class="route-number">03</span><div><a href="#chapter-7">这些知识怎样组成研究</a><p>A0/B0 基线 → 失败诊断 → 历史保留／重置。需要时再查<a href="math.html">数学与实现</a>和<a href="research.html">技术脉络与原始来源</a>。</p></div></li>
+  </ol>
+  <div class="table-wrap"><table id="model-roles" class="model-roles"><thead><tr><th>组件</th><th>输入 → 输出</th><th>不负责什么</th></tr></thead><tbody><tr><td>YOLO11s-seg</td><td>单帧图像 → 类别、框、分数与实例 mask</td><td>跨帧持续身份</td></tr><tr><td>ByteTrack</td><td>检测框 / 分数 → 关联后的轨迹 ID</td><td>像素分割或事件理解</td></tr><tr><td>SAM 2.1</td><td>图像 + 空间提示 + 记忆 → 指定目标的 mask</td><td>自动类别名、项目级新目标发现</td></tr></tbody></table></div>
+  <details id="course-project-links"><summary>已了解模型？直接进入项目环节</summary><p><a id="program-quick-link" href="program.html">程序逻辑与实验地图 →</a> · <a id="experiment-quick-link" href="experiments.html">实验流程：四组对照 →</a> · <a id="dataset-quick-link" href="dataset.html">数据与真实样本 →</a> · <a id="results-quick-link" href="results.html">真实实验结果 →</a></p></details>
+  <p class="notice">演示视频无标准标注，不用于准确率评测或模型排名；指标交互区使用合成数据。</p>
+  <h2>视频结果对照</h2><p>左上是 YOLO 框，右上是同次预测的 mask；左下增加 ByteTrack 的 ID，右下是 SAM 2.1 的提示传播。四格视频已经同步编码。</p>
+  @@COMPARISON@@
+  <details><summary>演示设置与比较限制</summary><p>YOLO / ByteTrack 可以逐帧发现后来进入的目标；本学习版 SAM 只接收第一帧最多若干个提示（默认两个）。目标发现机制不同，不能把四格演示直接当成完整系统的公平比较。播放器按源视频帧率播放，也不代表各模型实际推理一样快。</p></details>
+  <h3>任务定义</h3><div class="table-wrap"><table><thead><tr><th>任务</th><th>它回答什么</th><th>两只狗的例子</th></tr></thead><tbody><tr><td>分类</td><td>是什么类别？</td><td>dog</td></tr><tr><td>目标检测</td><td>每个目标在哪里？</td><td>两个框、类别与置信度</td></tr><tr><td>实例分割</td><td>每个目标占哪些像素？</td><td>两张独立的 mask</td></tr><tr><td>跟踪</td><td>前后帧中哪个是同一个体？</td><td>狗 A 持续对应 ID 7，狗 B 对应 ID 8</td></tr><tr><td>运动检测</td><td>哪些区域相对背景发生变化？</td><td>可能含阴影，未必知道它是狗</td></tr></tbody></table></div>
+  <p>本项目包含静止目标；运动检测不属于实验范围。</p>
+</section>
+
+<section id="chapter-1" class="chapter" data-title="YOLO ultralytics PyTorch 导入 import 权重 置信度 压缩 缩放 NMS">
+  <h2>1. YOLO：目标检测</h2>
+  <p>我们加载已经训练好的 <code>yolo11s-seg.pt</code>。对每一帧，它预测目标类别、位置、检测置信度，以及分割掩码。第一课先隐藏掩码，只观察框。</p>
+  @@VIDEO_BOXES@@
+  <ol class="steps"><li><strong>读取与缩放。</strong>OpenCV 解码视频，保持连续帧及原始帧率；长边按设置缩小，写成统一输入帧。缩放是减少像素量，不是 YOLO 必须要求“先压缩视频”。</li><li><strong>准备模型输入。</strong>库负责调整输入尺寸与填充、通道顺序、张量转换和归一化。外部视频缩放与模型内部预处理是两件事。</li><li><strong>提取特征与预测。</strong>神经网络根据训练中学到的形状、纹理和上下文，预测目标框、类别及分数；不是从数据库里逐张找相同图片。</li><li><strong>过滤结果。</strong>按类别和置信度筛选，再通过非极大值抑制（NMS）等后处理减少重复框。阈值太高可能漏掉困难目标，太低则可能增加误检。</li><li><strong>绘制结果。</strong>模型输出数值；<code>plot()</code> 将框、标签和分数绘制到画面上。</li></ol>
+  <div class="code-caption">① 导入工具，加载权重。两个 YOLO 实例用于隔离普通预测与有状态跟踪，都是同一个权重文件。</div>@@CODE_LOAD@@
+  <div class="code-caption">② 帧循环中的实际调用。<code>predict()</code> 是逐帧预测；<code>track()</code> 在第三课展开。</div>@@CODE_PREDICT@@
+  <h3>读懂一个检测结果</h3><p><code>dog · 0.73 · [x1, y1, x2, y2]</code> 表示模型把这个矩形区域判为狗，检测分数约 0.73。坐标表示左上和右下角，单位是输入画面的像素。<strong>0.73 不是“73% 像素都对”，也不是“73% 把握还是上一只狗”。</strong></p>
+
+  <details id="ultralytics"><summary>Ultralytics 库与相关依赖</summary><p><code>ultralytics</code> 是第三方 Python 库，封装了 YOLO 模型的加载、预测、训练和跟踪接口。它基于 PyTorch，不是 Python 内置包。</p><div class="table-wrap"><table><thead><tr><th>代码 / 文件</th><th>作用</th></tr></thead><tbody><tr><td><code>from ultralytics import YOLO</code></td><td>导入一个 Python 类，不是在导入训练数据或加载权重。</td></tr><tr><td><code>YOLO(checkpoint)</code></td><td>构建模型，并加载 <code>.pt</code> 中已经学好的参数。</td></tr><tr><td><code>model.predict(frame)</code></td><td>执行推理，得到结构化结果。</td></tr><tr><td>PyTorch</td><td>底层张量、神经网络与 GPU 运算。</td></tr><tr><td>OpenCV</td><td>读取、缩放图像与视频等处理。</td></tr></tbody></table></div><p>本次原始运行的库版本记录在页末；例如 ultralytics 的 8.x 包版本号不等于 YOLO 的模型代数。YOLO11 与 ultralytics 8.x 不矛盾。</p><p>把导入放在 <code>run_yolo()</code> 内是延迟导入：调用该功能时才加载依赖。Python 会缓存已导入的模块，不会每一帧重新安装这个包。</p></details>
+  <p class="small">数学展开：<a href="math.html#yolo">框解码、张量维度与 NMS</a>。</p>
+  <button class="complete" data-complete="chapter-1" aria-pressed="false">标记已读</button>
+</section>
+
+<section id="chapter-2" class="chapter" data-title="Mask 掩码 实例分割 像素 原型 面积 retina_masks">
+  <h2>2. YOLO：实例分割</h2>
+  <p>每个实例有自己的一张 mask。最直观的表示是与画面对应的二维数组：<code>1</code> 表示预测为该目标，<code>0</code> 表示不属于它。半透明颜色仅用于显示。</p>
+  @@VIDEO_MASKS@@
+  <h3>YOLO 分割输出</h3><p><code>yolo11s-seg.pt</code> 的 <code>seg</code> 表示支持分割。第一、二课使用<strong>同一个 prediction</strong>，仅展示开关不同：</p>@@CODE_MASK@@
+  <p><code>prediction.boxes</code> 保存类别、框和置信度；<code>prediction.masks.data</code> 保存各实例的 mask。同一帧中第 <code>i</code> 个框对应第 <code>i</code> 张 mask，但这个数组下标<strong>不是跨帧身份编号</strong>。</p>
+  <h3>掩码是怎样预测出来的？</h3><p>分割模型有专门的输出分支，利用图像特征预测目标区域。它不是简单地把检测框填满，也不是只沿颜色变化机械描边。</p><details><summary>Mask 原型与组合系数</summary><p>我们使用的实现会从当前图像特征生成一组共享的 mask 原型，再预测每个目标的组合系数，组合、调整尺寸并裁剪得到目标 mask。原型是当前图像相关的特征表示，不是一组固定“狗形状模板”。</p><p><code>retina_masks=True</code> 让输出掩码按所传入画面的尺寸对齐，方便叠加和统计；这个开关不意味着模型自动获得更强的识别能力。</p></details>
+  <h3>mask_pixels 为什么不是准确率？</h3><p>保存结果时，我们统计每张 mask 中的前景像素数量：</p>@@CODE_RECORDS@@
+  <p><code>(mask &gt; 0.5).sum()</code> 在这里数的是二值 mask 中值为 1 的位置，不是在重新筛选检测置信度。面积变大，可能是目标靠近镜头，也可能是错误地涂进了背景；没有标准标注，不能只凭面积判定准确。</p>
+  <details open><summary>边界误差：腿部、尾巴与细长物体</summary><p>暂停在目标腿部、尾巴和细长物体附近，看有没有漏掉目标或涂进背景。我们讨论的狗视频第 60 帧，YOLO 的狗 mask 包含了一部分腿间地面。这个观察适用于那次运行，不保证其他视频或其他帧也一样。</p></details>
+  <p class="small">数学展开：<a href="math.html#masks">原型组合与像素 logits</a>。</p>
+  <button class="complete" data-complete="chapter-2" aria-pressed="false">标记已读</button>
+</section>
+
+<section id="chapter-3" class="chapter" data-title="ByteTrack 卡尔曼 Kalman 两阶段 IoU 低置信度 轨迹 ID ReID 扔球 叼球">
+  <h2>3. ByteTrack：多目标跟踪</h2>
+  <p>YOLO 负责检测与分割，ByteTrack 负责关联检测框并维护 ID。画面中显示 <code>id:2 dog 0.73</code> 时，2 是轨迹编号，dog 是类别，0.73 仍然是检测分数，不是身份匹配概率。</p>
+  @@VIDEO_TRACK@@
+  <h3>不是大模型，也不只是卡尔曼滤波器</h3><ol class="steps"><li><strong>运动预测：它应该在哪里？</strong>每条轨迹维护自己的卡尔曼状态，根据框的位置、尺寸及变化趋势预测下一帧。找到新观测后再修正状态与不确定性。这不是训练神经网络。</li><li><strong>数据关联：哪个框对应它？</strong>用预测框与新检测框的 IoU 等信息计算匹配代价，再做整体一对一匹配。卡尔曼滤波本身不负责决定多个新框分别属于谁。</li><li><strong>两阶段匹配：先高分，再低分。</strong>先用高置信度检测匹配已有轨迹；再用部分低置信度框接续尚未匹配的活动轨迹。被遮挡的狗可能只剩一个低分框，但其位置与已有轨迹相符，仍有机会接上。</li><li><strong>轨迹管理：记住多久？</strong>新目标建立 ID；短暂丢失先保留；超过保留期限结束旧轨迹。回来后无法接上旧轨迹，就可能建立新编号。</li></ol>
+  <p><strong>ByteTrack 也有历史记忆：</strong>过去的观察融合为位置、速度与不确定性，并保留轨迹状态。它没有标准外观 ReID，不能仅凭毛色找回很久以前的狗。项目将比较它的历史保留与运动状态重初始化，而不是把 ByteTrack 当作“无记忆”组。</p>
+  <p><strong>当前配置：</strong>高分门槛 0.25、低分门槛 0.1，丢失轨迹保留约 30 帧；这些参数可调整。</p>
+  <h3>代码里的关键参数</h3><pre><code>tracked = tracker.track(
+    frame, persist=True, tracker="bytetrack.yaml", **options
+)[0]</code></pre><p><code>tracker</code> 是一个 YOLO 对象；<code>track()</code> 内部先运行 YOLO，再运行关联器。<code>persist=True</code> 保留前面帧的状态。读取 <code>box.id</code> 获取编号。我们为教学对比独立调用一次 <code>predict()</code>、一次 <code>track()</code>，不是把前者返回值直接传给后者。</p>
+  <details><summary>为什么不能把 YOLO 置信度门槛随便调高？</summary><p>如果 YOLO 已在前面丢弃置信度 0.18 的框，ByteTrack 的低分匹配阶段就再也看不到它。教程默认较低的检测阈值，是为了保留这类候选，但也会引入更多背景候选。阈值应在验证集上选择。</p></details>
+  <details open><summary>实际案例：狗从 ID 2 变成 ID 6</summary><p>我们讨论的原始狗视频运行中，狗先对应 ID 2，离开画面后跟踪中断，回来时成为 ID 6；人保持 ID 1。中断超过了约 30 帧的保留长度，与当前轨迹管理配置相符。数字跳到 6 不代表出现了六只狗。</p><p>这段话是对那次视频的案例分析。下方「逐帧证据」直接读取<strong>当前运行</strong>的日志，换视频后不要照搬原来的 ID 或帧号。</p></details>
+  <h3>ReID 与事件推理</h3><p>当前 ByteTrack 实现主要利用位置、运动与检测分数，没有外观重识别（ReID）网络，也没有“扔球—追球—叼球返回”的事件理解模块。</p><details><summary>如果人扔球，狗跑出画面又叼球回来，能作为同一只狗的证据吗？</summary><p>扔球、追球、叼球返回的行为链，加上外观、方向和时间间隔，可以支持同一身份的推断，但不能替代逐帧身份标注。ReID 补充外观线索；动作与事件推理需要额外模块，当前两套流程均未实现。</p></details>
+  <p class="small">数学展开：<a href="math.html#kalman">卡尔曼公式与两阶段匹配</a>。</p>
+  <button class="complete" data-complete="chapter-3" aria-pressed="false">标记已读</button>
+</section>
+
+<section id="chapter-4" class="chapter" data-title="SAM 2.1 提示 prompt 视频 视觉记忆 attention Tiny logit ID 初始化 新目标">
+  <h2>4. SAM 2.1：提示式视频分割</h2>
+  <p>本项目使用预训练的 SAM 2.1 Hiera Tiny。YOLO 检测预定义类别的目标；SAM 根据指定目标的空间提示生成并传播 mask，不直接输出类别名。</p>
+  @@VIDEO_SAM@@
+  <h3>第一帧的提示从哪里来？</h3><p>本教程自动模式中，YOLO 提供第一帧目标框，程序为选中的目标分配编号，然后把框交给 SAM。手动模式也可以自行选框。此后向前传播时，没有每帧用 YOLO 重新提示。</p>@@PROMPT@@
+  <p>提示可以是点、框或 mask；这里不是发送“dog”这个文字指令。视频上显示的 <code>dog</code> 标签由程序从初始化来源保存，<strong>不是 SAM 接口自己输出的类别名</strong>。</p>
+  <h3>视觉记忆怎样工作？</h3><ol class="steps"><li><strong>读取当前画面。</strong>图像编码器提取空间、形状和纹理等视觉特征。</li><li><strong>参考历史记忆。</strong>记忆注意力将当前特征与提示帧、部分历史帧的目标相关信息联系起来。</li><li><strong>预测当前 mask。</strong>掩码解码器结合当前图像、提示与记忆，输出此刻的目标区域。</li><li><strong>更新记忆。</strong>把预测与视觉特征编码，供后续帧使用。</li></ol>
+  <p>传播结合当前画面与历史视觉特征，不是简单平移上一帧 mask。记忆更新改变推理状态，不更新模型权重。</p>
+  <div class="code-caption">① 加载配置和预训练权重。</div>@@CODE_SAM_LOAD@@
+  <div class="code-caption">② 建立视频状态，逐个提供第一帧目标，然后向后传播。</div>@@CODE_SAM_PROMPT@@
+  <p><code>obj_id</code> 是我们指定的目标编号；<code>offload_video_to_cpu</code> 和 <code>offload_state_to_cpu</code> 通过把数据放到主存降低显存压力，不意味着完全不用 GPU。本地实现还使用 BF16 推理，并关闭可选 CUDA 小洞清理扩展。</p>
+  <div class="code-caption">③ 从模型分数生成二值 mask。</div>@@CODE_SAM_MASK@@
+  <p><code>logits</code> 不是百分比。以 0 为门槛选前景，对应 sigmoid 概率的 0.5 门槛；不是“只要置信度大于 0% 就选中”。</p>
+  <details open><summary>为什么 ID 一直是 2，也不能证明始终跟对了？</summary><p>SAM 的 ID 2 是目标槽位，由我们初始化。即使预测漂移到了另一只狗或背景，仍然可能输出 ID 2。必须检查该 ID 下的 mask 是否对应正确目标，而不是只看编号有没有变化。</p><p>在讨论过的狗视频中，第 90 帧目标 2 的 mask 为空；到第 106、119 帧又出现，并在最后的样例帧覆盖返回的狗。这是有用观察，但没有标准标注仍不能据此计算身份准确率。</p></details>
+  <details><summary>中途出现新目标怎么办？</summary><p>当前脚本只初始化第一帧目标。SAM 支持追加提示，但自动发现新目标需要额外逻辑。正式方案计划定期运行 YOLO，匹配旧目标、初始化新目标，并管理提示更新和失效轨迹。</p></details>
+  <p class="small">数学展开：<a href="math.html#sam">提示编码、注意力与记忆</a>。</p>
+  <button class="complete" data-complete="chapter-4" aria-pressed="false">标记已读</button>
+</section>
+
+<section id="chapter-7" class="chapter" data-title="proposal 对照实验 历史记忆 保留 重置 恢复 A-H A-R B-H B-R YouTube-VIS 2021">
+  <h2>项目实验设计</h2>
+  <p>项目：<strong>多目标分割与跟踪：历史状态对错误恢复的影响</strong>。新的目标观察到来时，旧状态是在帮助恢复，还是延续错误？先比较完整 A0/B0，再分别控制两套系统的历史处理，分析影响持续多久。</p>
+  <a class="experiment-link" href="experiments.html"><strong>打开对照实验流程图与逐步讲解 →</strong><span>自动基线 → 同一纠正 → 四组状态更新 → 后续观察 → 配对分析</span></a>
+  <h3>两套预训练基线</h3>
+  <div class="pipeline"><span class="pipeline-label">流程 A</span><p>每帧 YOLO11s-seg 框与掩码 <b>→</b> 按类别分别运行 ByteTrack <b>→</b> 带视频内唯一 ID 的 YOLO 掩码</p></div><div class="pipeline"><span class="pipeline-label">流程 B</span><p>定期 YOLO 框与类别 <b>→</b> 同类别 box IoU 一对一匹配与提示更新 <b>→</b> 冻结的 SAM 2.1 Hiera Tiny 传播掩码</p></div>
+  <div class="table-wrap"><table id="project-conditions"><thead><tr><th>实验组</th><th>YOLO 权重</th><th>后续处理</th></tr></thead><tbody><tr><td>A0</td><td>预训练</td><td>ByteTrack + YOLO 掩码</td></tr><tr><td>B0</td><td>与 A0 相同</td><td>冻结的 SAM 2.1</td></tr></tbody></table></div>
+  <p>A0/B0 都使用历史，且检测频率、掩码来源和关联方式不同。完整系统分数不能单独说明某种记忆机制更好。</p>
+  <h3>相同纠正机会下的四组实验</h3>
+  <div class="table-wrap"><table id="recovery-conditions"><thead><tr><th>实验组</th><th>历史处理</th><th>同一纠正框的作用</th></tr></thead><tbody><tr><td>A-H</td><td>保留 ByteTrack 运动状态</td><td>执行一次正常卡尔曼更新</td></tr><tr><td>A-R</td><td>重建 ByteTrack 运动状态</td><td>框初始化、零速度、默认初始协方差</td></tr><tr><td>B-H</td><td>保留 SAM 目标历史</td><td>向已有目标追加框提示</td></tr><tr><td>B-R</td><td>清除该目标旧推理状态</td><td>以相同框重新初始化</td></tr></tbody></table></div>
+  <p><strong>H 组也接收纠正。</strong>每套系统的 H/R 共享纠正前的历史，保留外部 ID，统一生命周期处理，冻结权重。纠正框只消费一次；纠正后继续正常检测与提示安排，不追加人工或标注帮助。人为固定目标对应关系只用于这项诊断，不混入自动基线成绩。</p>
+  <h3>先配对，再解释不同机制</h3>
+  <p>分别比较 A-H/A-R 与 B-H/B-R，观察恢复是否发生、持续多久、后续观察是否消除差异。共同看指定目标的定位与持续正确跟随；A 另外看运动预测和关联，B 另外看掩码与漂移。不把两个不同系统的原始分数直接解释成记忆形式的净影响。</p>
+  <p>覆盖稳定跟随、遮挡、返回、突然运动变化及相似目标。主要四组事件要求双方仍有可保留状态；轨迹已删除等不适用事件另报数量与比例。窗口排除被直接纠正的当帧，固定外部 ID，缺失和空输出不忽略。</p>
+  <p>有可复核证据时，最多选择一项简单自动策略放回对应流程验证；无明显收益同样是结果。核心实验不进行 YOLO 或 SAM 权重微调。</p>
+  <details><summary>尚待实现与验证的部分</summary><ul class="checklist"><li>A 的按类别跟踪封装，B 的周期发现、匹配、提示刷新及轨迹管理。</li><li>隔离四个分支的状态；验证目标级重置、单次纠正与后续输入安排。</li><li>核验标签、坐标与标注时间间隔；用合成样例验证评分器。</li><li>锁定事件清单、恢复标准及观察窗口，再进行保留评估。</li></ul></details>
+  <div id="dataset">
+  <h3>数据集与下载</h3>
+  <p>数据集仍为 YouTube-VIS 2021，当前获取渠道改为 SlotCurri 提供的 Google Drive 预处理版本。SlotCurri 是该版本的分发来源；原始数据集来自 YouTube-VIS。</p>
+  <div class="controls"><a id="dataset-download" class="button secondary" href="https://drive.google.com/file/d/1Iv-2zK6MnH0oDFTx9iBgQcPNh5PBzM7i/view?usp=sharing" target="_blank" rel="noopener noreferrer">Google Drive 数据包 ↗</a><a href="https://github.com/wjun0830/SlotCurri" target="_blank" rel="noopener noreferrer">SlotCurri 说明 ↗</a><a href="https://github.com/Colossus-MKII/CS550_Project/blob/main/data/README.md" target="_blank" rel="noopener noreferrer">项目数据准备文档 ↗</a></div>
+  <p class="small">@@DATASET_AUDIT_SUMMARY@@</p>
+  <p><a id="dataset-viewer-link" href="dataset.html#samples">逐帧查看五类真实样本：原图、实例通道与标注 mask →</a></p>
+  <div class="resource-columns" id="dataset-exports"><div><h4>训练导出</h4><p><code>--only-videos</code>：仅含 <code>video.npy</code>。可检查推理；缺少 mask 标注，不能直接用于准确率评估。</p></div><div><h4>带标注导出（validation）</h4><p>包含 <code>segmentations.npy</code>；实例通道保存跨帧对应，mask 非零值编码类别。核验标注后用于系统评分与恢复实验。</p></div></div>
+  <p>这里的 validation 是分发脚本从原始带标注训练数据中划出的内部部分，不等同于官方挑战验证集。使用带标注部分后，仍须按本项目的开发／验证／保留评估划分重新分组。</p>
+  <ol><li>分片与标注结构已核验；<a href="dataset.html#coverage">查看五类数量、类别失衡和划分约束</a>。</li><li>转换为帧和评估标注，保留视频 ID 与实例通道。实际短边为 320 像素；原始时间戳、FPS 和帧文件名未附带，不能将导出步数当成秒数。</li><li>目标为 200 段，按整段视频划分 120 开发、40 验证、40 保留评估。种子 550 的初始结果缺少保留集的马类，需覆盖约束调整后锁定清单；先划分再抽帧。</li></ol>
+  </div>
+  <h3>评估</h3>
+  <p>完整系统报告 mask HOTA、DetA、AssA、mask IoU 0.5 下的 IDF1、误检、漏检和身份切换；独立 YOLO 报告 box/mask AP50:95。局部实验另报恢复比例、时间、持续时长、复发与不可见期间错误输出。按视频汇总事件，时间使用实际标注时刻，不把稀疏标注点当连续视频帧。</p>
+  <p>同 GPU 预热并同步，报告三次运行的 FPS 中位数、显存、检测调用次数及纠正／重初始化开销。<a href="experiments.html#readouts">查看各指标的作用及结果解释</a>。</p>
+  <p class="small"><a href="https://youtube-vos.org/dataset/vis/" target="_blank" rel="noopener noreferrer">YouTube-VIS 原始数据与版本说明 ↗</a></p>
+  <h3>本地运行示例</h3><p>在本机终端运行。每次推理生成独立目录。</p><pre><code># 在 CS550_Project 目录运行：提高置信度，看低分目标是否更易丢失
+.venv/Scripts/python.exe -m learning.run --lesson yolo --conf 0.5 --max-frames 120 --open
+
+# 手动给不在检测类别中的物体一个框，学习 SAM 的提示分割
+.venv/Scripts/python.exe -m learning.run --lesson sam2 --video data/pilot/videos/03_blocks.mp4 --pick-box --open</code></pre>
+  <details><summary>推理、调参、微调，三者是什么关系？</summary><p><strong>推理：</strong>使用冻结权重处理新输入。<strong>调参：</strong>选择置信度、匹配门槛、发现间隔等流程设置。<strong>微调：</strong>用训练数据更新神经网络权重。更新卡尔曼状态或 SAM 视频记忆，都不是权重微调。</p></details>
+  <p class="small">数学展开：<a href="math.html#research">机制诊断与控制实验</a>。</p>
+  <button class="complete" data-complete="chapter-7" aria-pressed="false">标记已读</button>
+</section>
+
+<section id="chapter-6" class="chapter" data-title="IoU IDF1 HOTA DetA AssA TP FP FN ground truth 评估 置信度 FPS 显存">
+  <h2>IoU、IDF1 与 HOTA</h2>
+  <p>先有标准答案（Ground Truth）：每帧的目标类别、mask，以及跨帧真实身份。再将预测与之匹配。<strong>模型自己给的置信度，不是对照标准答案后的成绩。</strong>以下质量指标通常在 0–1 之间，也常乘 100 显示；越高越好，但不是同一种百分比。</p>
+  <h3>IoU：区域重合度</h3><div class="formula">IoU = |预测区域 ∩ 标注区域| / |预测区域 ∪ 标注区域|</div><p>如果真实 mask 和预测 mask 各有 100 个像素，其中 80 个重合，并集是 100 + 100 − 80 = 120，所以 IoU = 80 / 120 ≈ 0.667，不是 0.8。它同时惩罚漏掉的目标像素和多涂出的背景像素。</p>
+  <div class="lab" id="iou-lab"><div class="lab-heading"><span class="lab-tag">合成实验 A</span><h4>移动预测区域，观察交集与并集</h4></div><p class="small">这里用 100 × 80 像素的矩形简化演示。真实 mask IoU 对任意形状的像素集合使用同一公式。</p><label for="iou-offset">预测区域右移 <output id="iou-offset-value">20</output> 像素</label><input id="iou-offset" type="range" min="0" max="100" value="20"><div class="legend"><span class="legend-truth">实线：标注</span><span class="legend-prediction">虚线：预测</span></div><div class="geometry"><svg id="iou-geometry" role="img" aria-labelledby="iou-svg-title iou-svg-desc"><title id="iou-svg-title">标注和预测的重合区域</title><desc id="iou-svg-desc">拖动滑块改变预测区域的位置。</desc><rect id="iou-truth" y="20" width="100" height="80"></rect><rect id="iou-prediction" y="20" width="100" height="80"></rect></svg></div><div class="lab-results" aria-live="polite"><span>IoU <strong id="iou-score">0.667</strong></span><span>交集 <strong id="iou-intersection">6400</strong> px</span><span>并集 <strong id="iou-union">9600</strong> px</span></div></div>
+  <p><strong>box IoU 比矩形，mask IoU 比真实像素区域。</strong>框很准，不保证轮廓准。仅对匹配目标计算平均 mask IoU 会遗漏未检出的目标：十只狗只找到一只，找到的那只可能满分，剩下九只漏检却不在该均值中，不能只用它排名。正式指标见「项目实验设计」。</p>
+  <h3>IDF1：全局身份匹配</h3><p>IDF1 从整段视频建立真实身份与预测身份的一对一对应，再计算身份层面的正确、错误和遗漏。它不是逐帧比较数字是否一样：真实标注叫 A，预测始终叫 7，可以完全正确。</p><div class="formula">IDF1 = 2 × IDTP / (2 × IDTP + IDFP + IDFN)</div><ul><li><strong>IDTP：</strong>正确身份对应的目标出现次数。</li><li><strong>IDFP：</strong>预测中没有正确对应真实身份的出现次数。</li><li><strong>IDFN：</strong>真实目标没有得到正确身份对应的出现次数。</li></ul><p>单位是“一个目标在一帧中的一次出现”，不是像素。它们也不一定等于普通检测的 TP / FP / FN。</p>
+  <div class="worked-example"><strong>十帧的一只狗。</strong>每帧 mask 都完美，前五帧叫 7，后五帧叫 8。全局一对一身份匹配只能选一段，得到 IDTP = 5、IDFP = 5、IDFN = 5，IDF1 = 0.5。像素全对，身份仍然被拆断。</div>
+  <p>我们的计划在 mask IoU 0.5 下计算 IDF1，匹配细节遵循统一 TrackEval 适配器。保持 ID 不变但位置完全错误，不能得高分。门槛之上的轮廓差异也未必被 IDF1 充分区分，因此正式实验还会报告多阈值 mask HOTA，并单独检查 YOLO 的框与掩码 AP50:95。</p>
+  <h3>HOTA：检测与关联质量</h3><p><strong>DetA</strong> 关注找到了多少目标、漏了多少、多报了多少；<strong>AssA</strong> 关注轨迹关联是否正确，包括把同一目标拆开、把不同目标混成一个。AssA 不等于 IDF1，也不是“1 − ID 切换率”。</p><div class="formula">DetA(α) = TP / (TP + FP + FN)<br>HOTA(α) = √[DetA(α) × AssA(α)]</div><p>α 是评分时要求的重合门槛，不是 YOLO 的置信度。标准 HOTA 对 0.05、0.10……0.95 共 19 个门槛分别计算，再平均这些 HOTA 值；不是先平均 DetA、AssA 再开方。轮廓不准，会在较高门槛下失去匹配，因此定位质量也影响最终评分。</p><p>在刚才的五帧 + 五帧例子中，检测全对，DetA = 1；每个预测 ID 只覆盖真实轨迹的一半，AssA = 0.5。因此 HOTA ≈ 0.707。它与 IDF1 的 0.5 并不矛盾：评价方式不同。</p>
+  <div class="lab" id="identity-lab"><div class="lab-heading"><span class="lab-tag">合成实验 B</span><h4>相同的完美 mask，不同的跟踪质量</h4></div><p class="small">独立于上方滑块：同一目标真实可见 10 帧，所有已输出 mask 的 IoU 固定为 1，无额外目标。这里的 HOTA 已是 19 个门槛的均值。</p><label for="identity-scenario">预测情况</label><select id="identity-scenario"><option value="stable">十帧全部使用 ID 7</option><option value="split">前五帧 ID 7，后五帧 ID 8</option><option value="miss">前五帧 ID 7，后五帧漏检</option></select><div class="timeline"><div class="lane-label">帧号</div><div id="metric-frames" class="lane"></div><div class="lane-label">真实目标</div><div id="metric-truth" class="lane"></div><div class="lane-label">预测 ID（— 表示漏检）</div><div id="metric-prediction" class="lane"></div></div><div class="lab-results" aria-live="polite"><span>IDF1 <strong id="metric-idf1">100.0%</strong></span><span>DetA <strong id="metric-deta">100.0%</strong></span><span>AssA <strong id="metric-assa">100.0%</strong></span><span>HOTA <strong id="metric-hota">100.0%</strong></span></div><p id="metric-counts" class="small">IDTP 10 · IDFP 0 · IDFN 0</p><p class="small">本实验使用该单目标特例的闭式计算，不是可用于任意视频的通用评估器。</p></div>
+  <details><summary>为什么“狗在画面外没有 mask”不一定是漏检？</summary><p>漏检要对照标注定义。如果那一帧没有可评估的可见目标 mask，不输出 mask 通常正确。反过来，目标消失后还把地面涂成狗，可能是误检。模型内存里保留轨迹，与画面中必须输出目标是两件事。</p></details>
+  <details><summary>为什么光看“ID 有没有变”不够？</summary><p>同一个 ID 可能错误地从狗 A 跑到狗 B；编号不变，但身份关联错了。IDF1 / HOTA 通过与真实轨迹对应来判断，不能用“数字始终是 2”替代标注评分。ID 切换次数也要遵循评估器的连续性与匹配规则，不能随意自写计数再叫标准指标。</p></details>
+  <h3>FPS 与显存</h3><p>FPS = 处理帧数 / 耗时。正式计时需统一包含解码、预处理、检测、提示创建、传播 / 关联与后处理，排除并注明模型加载、渲染和评分；统一 GPU、输入、精度与预热，进行 GPU 同步，重复三次取中位数。</p><p>PyTorch allocated、reserved 与驱动报告的进程显存不是一个数。CPU offload 节省显存但占用内存并可能影响速度。当前日志是冷启动诊断，不是正式性能排名；播放器的 30 FPS 更不等于模型推理 30 FPS。</p>
+  <p class="small">数学展开：<a href="math.html#metrics">完整指标公式与官方匹配规则</a>。</p>
+  <button class="complete" data-complete="chapter-6" aria-pressed="false">标记已读</button>
+</section>
+
+<section id="deep-study" class="chapter" data-title="数学 张量 底层 实现 来源 技术发展 历史 研究假设">
+  <h2>深入学习：数学与实现</h2>
+  <p>理解模型职责和实验后，带着具体问题深入。完整推导放在独立页面，主线保留视频、模型说明和项目设计。</p>
+  <div class="deep-links"><div><h3><a href="math.html">数学与实现</a></h3><p><a href="math.html#yolo">YOLO 框解码</a> · <a href="math.html#masks">mask 原型</a> · <a href="math.html#training">训练损失</a><br><a href="math.html#kalman">卡尔曼更新</a> · <a href="math.html#association">关联匹配</a><br><a href="math.html#sam">SAM 注意力</a> · <a href="math.html#memory">记忆写入</a> · <a href="math.html#metrics">正式指标</a></p></div><div><h3><a href="research.html">技术脉络与来源</a></h3><p>从手工特征、CNN 到检测、分割和视觉记忆，按瓶颈与关键思路查阅；原论文和官方源码附在对应内容旁。</p><p><a href="research.html#inspiration">从机制提炼研究问题</a></p></div></div>
+</section>
+
+<section id="proposal" class="chapter" data-title="proposal 中文 英文 提案 原文 PDF A0 B0 历史记忆 错误恢复 保留 重置">
+  <h2>Proposal · 中文</h2>
+  <p>版本：2026-10-15。来源：<code>@@PROPOSAL_SOURCE_NAME@@</code>。正文与本地仓库文件一致。</p>
+  <p><strong>完整审阅稿：</strong>保留详细实验设计，全文在本页下方。<a href="#proposal-short">精简稿与源码下载 ↓</a></p>
+  <div class="controls"><a class="button primary" href="@@PROPOSAL_PDF@@" target="_blank" rel="noopener">打开中文 PDF ↗</a><a href="proposal/proposal.pdf" target="_blank" rel="noopener">英文 PDF ↗</a><a href="@@PROPOSAL_SOURCE@@" download>下载 Markdown 原文（TXT）</a><a href="index.en.html#proposal" lang="en" hreflang="en">Read English proposal</a></div>
+  <details class="small proposal-meta"><summary>快照与文件校验</summary><p>生成时间：@@GENERATED@@。页面刷新时读取本地源文件，不自动拉取 GitHub。SHA-256：<code>@@PROPOSAL_HASH@@</code> · <a href="proposal/manifest.json">校验清单</a></p></details>
+  <div id="proposal-latex" class="proposal-document">
+    <h3>完整审阅版与 LaTeX 下载</h3>
+    <p>英文 PDF 沿用 NeurIPS 2026 模板（<code>preprint</code> 模式、署名版）：5 页正文＋1 页参考文献；中文 PDF 为 4 页正文＋1 页参考文献。本节保留完整的已审阅实验细节。</p>
+    <p class="small">下方另提供精简稿，正文最多三页，参考文献另起页；两个版本分别保存。</p>
+    <div class="controls"><a id="latex-download" class="button primary" href="proposal/proposal-latex.zip" download>下载英文 Proposal LaTeX 源码包</a><a id="tex-download" href="proposal/proposal.tex" download>单独下载 proposal.tex</a><a id="template-download" href="proposal/neurips-2026-template-files.zip" download>下载保留的 NeurIPS 模板文件包</a></div>
+    <ul><li><strong>当前 proposal 源码包：</strong><code>proposal.tex</code>、<code>references.bib</code>、<code>neurips_2026.sty</code>；共 @@LATEX_BYTES@@ 字节。解压后以 <code>proposal.tex</code> 为主文件。单独的 .tex 为 @@TEX_BYTES@@ 字节，仍需要另外两个配套文件。</li><li><strong>模板示例包：</strong><code>neurips_2026.tex</code>、<code>neurips_2026.sty</code>、<code>checklist.tex</code>；共 @@TEMPLATE_BYTES@@ 字节。用于查阅模板格式，不包含我们的项目正文。</li></ul>
+    <details><summary>为什么是 2026？这个模板包是不是当时的原始 ZIP？</summary><p>课程截图标为 NeurIPS 2024，所提供模板文件标为 2026；当前英文稿沿用所给文件。原始 ZIP 未找到，此下载由仓库保留文件重新打包，并非原压缩包。样式文件统一为 LF 后的 SHA-256 与来源记录一致。模板示例与 checklist 不属于 proposal 正文。</p></details>
+  </div>
+  <div id="proposal-short" class="proposal-document">
+    <h3>精简稿 · PDF 与源码</h3>
+    <p>保留研究问题、A0/B0 基线、A-H/A-R/B-H/B-R 四组对照、核心控制与评估。正文自然连续排版，最多三页：当前英文正文三页、中文正文两页，参考文献各另起一页。详细规则仍可对照完整审阅稿。</p>
+    <div class="controls"><a id="short-pdf-download" class="button primary" href="@@SHORT_PDF@@" target="_blank" rel="noopener">打开中文精简 PDF ↗</a><a href="proposal/proposal_short.pdf" target="_blank" rel="noopener">英文精简 PDF ↗</a><a id="short-source-download" href="@@SHORT_SOURCE@@" download>下载中文精简原文（TXT）</a><a href="proposal/proposal_short.md.txt" download>英文精简原文（TXT）</a></div>
+    <div class="controls"><a id="short-latex-download" href="proposal/proposal-short-latex.zip" download>下载英文精简 LaTeX 源码包</a><a id="short-tex-download" href="proposal/proposal_short.tex" download>单独下载 proposal_short.tex</a></div>
+    <p class="small">中文精简 PDF：@@SHORT_PDF_BYTES@@ 字节。英文精简源码包：@@SHORT_LATEX_BYTES@@ 字节，仅含 <code>proposal_short.tex</code>、<code>references.bib</code>、<code>neurips_2026.sty</code>。主 .tex：@@SHORT_TEX_BYTES@@ 字节，仍需配套文件。所有版本均记录于<a href="proposal/manifest.json">文件校验清单</a>。</p>
+  </div>
+  <article id="proposal-content" class="proposal-document">@@PROPOSAL_BODY@@</article>
+</section>
+
+<section id="evidence" class="chapter evidence" data-title="逐帧证据 实际日志 JSONL frame mask_pixels">
+  <h2>逐帧预测与日志</h2><p>对照原始帧、类别、ID、检测分数和掩码面积。帧索引从 0 开始；数值为模型预测，不是标注。</p>@@WARNINGS@@@@EXPLORER_MISSING@@
+  <div id="frame-explorer" @@EXPLORER_HIDDEN@@><div class="controls"><label for="frame-range">帧索引 <output id="frame-value">0</output></label><button id="frame-prev">上一帧</button><button id="frame-next">下一帧</button><button id="seek-videos">所有视频定位到此帧</button></div><input id="frame-range" type="range" min="0" max="0" value="0"><div id="frame-presets" class="controls"></div><figure class="source-frame"><img id="source-frame" alt="当前帧的原始图像"><figcaption id="frame-caption"></figcaption></figure><div class="table-wrap"><table><thead><tr><th>输出</th><th>类别 / 标签来源</th><th>ID</th><th>检测置信度</th><th>mask 像素数</th></tr></thead><tbody id="frame-records"></tbody></table></div><p id="frame-evidence-status" class="small" aria-live="polite"></p></div>
+</section>
+
+<section id="chapter-5" class="chapter" data-title="SAM-Track DeAOT AOT 第一代 SAM 解耦 背景知识 非项目范围">
+  <h2>SAM-Track / DeAOT（背景）</h2>
+  <p class="notice">仅供背景阅读，不在最新版项目范围内。当前脚本未运行 SAM-Track / DeAOT，无对应视频或评测结果。</p>
+  <div class="table-wrap"><table><thead><tr><th>名称</th><th>职责</th><th>不要混淆</th></tr></thead><tbody><tr><td>第一代 SAM</td><td>根据空间提示生成单张图像的 mask</td><td>不是 SAM 2.1 的视频模型</td></tr><tr><td>DeAOT</td><td>根据带目标身份的参考 mask 传播后续分割</td><td>是预训练神经网络，不是 ByteTrack 式框关联器</td></tr><tr><td>SAM-Track</td><td>连接 SAM 分割与 DeAOT 传播的框架</td><td>不是一个独立 checkpoint</td></tr></tbody></table></div>
+  <h3>参考掩码与目标编号</h3><p>第一帧里，SAM 勾出人和狗。程序把背景设为 0、人的像素设为 1、狗的像素设为 2。DeAOT 接收第一帧图像和这张带编号的参考掩码，再预测后续帧中两个目标的像素区域。</p>
+  <h3>DeAOT 的“解耦”是什么？</h3><p>它把一般视觉信息与目标特定的身份信息放在不同分支中传播。通俗地说，同时保留“这里长什么样”和“这里属于初始化的哪个目标”，避免传播身份时损失有用的视觉信息。这是对内部表示的简化解释，不是两个独立分类器。</p>
+  <p>参考掩码不好、遮挡、相似目标或累积误差都可能造成漂移；模型不会因为运行起来就自动获得任意新物体的项目级身份。</p>
+
+
+  <details><summary>“半监督视频分割”是不是每个视频都要重新训练？</summary><p>这个任务名称通常指推理时提供参考帧标注（常见为第一帧 mask），随后预测其他帧。它不意味着每个新视频都要微调模型。使用冻结预训练权重也可以完成这类任务；是否训练是另一个决定。</p></details>
+  <button class="complete" data-complete="chapter-5" aria-pressed="false">标记已读</button>
+</section>
+
+<section id="run-record" class="chapter" data-title="运行参数 源码 环境 版本 参考文献">
+  <h2>源码、运行记录与参考</h2><p>运行目录：<code>@@RUN_NAME@@</code>。</p>
+  <details><summary>本次运行参数与环境</summary><div class="table-wrap"><table><tbody>@@ROWS@@</tbody></table></div><p class="small">YOLO 峰值包含教学用的两个模型实例；内存统计不等于整张显卡的全部占用。</p></details>
+  <div class="resource-columns"><div><h3>实际运行数据</h3><ul><li><a href="summary.json">summary.json · 参数与原始状态</a></li><li><a href="environment.txt">environment.txt · 依赖版本</a></li><li><a href="yolo_records.jsonl">YOLO / ByteTrack 逐帧日志</a></li><li><a href="sam2_records.jsonl">SAM 逐帧日志</a></li></ul><p class="small">部分运行可能没有执行某种方法，因而没有对应日志。</p></div><div><h3>教学代码快照</h3><ul>@@SOURCE_LINKS@@</ul><p class="small">源码快照生成于页面更新时，可能与原始运行版本不同。代码行号对应此快照。</p></div></div>
+  <h3>参考资料</h3><ul class="references"><li><a href="https://docs.ultralytics.com/models/yolo11/" target="_blank" rel="noopener noreferrer">YOLO11 与分割模型</a> · <a href="https://docs.ultralytics.com/tasks/segment/" target="_blank" rel="noopener noreferrer">掩码接口</a> · <a href="https://docs.ultralytics.com/modes/track/" target="_blank" rel="noopener noreferrer">跟踪接口</a></li><li><a href="https://github.com/FoundationVision/ByteTrack" target="_blank" rel="noopener noreferrer">ByteTrack 原作者仓库</a></li><li><a href="https://github.com/facebookresearch/sam2" target="_blank" rel="noopener noreferrer">SAM 2 / 2.1 官方仓库</a> · <a href="https://arxiv.org/html/2408.00714v2" target="_blank" rel="noopener noreferrer">模型与记忆机制论文</a></li><li><a href="https://github.com/z-x-yang/Segment-and-Track-Anything" target="_blank" rel="noopener noreferrer">SAM-Track</a> · <a href="https://arxiv.org/abs/2210.09782" target="_blank" rel="noopener noreferrer">DeAOT</a></li><li><a href="https://arxiv.org/abs/2009.07736" target="_blank" rel="noopener noreferrer">HOTA 论文</a> · <a href="https://arxiv.org/abs/1609.01775" target="_blank" rel="noopener noreferrer">IDF1 论文</a></li><li><a href="https://github.com/JonathonLuiten/TrackEval/blob/master/trackeval/metrics/hota.py" target="_blank" rel="noopener noreferrer">TrackEval HOTA 实现</a> · <a href="https://github.com/JonathonLuiten/TrackEval/blob/master/trackeval/metrics/identity.py" target="_blank" rel="noopener noreferrer">身份指标实现</a></li><li><a href="https://youtube-vos.org/dataset/vis/" target="_blank" rel="noopener noreferrer">YouTube-VIS 数据与官方评估</a></li></ul>
+  <footer>CS550 · 页面更新：@@GENERATED@@</footer>
+</section>
+<noscript><p class="notice">JavaScript 已关闭：正文、代码与视频仍可阅读；交互实验、搜索和逐帧日志检查需要开启 JavaScript。</p></noscript>
+</main></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script id="lesson-data" type="application/json">@@DATA@@</script>
+<script>@@JS@@</script>
+</body>
+</html>

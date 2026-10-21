@@ -1,0 +1,5 @@
+# Source-only website generation and preview; no PyTorch/model installation.
+numpy==2.2.6
+opencv-python==4.12.0.88
+imageio-ffmpeg==0.6.0
+latex2mathml==3.78.1

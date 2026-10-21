@@ -1,0 +1,74 @@
+/* Workspace links remain visible even when the mobile contents menu is closed. */
+body{--workspace-accent:var(--accent)}
+body[data-workspace=learning]{--accent:var(--blue);--accent-ink:#0d2437;--workspace-accent:var(--accent)}
+:root[data-theme=light] body[data-workspace=learning]{--accent-ink:#fff}
+.workspace-switcher{display:flex;align-items:center;gap:4px;margin-right:auto;padding:4px;border:1px solid var(--line);border-radius:10px;background:var(--code)}
+.workspace-switcher a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:6px 18px;border:1px solid transparent;border-radius:6px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:600;line-height:1.5;white-space:nowrap}
+.workspace-switcher svg,.workspace-context>svg{width:18px;height:18px;flex-shrink:0}
+.workspace-switcher a[data-workspace=project]{--link-accent:var(--accent)}
+.workspace-switcher a[data-workspace=learning]{--link-accent:var(--blue)}
+.workspace-switcher a:hover{color:var(--fg);background:var(--surface)}
+.workspace-switcher a[aria-current=true]{color:var(--link-accent);border-color:color-mix(in srgb,var(--link-accent) 45%,var(--line));background:color-mix(in srgb,var(--link-accent) 12%,var(--bg))}
+.topbar{gap:28px}
+.workspace-context{display:flex;align-items:flex-start;gap:11px;padding:16px 13px;margin:0 0 14px;border:1px solid var(--line);border-top:3px solid var(--workspace-accent);border-radius:8px;background:var(--surface)}
+.workspace-context>svg{color:var(--workspace-accent);margin-top:4px}
+.workspace-context strong{display:block;font-size:16px;line-height:1.6;color:var(--fg)}
+.workspace-context p{margin:3px 0 0;color:var(--muted);font-size:11px;line-height:1.7}
+.project-navigation{display:grid;gap:3px;border-bottom:1px solid var(--line);padding:0 0 18px;margin:0 0 20px}
+.project-navigation a{display:block;text-decoration:none;font-size:13px;line-height:1.6;color:var(--muted);padding:9px 12px;border:1px solid transparent;border-radius:6px}
+.project-navigation a:hover{background:var(--surface);color:var(--fg)}
+.project-navigation a[aria-current=page]{color:var(--workspace-accent);border-color:color-mix(in srgb,var(--workspace-accent) 35%,var(--line));background:color-mix(in srgb,var(--workspace-accent) 10%,var(--bg));font-weight:600}
+.sidebar .nav-label{display:flex;align-items:center;gap:9px;margin:0 0 12px;font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--fg)}
+.sidebar .nav-label::after{content:"";height:1px;flex:1;background:var(--line)}
+.sidebar #course-nav .nav-group{font-size:11px;font-weight:600;color:var(--workspace-accent);margin-top:20px}
+.sidebar #course-nav a{font-size:13px;line-height:1.7;padding:8px 10px}
+.sidebar #course-nav a.active{color:var(--workspace-accent);border-left-color:var(--workspace-accent);background:var(--surface)}
+.sidebar .reading-progress{border-top:1px solid var(--line);padding-top:16px}
+.sidebar .reading-progress progress{accent-color:var(--workspace-accent)}
+/* Native groups stay usable with JavaScript disabled. */
+.sidebar{overflow-anchor:none}
+.sidebar #locate-current-section{order:1;padding:4px 7px;border:0;background:transparent;color:var(--accent);font-size:11px;line-height:1.6;font-weight:500;white-space:nowrap}
+.sidebar #locate-current-section:hover{background:var(--surface)}
+.sidebar :is(#course-nav,#project-navigation):has(.outline-group){grid-template-columns:1fr;gap:6px}
+.sidebar :is(#course-nav,#project-navigation) .outline-group{min-width:0;margin:0;padding:0;border:1px solid var(--line);border-radius:7px;background:transparent;overflow:clip}
+.sidebar :is(#course-nav,#project-navigation) .outline-group>summary{display:flex;align-items:center;gap:8px;min-height:44px;margin:0;padding:10px;list-style:none;color:var(--muted);font-weight:600;line-height:1.6}
+.sidebar :is(#course-nav,#project-navigation) .outline-group>summary::-webkit-details-marker{display:none}
+.sidebar :is(#course-nav,#project-navigation) .outline-group>summary:focus-visible{outline-offset:-3px}
+.sidebar :is(#course-nav,#project-navigation) .outline-group>summary::before{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);flex-shrink:0;margin:0 3px 0 1px}
+.sidebar :is(#course-nav,#project-navigation) .outline-group[open]>summary::before{transform:rotate(45deg)}
+.sidebar :is(#course-nav,#project-navigation) .outline-group .nav-group{font:inherit;letter-spacing:0;color:inherit;margin:0;grid-column:auto}
+.sidebar :is(#course-nav,#project-navigation) .course-group-count{margin-left:auto;font:11px/1.5 Consolas,monospace;color:var(--muted);background:var(--soft);border-radius:4px;padding:1px 6px}
+.sidebar :is(#course-nav,#project-navigation) .outline-group>summary:hover{background:var(--surface);color:var(--fg)}
+.sidebar :is(#course-nav,#project-navigation) .outline-group.is-current{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.sidebar :is(#course-nav,#project-navigation) .outline-group.is-current>summary{color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--bg))}
+.sidebar :is(#course-nav,#project-navigation) .course-group-links{display:grid;gap:2px;padding:2px 5px 7px}
+.sidebar :is(#course-nav,#project-navigation) .course-group-links a{padding:8px 10px;font-size:12px;border-radius:0 4px 4px 0}
+@media(max-width:1100px) and (min-width:861px){.topbar{gap:18px}.workspace-switcher a{padding-inline:14px}}
+@media(max-width:860px){
+  .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:40px 40px;align-content:center;gap:8px 12px;height:112px;min-height:112px;padding:10px 18px}
+  .topbar .brand{grid-column:1/-1}
+  .topbar .top-actions{width:auto;gap:7px}
+  .workspace-switcher{margin:0;justify-self:start;padding:3px}
+  .workspace-switcher a{min-height:34px;padding:5px 12px;font-size:13px;gap:6px}
+  .workspace-context{margin-bottom:12px;padding:12px 14px}
+  .project-navigation{grid-template-columns:1fr 1fr;gap:4px;margin-bottom:18px;padding-bottom:16px}
+  .sidebar.is-open{position:fixed;top:112px;bottom:0;left:0;right:0;z-index:19;height:auto;max-height:calc(100dvh - 112px);overflow-y:auto;overscroll-behavior:contain;padding:20px 22px;background:var(--bg);border-bottom:1px solid var(--line)}
+  :root{scroll-padding-top:130px}
+}
+@media(max-width:480px){
+  .topbar{padding:10px 12px;column-gap:6px}
+  .workspace-switcher{gap:1px;padding:2px}
+  .workspace-switcher a{padding:5px 7px;font-size:12px;gap:4px}
+  .workspace-switcher svg{width:14px;height:14px}
+  .topbar .top-actions{gap:5px}
+  .topbar .top-actions a,.topbar .top-actions button{padding:6px 7px}
+  .sidebar #course-nav{grid-template-columns:1fr}
+  .project-navigation a{padding:9px 10px}
+}
+@media(max-width:360px){
+  .workspace-switcher a{padding-inline:5px;gap:3px}
+  .topbar .top-actions{gap:4px}
+}
+.context-links,.lesson-connection{margin:22px 0;padding:14px 18px;border-left:3px solid var(--accent);background:var(--surface);font-size:14px;line-height:1.8}.context-links p,.lesson-connection p{margin:0 0 8px}.lesson-connection strong{font-size:12px;color:var(--muted)}.lesson-connection p{margin-top:4px}.context-links a,.lesson-connection a{font-size:13px}
+/* Keep the full link box clickable when a label moves onto another line. */
+.context-links a,.lesson-connection a,.pathway-links a{display:inline-block;max-width:100%;vertical-align:top}

@@ -1,0 +1,11 @@
+# Keep the original workstation/network operations log local.
+# Shared verification is summarized in VALIDATION_SUMMARY.md.
+/VALIDATION.md
+/web/favicon-preview.png
+__pycache__/
+.pytest_cache/
+node_modules/
+browser-qa*/
+*.before-refresh-*
+.coverage
+htmlcov/

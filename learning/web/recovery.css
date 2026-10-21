@@ -1,0 +1,10 @@
+/* Existing project language/theme/layout, with opt-in detailed media. */
+.hr-journey{padding-left:25px}.hr-journey li{margin:10px 0}
+.hr-condition{margin:22px 0;border:1px solid var(--line);border-radius:6px;padding:15px}
+.hr-condition>summary{font-weight:650;color:var(--accent);cursor:pointer;overflow-wrap:anywhere}
+.hr-condition img{display:block;width:100%;height:auto;margin:16px 0}
+.hr-condition video{display:block;width:100%;height:auto;max-height:820px;background:#101010}
+.hr-condition details{margin:16px 0}.hr-condition .table-wrap{margin:18px 0}
+.study-page main p>a{display:inline-block;max-width:100%;vertical-align:top}
+@media(max-width:680px){.hr-condition{padding:10px}.study-page .hr-condition .table-wrap table{min-width:700px}}
+@media print{.hr-condition{break-inside:auto}.hr-condition video{display:none}}

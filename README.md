@@ -25,6 +25,20 @@ Both editions include an abstract, related work, experimental design, evaluation
 
 Actual experiment code lives in [experiments](experiments/README.md), with an installable `tracking_lab` package, independent inputs/configuration, tests, and Windows/Linux entrypoints. It does not import `learning/` or use the teaching site's data paths. It runs automatic A0/B0 systems, scores class-aware masks with pinned official TrackEval, and generates saved-result figures/reports. See the [Chinese code guide](experiments/CODE_GUIDE.md). The first pilot covers five annotated videos, 207 exported steps. The teaching website only consumes saved results; it is not the experiment runtime. Data, checkpoints, third-party code and runs remain ignored. No school-server upload or coursework delivery is implied by this workspace.
 
+## Website source and local preview
+
+The bilingual project/learning website is versioned in [learning](learning/README.md): page generators, templates, styles, interactions, preview server and tests. The repository contains the website source; saved experiment outputs, teaching videos, datasets and weights remain separate local resources. This is the first tracked website-source snapshot after earlier local development.
+
+For a source-only preview, install the CPU website dependencies and build a new output directory:
+
+```bash
+python -m pip install -r learning/requirements-web.txt
+python -m learning.preview --output outputs/learning/source-preview
+python -m learning.serve --run source-preview --port 8765
+```
+
+Open `http://127.0.0.1:8765/cs550-tracking-lab/`. This preview requires no model installation or inference. Without separately retained result assets, evidence/media pages explain their unavailable state. Existing measured runs are never overwritten. See the [website validation summary](learning/VALIDATION_SUMMARY.md) and [complete website guide](learning/README.md) for tests and saved-result workflows.
+
 ## Build
 
 The Python builder uses the standard library and generates `docs/proposal/proposal.tex` from the Markdown content:
@@ -77,7 +91,7 @@ Automatic A0/B0 inference, GT evaluation and paired state interventions have bee
 
 ## Pilot resources
 
-The personal teaching website and lesson code (`learning/`), generated results (`outputs/`), video files, datasets, model weights, and private connection notes remain local and are excluded from Git. Shared model explanations are available in the [English study guide](docs/model-guide/README.md). Local demonstrations are smoke tests, not the proposal's complete automatic pipeline or benchmark results.
+The website and lesson source (`learning/`) are tracked. Generated results (`outputs/`), video files, datasets, model weights and private connection notes remain local and are excluded from Git. Shared model explanations are also available in the [English study guide](docs/model-guide/README.md). Local demonstrations are smoke tests, not the proposal's complete automatic pipeline or benchmark results.
 
 Download the pretrained checkpoints and small smoke-test videos used by the proposed pipelines:
 

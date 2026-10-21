@@ -23,8 +23,7 @@ models/checkpoints/
 external/
 outputs/
 
-# Personal teaching site/code and private connection notes stay local.
-/learning/
+# Website source is tracked; private connection notes stay local.
 .local-private/
 
 # Video assets and rendered demonstrations are not shared through Git.
