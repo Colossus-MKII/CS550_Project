@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import re
 
+from . import journey
 from .navigation import decorate_page
 from .baseline_revision import revision_notice
 from .recovery_page import read_recovery, recovery_link
@@ -134,83 +135,6 @@ def score_table(evidence, language):
     )
 
 
-def next_actions(language, long_window=False, cohort=False):
-    t = lambda zh, en: pick(language, zh, en)
-    if cohort:
-        return (
-            "<ol><li>"
-            + t(
-                "16段开发对照已完成；200段120/40/40划分已冻结，保留集尚未评估。",
-                "The 16-event development cohort is complete; the 200-video 120/40/40 split is frozen, with no held-out evaluation yet.",
-            )
-            + "</li><li>"
-            + t(
-                "下一步预先控制历史可靠性×框质量，并把TTL和实际提示分开记录；尚未运行。",
-                "Next, preregister history reliability × box quality, logging TTL and actual prompts separately; not yet run.",
-            )
-            + "</li></ol>"
-        )
-    items = [
-        (
-            "事件清单",
-            "Event manifest",
-            "扩展同类事件",
-            "Expand comparable events",
-            "骑手失败与猫稳定对照已完成；下一步增加独立视频，继续检查既有 ID、状态和框来源，正式事件清单尚未冻结。",
-            "The rider failure and stable-cat control are complete. Add independent videos, checking prior IDs, state and box sources; the formal event set is not frozen.",
-        ),
-        (
-            "恢复标准",
-            "Recovery criteria",
-            "待锁定",
-            "Not frozen",
-            "确定定位门槛、连续成功次数、恢复时间和复发定义；纠正当帧不计主评分。",
-            "Freeze localization threshold, success streak, recovery latency and relapse definition; exclude the corrected frame.",
-        ),
-        (
-            "四组状态干预",
-            "Four state interventions",
-            "开发实现已验证",
-            "Development implementation verified",
-            "A-H/A-R、B-H/B-R：共享前史、同框一次更新、同外部 ID，不主动重置其他目标。",
-            "A-H/A-R and B-H/B-R: shared prefix, one same-box update, same external ID and no explicit reset of other targets.",
-        ),
-        (
-            "小规模开发预实验",
-            "Small development pilot",
-            "冒烟检查已完成",
-            "Smoke test complete",
-            "早期 24 分支验证实现；最新骑手／猫 16 分支检验真实现象，并已完整复跑。下一步关注关联竞争、提示条件与改善持续时间。",
-            "The early 24 branches checked implementation; the latest 16 rider/cat branches tested observed phenomena and repeated exactly. Next investigate competing associations, prompt conditions and improvement duration.",
-        ),
-        (
-            "正式数据划分",
-            "Formal data split",
-            "待冻结",
-            "Not frozen",
-            "五类、200 段目标；先满足覆盖约束，冻结清单，再进入保留评估。",
-            "Target five classes and 200 videos; satisfy coverage constraints and freeze manifests before held-out evaluation.",
-        ),
-    ]
-    if long_window:
-        items[3] = (
-            "长窗口与刷新消融",
-            "Long-window and refresh ablation",
-            "完成并复跑",
-            "Completed and repeated",
-            "30步主实验16分支＋刷新消融16分支已验证。下一步扩展独立视频，分别统计延迟恢复、关联竞争和生命周期删除。",
-            "Sixteen 30-step main branches plus 16 refresh-ablation branches are verified. Next add independent videos and distinguish delayed recovery, association competition and lifecycle removal.",
-        )
-    return (
-        '<ol class="action-list">'
-        + "".join(
-            f'<li><div><strong>{t(zh,en)}</strong><span class="state-tag pending">{t(state_zh,state_en)}</span></div><p>{t(body_zh,body_en)}</p></li>'
-            for zh, en, state_zh, state_en, body_zh, body_en in items
-        )
-        + "</ol>"
-    )
-
-
 def overview(output, language, evidence):
     t = lambda zh, en: pick(language, zh, en)
     suffix = ".en" if language == "en" else ""
@@ -220,10 +144,8 @@ def overview(output, language, evidence):
         title = t(zh, en)
         blocks.append((key, title, section(key, title, body)))
 
-    videos, frames = run_facts(evidence)
     hr = read_recovery(output)
     long_window = read_long(output)
-    cohort = (Path(output) / "recovery-cohort-results/manifest.json").exists()
     intro = (
         '<p class="project-summary">'
         + t(
@@ -242,124 +164,23 @@ def overview(output, language, evidence):
         )
         + "</p></div>"
     )
-    intro += (
-        '<div class="phase-strip"><span class="state-tag '
-        + ("done" if evidence else "pending")
-        + '">'
-        + t(
-            "阶段 1：基线已验证" if evidence else "阶段 1：待导入记录",
-            "Phase 1: baseline verified" if evidence else "Phase 1: no imported record",
-        )
-        + '</span><span class="state-tag pending">'
-        + t(
-            (
-                (
-                    "阶段 2：30步 H/R 与刷新消融完成"
-                    if long_window
-                    else "阶段 2：骑手／猫 H/R 实测完成"
-                )
-                if hr
-                else "阶段 2：开发对照已跑通，正式事件待冻结"
-            ),
-            (
-                (
-                    "Phase 2: 30-step H/R and refresh ablation complete"
-                    if long_window
-                    else "Phase 2: rider/cat H/R measurements complete"
-                )
-                if hr
-                else "Phase 2: development comparisons run; formal events not frozen"
-            ),
-        )
-        + "</span></div>"
-    )
-    if cohort:
-        intro = intro.replace(
-            t(
-                "阶段 2：30步 H/R 与刷新消融完成",
-                "Phase 2: 30-step H/R and refresh ablation complete",
-            ),
-            t(
-                "阶段 2：16段独立事件，128主分支完成",
-                "Phase 2: 16-event cohort, 128 main branches complete",
-            ),
-        )
+    latest = journey.latest(output)
+    latest_target = journey.stage_href(latest, language) if latest else journey.href("results", language)
     intro += (
         '<div class="hero-actions">'
-        + link(
-            "handbook" + suffix + ".html",
-            t("从模型职责开始 →", "Start with model roles →"),
-        ).replace("<a ", '<a id="learning-entry-link" class="button primary" ', 1)
-        + link(
-            (
-                "recovery-cohort"
-                if cohort
-                else "recovery-long" if long_window else "results"
-            )
-            + suffix
-            + ".html",
-            t("查看最新结果 →", "Review latest results →"),
-        ).replace("<a ", '<a id="latest-results-link" class="button primary" ', 1)
-        + link(
-            "#pathways", t("按问题找学习与实验", "Find a concept and its experiment")
-        ).replace("<a ", '<a class="button secondary" ', 1)
+        + link("#experiment-route", t("沿实验主线阅读 ↓", "Follow the experiment route ↓")).replace("<a ", '<a id="start-route-link" class="button primary" ', 1)
+        + link(journey.href("results", language), t("阶段 1：五段 A0/B0 基线", "Phase 1: five-clip A0/B0 baselines")).replace("<a ", '<a id="baseline-entry-link" class="button secondary" ', 1)
+        + link(latest_target, t("查看最新进展 →", "See latest progress →") if latest else t("查看结果页", "Open results page")).replace("<a ", '<a id="latest-results-link" class="button secondary" ', 1)
         + "</div>"
+        + '<p class="small">' + escape(journey.split_status(language)) + " "
+        + t("正式评估尚未完成。", "Formal evaluation remains pending.") + " · "
+        + link(journey.href("handbook", language), t("独立教学区 →", "Open learning area →")).replace("<a ", '<a id="learning-entry-link" ', 1) + "</p>"
     )
-    intro += (
-        '<div class="project-stats">'
-        + "".join(
-            f"<div><strong>{value}</strong><span>{label}</span></div>"
-            for value, label in [
-                (
-                    str(1 if evidence else 0),
-                    t("已导入基线运行", "Imported baseline runs"),
-                ),
-                (str(videos), t("开发视频", "Development clips")),
-                (str(frames), t("导出帧", "Exported frames")),
-                (
-                    (
-                        "128"
-                        if cohort
-                        else (
-                            str(
-                                sum(
-                                    len(run["branches"])
-                                    for run in long_window["runs"].values()
-                                )
-                                if long_window
-                                else len(hr["branches"])
-                            )
-                            if hr
-                            else (
-                                "24"
-                                if evidence
-                                and evidence.get("correction", {}).get("recovery_pilot")
-                                else "0"
-                            )
-                        )
-                    ),
-                    t("最新 H/R 批次分支", "Latest H/R batch branches"),
-                ),
-            ]
-        )
-        + "</div>"
-    )
-    intro += (
-        '<p class="small">'
-        + t(
-            (
-                "当前展示修正后的基线、骑手／猫与16段独立事件H/R实测；早期冒烟检查仅验证实现。正式200段实验尚未完成。"
-                if hr
-                else "当前展示修正后的开发基线。H/R 冒烟检查已完成，但不能把流程跑通或旧候选的结果当作正式研究结论。"
-            ),
-            (
-                "The current view connects corrected baselines, rider/cat pilots and the 16-event H/R cohort; early smoke checks only validated implementation. The formal 200-video study is not complete."
-                if hr
-                else "The current evidence is a development pilot, not a formal conclusion."
-            ),
-        )
-        + "</p>"
-    )
+    add("experiment-route", "沿实验主线阅读", "Follow the experiment route",
+        "<p>" + t(
+            "第一次来，从 01 开始。每页末尾都有前后步骤；熟悉项目时可直接跳到任一阶段。运行记录和下载放在后面，供查证。",
+            "Start at 01 on your first visit. Each page ends with the previous and next steps. Jump to any stage if you know the project; use records and downloads for verification.",
+        ) + "</p>" + journey.route_map(output, language))
 
     routes = [
         (
@@ -462,70 +283,9 @@ def overview(output, language, evidence):
         route_body,
     )
 
-    run_body = (
-        "<p>"
-        + t(
-            "当前已归档的是第一阶段本地 RTX 3080 开发预实验，已完成预测、评分、错误可视化和独立复核。",
-            "The archived record is the first local RTX 3080 development pilot: predictions, scoring, error visualizations and independent verification are complete.",
-        )
-        + "</p>"
-        if evidence
-        else "<p>"
-        + t("尚无可展示的已验证运行。", "No verified run is available for display.")
-        + "</p>"
-    )
-    if evidence:
-        run_body += (
-            '<div class="run-summary"><div><span class="state-tag done">'
-            + t("验证通过", "Verification passed")
-            + "</span><h3>"
-            + t("阶段 1 · A0 / B0 本地基线", "Stage 1 · Local A0 / B0 baselines")
-            + '</h3><p class="small">'
-            + escape(evidence["run"])
-            + "</p></div><div>"
-            + link(
-                "runs" + suffix + ".html#baseline",
-                t("配置、证据与来源 →", "Configuration, evidence and provenance →"),
-            )
-            + "</div></div>"
-        )
-    if long_window:
-        run_body = (
-            "<p>"
-            + t(
-                "最新归档包含30步主实验与单次刷新消融；各16分支，均已完整复跑。基线与8步记录继续保留。",
-                "Latest archives include 30-step follow-up and a skip-one-refresh ablation: 16 branches each, independently repeated. Baseline and eight-step records are retained.",
-            )
-            + "</p><p>"
-            + link(
-                "runs" + suffix + ".html#hr-long-run",
-                t(
-                    "查看长窗口运行与复核记录 →",
-                    "Inspect long-window run and verification records →",
-                ),
-            )
-            + "</p>"
-            + run_body
-        )
-    if cohort:
-        run_body = (
-            "<p>"
-            + t(
-                "最新：16段独立开发事件，128主分支；64个A分支CPU重放和E09/E13的16个GPU验证分支均一致。早期基线、8步和长窗口记录继续保留。",
-                "Latest: 16 development events and 128 main branches; all 64 A CPU replays and 16 GPU verification branches for E09/E13 match exactly. Earlier baseline, eight-step and long-window records remain available.",
-            )
-            + "</p><p>"
-            + link(
-                "runs" + suffix + ".html#independent-cohort",
-                t("查看最新批次记录 →", "Inspect the latest cohort record →"),
-            )
-            + "</p>"
-            + run_body.replace(
-                t("最新归档包含", "Latest archives include"),
-                t("此前归档包含", "Earlier archives include"),
-            )
-        )
-    add("runs", "最新运行记录", "Latest run record", run_body)
+    add("runs", "运行记录与查证", "Run records & verification",
+        "<p>" + t("按阶段查运行配置、复跑证据和未完成项。", "Trace configurations, repeat checks and pending work by stage.") + " "
+        + link(journey.href("runs", language), t("打开运行档案 →", "Open the run archive →")) + "</p>")
     result_body = revision_notice(evidence, language) + score_table(evidence, language)
     result_body += (
         '<p class="small">'
@@ -580,7 +340,7 @@ def overview(output, language, evidence):
         + "</p>"
     )
     add(
-        "results", "当前结果与关键现象", "Current results and observations", result_body
+        "results", "阶段 1：基线分数与例帧", "Phase 1: baseline scores and example frames", result_body
     )
     if hr:
         add(
@@ -605,23 +365,10 @@ def overview(output, language, evidence):
             + (" · " + long_link(output, language) if long_window else "")
             + "</p>",
         )
-    add(
-        "next",
-        "下一阶段：深度实验准备",
-        "Next phase: prepare deeper experiments",
-        next_actions(language, bool(long_window), cohort)
-        + "<p>"
-        + link(
-            "experiments" + suffix + ".html#walkthrough",
-            t("核对 H/R 对照流程 →", "Check the H/R protocol →"),
-        )
-        + " · "
-        + link(
-            "program" + suffix + ".html#criteria",
-            t("核对恢复判据 →", "Check recovery criteria →"),
-        )
-        + "</p>",
-    )
+    add("next", "正式评估待办", "Formal evaluation still pending",
+        journey.assessment(language) + "<p>"
+        + link(journey.href("runs", language, "pending"), t("核对正式评估缺口 →", "Review what remains for formal evaluation →"))
+        + "</p>")
     add(
         "pipeline",
         "实验实现入口",
@@ -649,8 +396,8 @@ def overview(output, language, evidence):
         "Data and annotations",
         "<p>"
         + t(
-            "初始验证运行使用五段真实标注视频；后续200段120/40/40划分已冻结。16段开发事件不同于完整五类评估；实例通道和缺少原始时间戳的限制见数据页。",
-            "The initial verified run uses five genuinely annotated clips; the later 200-video 120/40/40 split is frozen. The 16-event development cohort is not the full five-class evaluation; see the data page for instance channels and missing source timing.",
+            "初始验证运行使用五段真实标注视频。开发事件不等于完整五类评估；实例通道和时间戳限制见数据页。",
+            "The initial verified run uses five genuinely annotated clips. Development events do not constitute full five-class evaluation; see the data page for instance channels and timing limitations.",
         )
         + "</p><p>"
         + link(
@@ -723,27 +470,10 @@ def overview(output, language, evidence):
         + "</div>"
         + shortcuts,
     )
-    order = {
-        key: index
-        for index, key in enumerate(
-            (
-                "pathways",
-                "results",
-                "runs",
-                "next",
-                "pipeline",
-                "dataset",
-                "proposal",
-                "resources",
-            )
-        )
-    }
-    order["recovery-results"] = order["results"] + 0.5
-    blocks.sort(key=lambda block: order[block[0]])
     return t("实验项目总览", "Experiment project overview"), intro, blocks
 
 
-def records(language, evidence, hr=None, long_window=None, cohort=False):
+def records(language, evidence):
     t = lambda zh, en: pick(language, zh, en)
     suffix = ".en" if language == "en" else ""
     blocks = []
@@ -752,55 +482,13 @@ def records(language, evidence, hr=None, long_window=None, cohort=False):
         title = t(zh, en)
         blocks.append((key, title, section(key, title, body)))
 
-    add(
-        "process",
-        "过程记录与当前边界",
-        "Process record and current boundary",
-        '<ol class="process-list"><li><strong>'
-        + t("数据与标注核验", "Data and annotation audit")
-        + "</strong><p>"
-        + t(
-            "数据结构、五类候选覆盖与五段样本已检查；后续200段120/40/40划分已冻结，保留集评估尚未进行。",
-            "Data structure, candidate class coverage and five sample clips were checked; the later 200-video 120/40/40 split is frozen, with no held-out evaluation yet.",
-        )
-        + " "
-        + link("dataset" + suffix + ".html", t("查看数据证据", "Inspect data evidence"))
-        + "</p></li><li><strong>"
-        + t("第一阶段 A0/B0", "Stage-one A0/B0")
-        + "</strong><p>"
-        + t(
-            "完成本地五段／207 帧开发预实验及复核。仅展示审核导入的记录，不扫描或公开任意实验目录。",
-            "The local five-clip / 207-frame development pilot and verification are complete. Only reviewed imported records are shown; arbitrary experiment directories are not scanned or exposed.",
-        )
-        + "</p></li><li><strong>"
-        + t("实验与教学拆分", "Scientific runtime separated from teaching")
-        + "</strong><p>"
-        + t(
-            "实验代码移至独立 experiments 工作区，本地迁移回放已验证；Linux 脚本仅做语法检查，未宣称学校环境实测。",
-            "Scientific code moved to experiments and local migration/replay was validated. Linux scripts were syntax-checked only; no school-environment validation is claimed.",
-        )
-        + "</p></li><li><strong>"
-        + t("历史保留／重置研究", "Retain/reset study")
-        + "</strong><p>"
-        + t(
-            (
-                "修正版基线后的8步初测、30步跟随和单次刷新消融已完成并复跑；后续16段独立事件及128分支见最新记录。"
-                if long_window
-                else "四组干预与恢复评分已通过开发冒烟和重复性检查。SAM同步错误另行修复；正式事件规则尚未冻结。"
-            ),
-            (
-                "Eight-step pilot, 30-step follow-up and skip-one-refresh ablation after corrected baselines are complete and repeated; see the latest record for the subsequent 16-event, 128-branch cohort."
-                if long_window
-                else "Four-group interventions and recovery scoring passed development smoke/repeatability checks. SAM synchronization was corrected separately; formal event rules remain unfrozen."
-            ),
-        )
-        + '</p></li></ol><p class="small">'
-        + t(
-            "这些是项目记录，不是实时服务器状态或自动任务完成日志。",
-            "These are project records, not real-time server status or automatically completed tasks.",
-        )
-        + "</p>",
-    )
+    add("process", "档案阅读顺序", "Reading the run archive",
+        "<p>" + t(
+            "以下按基线、8 步、30 步、16 段、自然失败排列。每项记录保留当时的配置、核验和局限；先沿主线看实验，再来查出处。",
+            "Records follow the baseline, eight-step, 30-step, 16-event and natural-failure studies. Each keeps its configuration, checks and limits; read the experiment route before consulting the archive.",
+        ) + "</p><p>" + escape(journey.split_status(language)) + "</p><p>"
+        + link(journey.href("index", language, "experiment-route"), t("查看实验主线 →", "Open the experiment route →"))
+        + " · " + link("#pending", t("查看正式评估待办 ↓", "See pending formal evaluation ↓")) + "</p>")
     if evidence:
         summary = evidence["summary"]
         env = summary["environment"]
@@ -897,26 +585,11 @@ def records(language, evidence, hr=None, long_window=None, cohort=False):
         )
     else:
         add("baseline", "运行记录", "Run record", score_table(None, language))
-    add(
-        "pending",
-        "下一条记录应该包含什么",
-        "What the next record should contain",
-        "<p>"
-        + t(
-            (
-                "上方已有开发H/R实测。下一批独立视频继续保存事件／协议版本、共享前史、框来源、一次纠正、后续输入安排、恢复曲线、不可用事件和配对汇总；同一视频的多个窗口不是独立视频样本。"
-                if hr
-                else "H/R记录需要事件清单与协议版本、同源状态证据、框来源、一次更新记录、后续输入安排、恢复曲线、不可用事件和配对汇总。尚未导入这些实测记录。"
-            ),
-            (
-                "Development H/R measurements are recorded above. For new independent videos, keep event/protocol versions, shared prefixes, box sources, one correction, later schedules, curves, ineligible events and paired summaries. Multiple windows of one video are not independent video samples."
-                if hr
-                else "An H/R record needs event/protocol versions, shared prefixes, box sources, one update, subsequent schedules, curves, ineligible events and paired summaries. No such measurements are imported yet."
-            ),
-        )
-        + "</p>"
-        + next_actions(language, bool(long_window), cohort),
-    )
+    add("pending", "正式评估待办", "Formal evaluation still pending",
+        journey.assessment(language) + "<p>" + t(
+            "后续评估需要可复核的冻结配置、分组指标与完整运行记录。五段基线和开发 H/R 案例不能作为保留集成绩。",
+            "A formal evaluation needs auditable frozen configurations, split-level metrics and complete run records. The five-clip baseline and development H/R cases cannot stand in for held-out scores.",
+        ) + "</p>")
     return (
         t("过程与运行记录", "Process and run records"),
         "<p>"
@@ -994,8 +667,15 @@ def documents(output, language, proposal):
         ),
     ]:
         blocks.append((key, title, section(key, title, body)))
+    from .team_downloads import content as resource_content
+    shared_resources = resource_content(output, language)
+    if shared_resources:
+        title = t("组内数据、权重与pilot资源下载", "Shared data, checkpoints and pilot downloads")
+        blocks.insert(0, ("team-assets", title, section("team-assets", title, shared_resources)))
+    order = ("approved-design", "downloads", "team-assets", "references")
+    blocks.sort(key=lambda block: order.index(block[0]))
     return (
-        t("Proposal 与项目文档", "Proposal and project documents"),
+        t("研究问题与 Proposal", "Research question and proposal"),
         "<p>"
         + t(
             "中英文 Proposal、源文件及项目说明集中于此。",
@@ -1011,7 +691,6 @@ def write_workbench(output, proposals):
     evidence = read_evidence(output)
     hr = read_recovery(output)
     long_window = read_long(output)
-    cohort = (output / "recovery-cohort-results/manifest.json").is_file()
     template = (WEB / "study.html").read_text(encoding="utf-8")
     css = "".join(
         (WEB / name).read_text(encoding="utf-8")
@@ -1022,15 +701,27 @@ def write_workbench(output, proposals):
         suffix = ".en" if language == "en" else ""
         for slug, builder in [
             ("index", lambda: overview(output, language, evidence)),
-            ("runs", lambda: records(language, evidence, hr, long_window, cohort)),
+            ("runs", lambda: records(language, evidence)),
             ("documents", lambda: documents(output, language, proposals[language])),
         ]:
             title, intro, blocks = builder()
+            from .team_downloads import download_link as resource_link
+            resources = resource_link(output, language)
+            if resources and slug == "index":
+                pos = next(i for i, (key, _, _) in enumerate(blocks) if key == "resources")
+                key, label, body = blocks[pos]
+                blocks[pos] = (key, label, body.removesuffix("</section>")
+                               + '<p id="team-resource-entry">' + resources + '</p></section>')
             from .recovery_cohort_page import progress_block
 
             cohort_block = progress_block(output, language)
             if cohort_block and slug in {"index", "runs"}:
                 key, label, body = cohort_block
+                blocks.insert(0, (key, label, section(key, label, body)))
+            from .natural_page import progress_block as natural_progress
+            natural_block = natural_progress(output, language)
+            if natural_block and slug in {"index", "runs"}:
+                key, label, body = natural_block
                 blocks.insert(0, (key, label, section(key, label, body)))
             if slug == "runs" and hr:
                 title_hr = t("8步 H/R：骑手与猫", "Eight-step H/R: rider and cat")
@@ -1077,6 +768,15 @@ def write_workbench(output, proposals):
                         section("hr-long-run", title_long, body_long),
                     ),
                 )
+            if slug == "runs":
+                record_order = ("process", "baseline", "hr-run", "hr-long-run",
+                                "independent-cohort", "natural-followup", "pending")
+                blocks.sort(key=lambda block: record_order.index(block[0]))
+            elif slug == "index":
+                home_order = ("experiment-route", "pathways", "results", "recovery-results",
+                              "independent-cohort", "natural-followup", "next", "runs",
+                              "pipeline", "dataset", "proposal", "resources")
+                blocks.sort(key=lambda block: home_order.index(block[0]))
             legacy = (
                 Ids(
                     (output / ("handbook" + suffix + ".html")).read_text(
@@ -1119,5 +819,5 @@ def write_workbench(output, proposals):
             if slug == "index":
                 text = text.replace('id="start"', 'id="overview"', 1)
             (output / (slug + suffix + ".html")).write_text(
-                decorate_page(text, language, slug), encoding="utf-8"
+                decorate_page(text, language, slug, output), encoding="utf-8"
             )

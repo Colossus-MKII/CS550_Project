@@ -23,7 +23,7 @@ def content(language, home):
         '<li>' + card('01', t('A0 / B0 自动基线', 'A0 / B0 automatic baselines'), t('比较完整质量与成本；定位观察、关联及状态更新问题。', 'Compare complete-system quality and cost; locate observation, association and state-update failures.')) + '</li>' +
         '<li>' + card('02', t('四组受控恢复', 'Four controlled recovery groups'), t('同一事件、同一纠正框；分别比较 A-H / A-R 与 B-H / B-R。', 'One event and correction box; compare A-H / A-R and B-H / B-R separately.')) + '</li>' +
         '<li>' + card('03', t('解释规律与验证', 'Explain patterns and validate'), t('观察差异出现与消失的过程。有证据时，最多验证一项自动策略。', 'Study when differences arise and disappear. If evidence supports it, validate at most one automatic policy.')) + '</li></ol>' +
-        '<p class="status-note">' + t('本页保留已批准的实验设计，不展示虚构结果。四组开发冒烟检查已跑通；修正后的真实案例与下一批事件筛选见程序地图。按钮仅切换说明步骤。', 'This page preserves the approved design without invented outcomes. Four-group development smoke tests ran; see the program map for corrected real cases and the next candidate set. Controls only navigate the explanation.') + '</p><p>' + link('program'+suffix+'.html#recovery', t('修正后案例 → 下一批实验怎么选', 'Corrected cases → selecting the next experiment')) + '</p>')
+        '<p class="status-note">' + t('本页解释同框 H/R 对照。先核对固定前史、目标 ID 与纠正框，再读骑手／猫和后续开发证据。按钮仅切换说明步骤。', 'This page explains the same-box H/R comparison. Check the fixed prior state, target ID and corrective box before reading rider/cat and subsequent development evidence. Controls only navigate the explanation.') + '</p><p>' + link('program'+suffix+'.html#recovery', t('查原始案例与程序逻辑', 'Inspect the original cases and code')) + '</p>')
 
     add("baselines", ("A / B 保留各自的自动流程", "A / B retain their automatic pipelines"),
         '<div class="protocol-grid">' +

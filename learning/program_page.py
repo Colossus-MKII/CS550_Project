@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 
 from .study import WEB, link, pick, section
+from . import journey
 from .navigation import decorate_page
 from .baseline_revision import revision_notice
 from .recovery_page import read_recovery, recovery_link
@@ -222,11 +223,12 @@ def table(headers, rows, key):
     )
 
 
-def source_catalog(output):
+def source_catalog(output, evidence=None):
     """Export only reviewed Python files; never import experiment code."""
     destination = Path(output) / "program-code"
     destination.mkdir(exist_ok=True)
     catalog = {}
+    example = journey.baseline_fp_example(evidence)
     for name in SOURCE_FILES:
         raw = (SOURCE_ROOT / name).read_bytes()
         text = raw.decode("utf-8")
@@ -247,10 +249,18 @@ def source_catalog(output):
             nav = " · ".join(
                 link(f"#L{line}", function) for function, line in functions.items()
             )
+            step = {"diagnose.py": "diagnose", "sam_baseline.py": "b0"}.get(name)
+            back_href = f"../program{suffix}.html?step={step}#stage-{step}" if step else f"../program{suffix}.html#steps"
+            back_links = link(back_href, t("← 返回程序地图", "← Back to the program map"))
+            if step and example:
+                back_links += " · " + link(
+                    "../" + journey.baseline_frame_href(language, *example),
+                    t("返回基线误检帧", "Return to the baseline FP frame"),
+                ).replace("<a ", '<a data-baseline-fp-return ', 1)
             css = (WEB / "tutorial.css").read_text(encoding="utf-8")
             page = f"""<!doctype html><html lang="{t('zh-CN','en')}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{name} · CS550</title><style>{css}
 body{{padding:24px;max-width:1200px;margin:auto}}pre{{white-space:pre;max-width:100%;overflow:auto}}.source-line:target{{background:#25453a;color:#fff}}.source-line>a{{display:inline-block;min-width:3ch;text-align:right;user-select:none}}nav{{overflow-wrap:anywhere}}</style></head><body>
-<p>{link('../program'+suffix+'.html#steps',t('← 返回程序地图','← Back to the program map'))} · {link(name+('.en' if language=='zh' else '')+'.html',t('English','中文'))} · {link(name+'.txt',t('原始文本','Plain source'))}</p>
+<p>{back_links} · {link(name+('.en' if language=='zh' else '')+'.html',t('English','中文'))} · {link(name+'.txt',t('原始文本','Plain source'))}</p>
 <h1>{name}</h1><p>{t('当前工作区源码参考，不是历史实验的不可变快照。','Current workspace reference, not an immutable historical inference snapshot.')}</p><p class="small">SHA-256: {catalog[name]['sha256']}</p><nav>{nav}</nav><pre><code>{lines}</code></pre></body></html>"""
             (destination / (name + suffix + ".html")).write_text(page, encoding="utf-8")
     (destination / "manifest.json").write_text(
@@ -323,8 +333,8 @@ def candidate_table(evidence, language, hr=None):
                     t("已完成本批 H/R", "Completed in this H/R batch")
                     if hr and event["name"] in {e["name"] for e in hr["events"]}
                     else t(
-                        "未运行" if conditions else "排除",
-                        "Not run" if conditions else "Excluded",
+                        "未纳入早期批次" if conditions else "排除",
+                        "Outside early batch" if conditions else "Excluded",
                     )
                 ),
             ]
@@ -345,8 +355,8 @@ def candidate_table(evidence, language, hr=None):
         )
         + '<p class="small">'
         + t(
-            "yolo 为实际检测框，reference 为标注外接框；缺失条件不补造。资格来源是基线修订时的草案；完成状态来自最新 H/R 记录，其余事件仍未执行。",
-            "yolo means actual detector boxes; reference means annotation-derived boxes. Missing conditions are not fabricated. Eligibility comes from the baseline-correction draft; completion comes from the latest H/R record. Other events remain unrun.",
+            "yolo 为实际检测框，reference 为标注外接框；缺失条件不补造。资格来源是基线修订时的草案；此处完成状态只指早期 8 步骑手／猫批次。",
+            "yolo means actual detector boxes; reference means annotation-derived boxes. Missing conditions are not fabricated. Eligibility comes from the baseline-correction draft. Completion here refers only to the early eight-step rider/cat batch.",
         )
         + " "
         + link(
@@ -385,19 +395,27 @@ def content(language, catalog, evidence, hr=None):
 <a class="flow-node" href="#stage-gt">{t('推理结束，才读取 GT','Load GT only after inference')}<small>{t('A0 ↔ GT；B0 ↔ 同一 GT','A0 ↔ GT; B0 ↔ the same GT')}</small></a><span class="flow-arrow" aria-hidden="true">↓</span>
 <div class="program-branches"><a class="flow-node" href="#stage-diagnose">{t('逐帧诊断：哪里错了？','Frame diagnostics: where did it fail?')}<small>diagnose()</small></a><a class="flow-node" href="#stage-scores">{t('正式评分：整体怎样？','Official scores: how well overall?')}<small>evaluate_all() → TrackEval</small></a></div><span class="flow-arrow" aria-hidden="true">↓</span>
 <a class="flow-node" href="#stage-report">{t('独立后处理：报告、视频、复核','Separate post-processing: reports, videos, verification')}<small>report.build() / verify.verify()</small></a></div>
-<p class="status-note">{t('已跑通：五段／207 帧基线与 24 个 H/R 开发分支。正常 B0 入口现包含 CPU 卸载同步保护；正式 200 段实验及事件集仍待冻结。','Completed: five-clip / 207-frame baselines and 24 H/R development branches. Normal B0 now includes the CPU-offload fence; the formal 200-video experiment and event set remain unfrozen.')}</p>
+<p class="status-note">{escape(journey.split_status(language))} {t('B0 使用 CPU 卸载同步保护；正式保留集尚未评分。','B0 uses a CPU-offload synchronization fence; held-out evaluation is still pending.')} {link(journey.href('runs', language, 'pending'), t('核对正式评估待办 →','Review pending formal evaluation →'))}</p>
 <p>{t('实验代码独立位于 experiments/tracking_lab；learning 只生成学习页面、展示已保存结果。','Scientific code lives independently in experiments/tracking_lab; learning only builds teaching pages and displays saved evidence.')}</p>""",
     )
 
     buttons, cards = [], []
+    example = journey.baseline_fp_example(evidence)
     for index, (key, titles, functions, inputs, action, outputs, boundary) in enumerate(
         STEPS
     ):
         buttons.append(
             f'<button type="button" data-program-step="{key}" aria-controls="stage-{key}">{index+1:02d} · {t(*titles)}</button>'
         )
+        return_link = ""
+        if key in {"b0", "diagnose"} and example:
+            video, frame = example
+            return_link = '<p class="small">' + link(
+                journey.baseline_frame_href(language, video, frame),
+                t(f"← 返回基线误检示例：{video} / 帧 {frame}", f"← Back to the baseline FP example: {video} / frame {frame}"),
+            ).replace("<a ", '<a data-baseline-fp-return ', 1) + "</p>"
         cards.append(
-            f"""<article class="program-stage" id="stage-{key}" data-program-panel="{key}"><p class="small">{t('实验步骤','Experiment step')} {index+1:02d} / 08</p><h3>{t(*titles)}</h3><p class="function-route">{'<br>'.join(code(*function) for function in functions)}</p><dl><dt>{t('输入','Input')}</dt><dd>{t(*inputs)}</dd><dt>{t('职责','Responsibility')}</dt><dd>{t(*action)}</dd><dt>{t('输出交给下一步','Output passed onward')}</dt><dd>{t(*outputs)}</dd></dl><p class="status-note">{t(*boundary)}</p></article>"""
+            f"""<article class="program-stage" id="stage-{key}" data-program-panel="{key}"><p class="small">{t('实验步骤','Experiment step')} {index+1:02d} / 08</p><h3>{t(*titles)}</h3><p class="function-route">{'<br>'.join(code(*function) for function in functions)}</p><dl><dt>{t('输入','Input')}</dt><dd>{t(*inputs)}</dd><dt>{t('职责','Responsibility')}</dt><dd>{t(*action)}</dd><dt>{t('输出交给下一步','Output passed onward')}</dt><dd>{t(*outputs)}</dd></dl><p class="status-note">{t(*boundary)}</p>{return_link}</article>"""
         )
     add(
         "steps",
@@ -638,41 +656,11 @@ verify.verify() → replay / rescore"""
     )
 
     add(
-        "next",
-        "深度实验开始前，要准备什么",
-        "Before the deeper experiments",
-        "<p>"
-        + t(
-            "这是下一阶段待办，不是已完成状态。先锁定实验规则，再扩展测试。",
-            "These are pending preparation tasks, not completed work. Freeze the protocol before scaling tests.",
-        )
-        + "</p><ol>"
-        + "".join(
-            "<li>" + t(*item) + "</li>"
-            for item in [
-                (
-                    "核验候选视频与标注，确定具备足够后续观察窗口的事件；同时保留可靠历史对照。",
-                    "Audit candidate videos/labels and select events with adequate post-correction windows, including reliable-history controls.",
-                ),
-                (
-                    "建立事件清单：视频、目标、纠正时刻、框来源／坐标、既有状态是否可保留、可见性、窗口及分组依据。",
-                    "Create an event manifest: video, target, correction time, box source/coordinates, retained-state eligibility, visibility, window and grouping criteria.",
-                ),
-                (
-                    "复用已验证的 A-H/A-R、B-H/B-R 实现；每次仍审计共享前史、同框一次更新、同外部 ID、目标清空与其他对象未被主动重置。",
-                    "Reuse the verified A-H/A-R and B-H/B-R implementation, auditing shared prefixes, one same-box update, fixed external IDs, cleared target history and unchanged other targets each time.",
-                ),
-                (
-                    "用合成成功、失败、复发、换对象及空输出测试恢复评分器，锁定阈值、连续次数和窗口。",
-                    "Test the recovery evaluator on synthetic success, failure, relapse, wrong-object and empty-output cases; freeze thresholds, streak and window.",
-                ),
-                (
-                    "先跑少量开发事件，检查曲线和干预记录；再开展正式配对实验。固定权重，不把参考框结果冒充全自动性能。",
-                    "Pilot a small development event set and inspect curves/intervention logs before formal paired experiments. Keep weights fixed; do not present reference-box results as fully automatic performance.",
-                ),
-            ]
-        )
-        + "</ol>",
+        "next", "实现复核与正式评估", "Implementation checks and formal evaluation",
+        journey.assessment(language) + "<p>" + t(
+            "基线后的各批 H/R 使用保存的开发证据。早期 24 个冒烟分支只验证实现，不计为后续样本或正式评估结果。",
+            "Subsequent H/R studies use saved development evidence. The 24 early smoke branches checked implementation and are not later samples or formal evaluation results.",
+        ) + "</p><p>" + link(journey.href("runs", language, "pending"), t("查看正式评估缺口 →", "Review the formal evaluation gaps →")) + "</p>",
     )
     return sections
 
@@ -795,7 +783,7 @@ def write_program_pages(output):
     output = Path(output)
     evidence = read_evidence(output)
     hr = read_recovery(output)
-    catalog = source_catalog(output)
+    catalog = source_catalog(output, evidence)
     template = (WEB / "study.html").read_text(encoding="utf-8")
     css = "".join(
         (WEB / name).read_text(encoding="utf-8")
@@ -854,6 +842,7 @@ def write_program_pages(output):
                 re.sub(r"@@([A-Z_]+)@@", lambda match: values[match[1]], template),
                 language,
                 "program",
+                output,
             ),
             encoding="utf-8",
         )

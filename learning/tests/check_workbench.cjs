@@ -28,13 +28,13 @@ async function switchLanguage(page) {
     page.on('response', response => { if (response.status() >= 400) failed.push([response.status(), response.url()]); });
     for (const suffix of ['', '.en']) {
       await page.goto(new URL(`index${suffix}.html`, url).href, { waitUntil: 'networkidle' });
-      assert.equal(await page.locator('#project-navigation a').count(), 8);
+      assert.equal(await page.locator('#project-navigation a').count(), 11);
       assert.equal(await page.locator('#project-navigation [aria-current="page"]').getAttribute('href'), `index${suffix}.html`);
       assert.equal(await page.locator('#course-progress').count(), 0);
       assert.equal(await page.locator('video').count(), 0);
       assert.equal(await page.locator('#project-score-table tbody tr').count(), 2);
       assert.equal(await page.locator('.evidence-card').count(), 3);
-      assert.equal(await page.locator('#next .pending').count(), 5);
+      assert.equal(await page.locator('#experiment-route .journey-row').count(), 10);
       assert.equal(await page.locator('.project-pathways li').count(), 4);
       assert.equal(await page.locator('#learning-entry-link').isVisible(), true);
       assert.equal(await page.locator('#learning-entry-link').getAttribute('href'), `handbook${suffix}.html`);
@@ -70,20 +70,18 @@ async function switchLanguage(page) {
       const latestHref = await page.locator('#latest-results-link').getAttribute('href');
       await page.locator('#latest-results-link').click();
       await page.waitForURL(destination => destination.pathname.endsWith(latestHref));
-      if (latestHref === `recovery-long${suffix}.html`) {
-        assert.equal(await page.locator('video').count(), 8);
-        assert.equal(await page.locator('#long-normal-rider-yolo-scores tbody tr').count(), 6);
-        await page.locator(`main .long-route a[href="results${suffix}.html"]`).click();
-        await page.waitForURL(destination => destination.pathname.endsWith(`results${suffix}.html`));
-      }
+      await page.goto(new URL(`index${suffix}.html`, url).href);
+      await page.locator('#baseline-entry-link').click();
+      await page.waitForURL(destination => destination.pathname.endsWith(`results${suffix}.html`));
       assert.equal(await page.locator('#viewer-controls').isVisible(), true);
-      await page.locator('#project-group-1 > summary').click();
-      await page.locator(`#project-navigation a[href="runs${suffix}.html"]`).click();
-      await page.waitForURL(destination => destination.pathname.endsWith(`runs${suffix}.html`));
-      assert.equal(await page.locator('#run-record-table').count(), 1);
-      assert.equal(await page.locator('#pending .pending').count(), 5);
+      assert.equal(await page.locator('#curves video').count(), 5);
       await page.locator('#project-group-3 > summary').click();
-      await page.locator(`#project-navigation a[href="documents${suffix}.html"]`).click();
+      await page.locator('#project-navigation [data-route-page="runs"]').click();
+      await page.waitForURL(destination => destination.pathname.endsWith(`runs${suffix}.html`) && destination.hash === '#pending');
+      assert.equal(await page.locator('#run-record-table').count(), 1);
+      assert.equal(await page.locator('#pending').count(), 1);
+      await page.locator('#project-group-1 > summary').click();
+      await page.locator('#project-navigation [data-route-page="documents"]').click();
       await page.waitForURL(destination => destination.pathname.endsWith(`documents${suffix}.html`));
       assert.equal(await page.locator('#project-proposal-downloads tbody tr').count(), 4);
       await page.locator(`#workspace-switcher a[href="handbook${suffix}.html"]`).click();
@@ -120,8 +118,9 @@ async function switchLanguage(page) {
     await page.setViewportSize({ width:390, height:900 });
     await page.goto(new URL('index.html',url).href);
     await page.locator('#menu-toggle').click();
-    await page.locator('#project-navigation a[href="runs.html"]').click();
-    await page.waitForURL('**/runs.html');
+    await page.locator('#project-group-3 > summary').click();
+    await page.locator('#project-navigation [data-route-page="runs"]').click();
+    await page.waitForURL('**/runs.html#pending');
     // No-JS readers retain evidence, documents and handbook links.
     const context = await browser.newContext({ javaScriptEnabled:false });
     const offline = await context.newPage();

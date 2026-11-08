@@ -21,6 +21,7 @@ from .recovery_page import PAGES as RECOVERY_PAGES, write_recovery_pages
 from .recovery_long_data import PAGES as LONG_RECOVERY_PAGES
 from .recovery_long_page import write_long_pages
 from .recovery_cohort_page import write_cohort_pages
+from .natural_page import write_natural_pages
 from .navigation import decorate_page
 from .workbench import PAGES as WORKBENCH_PAGES, HANDBOOK_PAGES, write_workbench
 
@@ -150,6 +151,7 @@ def write_report(output: Path, summary):
     write_recovery_pages(output)
     write_long_pages(output)
     write_cohort_pages(output)
+    write_natural_pages(output)
     write_program_pages(output)
     write_workbench(output, proposals)
 

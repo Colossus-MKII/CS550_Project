@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 
 from .study import WEB, link, pick, section
+from . import journey
 
 PAGES = ("dataset.html", "dataset.en.html")
 NAMES = {'person': '人', 'dog': '狗', 'cat': '猫', 'horse': '马', 'car': '汽车',
@@ -80,8 +81,9 @@ def content(data, language):
         '<div class="table-wrap"><table><thead><tr><th>' + t('目标类别','Target class') + '</th><th>' + t('包含该类的视频','Videos containing class') + '</th><th>' + t('实例轨迹','Instance tracks') + '</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
         '<p>' + t('一段视频可包含多个类别，所以上表视频数不能相加。五类去重后为 226 段；猫仅有 6 段，不能称为平衡数据集。300 段标注样本共 10,949 个导出帧，单段 12–62 帧，短边均为 320 像素。',
             'Videos may contain multiple classes, so class counts cannot be added. Their union is 226 videos; only six contain cats. This is not a balanced dataset. The 300 labeled samples contain 10,949 exported frames, 12–62 per sample, with a 320-pixel short side.') + '</p>' +
-        '<p>' + t('计划仍是 200 段、120/40/40 的开发/验证/评估划分。同一视频及其全部实例必须留在同一组。当前 seed 550 选择器会把马全部分到开发集，不能直接作为最终划分；本地可行性检查已证明可通过视频交换让三组均包含五类，但正式清单尚未冻结，稀少类别的统计结论需谨慎。',
-            'The plan remains 200 videos with a 120/40/40 development/validation/evaluation split. A video and all its instances must stay in one split. The current seed-550 selector places all horses in development, so it cannot be accepted unchanged. A local feasibility check found video swaps that give all three splits five-class coverage, but the final manifest is not frozen; rare-class conclusions require caution.') + '</p>' +
+        '<p>' + escape(journey.split_status(language)) + ' ' + t('同一视频及其全部实例留在同一组，近重复组也不跨划分。稀少类别的统计结论仍需谨慎。',
+            'A video and all its instances stay in one split, as do near-duplicate groups. Conclusions about rare classes still require caution.') + ' ' +
+        link(journey.href('runs', language, 'pending'), t('正式评估待办', 'Pending formal evaluation')) + '</p>' +
         '<p>' + t('SlotCurri 的 train/validation 是从原始已标注训练集内部划分的导出，不是官方挑战赛的 validation。其 2,685 段 train 导出只含视频，300 段 validation 导出才含 mask；不要误把 2,985 段都算作可直接评估的标注视频。',
             'SlotCurri train/validation are internal exports from the original labeled training set, not the official challenge validation set. Its 2,685 training exports contain video only; the 300 validation exports include masks. Do not count all 2,985 as directly evaluable labeled videos.') + '</p>'))
     blocks.append(('usage', t('怎样用于我们的实验', 'How these data enter our experiment'),
@@ -119,4 +121,4 @@ def write_dataset_pages(output):
             'TRAIL':t('研究与实验 · 数据','Research and experiments · Data'),
             'FOOT':t('更新：2026-10-17。真实样本预览不包含模型推理结果。','Updated 2026-10-17. Real-data previews contain no model predictions.')}
         from .navigation import decorate_page
-        (output/name).write_text(decorate_page(re.sub(r'@@([A-Z_]+)@@',lambda m: values[m[1]],template),language,'dataset'),encoding='utf-8')
+        (output/name).write_text(decorate_page(re.sub(r'@@([A-Z_]+)@@',lambda m: values[m[1]],template),language,'dataset', output),encoding='utf-8')

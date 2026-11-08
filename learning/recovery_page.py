@@ -692,6 +692,7 @@ def write_recovery_pages(output):
                 re.sub(r"@@([A-Z_]+)@@", lambda m: values[m[1]], template),
                 language,
                 "recovery",
+                output,
             ),
             encoding="utf-8",
         )

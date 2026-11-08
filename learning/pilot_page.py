@@ -8,6 +8,7 @@ from hashlib import sha256
 from html import escape
 import json
 from pathlib import Path
+from . import journey
 import re
 import shutil
 
@@ -109,6 +110,28 @@ def score_table(metrics, language):
     return '<div class="table-wrap"><table><thead><tr><th>'+t('方法 / 类别','Method / class')+'</th>'+''.join(f'<th>{key}</th>' for key in ('HOTA','DetA','AssA','IDF1','FP','FN','IDSW'))+'</tr></thead><tbody>'+''.join(rows)+'</tbody></table></div>'
 
 
+def frame_guide(manifest, language):
+    t = lambda zh,en: pick(language,zh,en)
+    suffix = '.en' if language == 'en' else ''
+    example = journey.baseline_fp_example(manifest)
+    title = t('从误检追到代码', 'Trace a false positive to the code')
+    example_link = ''
+    if example:
+        video, frame = example
+        example_link = '<p>' + link(
+            journey.baseline_frame_href(language, video, frame),
+            t(f'打开 B0 误检示例：视频 {video}，导出帧 {frame} →', f'Open a B0 false positive: video {video}, exported frame {frame} →'),
+        ).replace('<a ', '<a id="baseline-fp-example" ', 1) + '</p>'
+    return (
+        '<aside class="baseline-case-guide"><strong>' + title + '</strong>' + example_link + '<p>'
+        + t('在六格图看额外预测，再对照本帧 FP 计数。未匹配的预测是评分上的误检；单帧不足以确定是提示、发现还是关联造成。',
+            'Look for the extra prediction in the six panels and compare it with the frame FP count. An unmatched prediction counts as a false positive; one frame does not isolate prompting, discovery or association.')
+        + '</p><p>' + link(f'program{suffix}.html?step=diagnose#stage-diagnose', t('查逐帧诊断函数 diagnose() →', 'Inspect the frame diagnosis function diagnose() →'))
+        + ' · ' + link(f'program{suffix}.html?step=b0#stage-b0', t('查 B0 预测入口 run_sam() →', 'Inspect the B0 prediction entry run_sam() →'))
+        + ' · ' + link('#code', t('本次运行源码快照', 'Source snapshot for this run')) + '</p></aside>'
+    )
+
+
 def content(manifest, language):
     t = lambda zh,en: pick(language,zh,en)
     if not manifest:
@@ -119,7 +142,7 @@ def content(manifest, language):
     first = viewer['videos'][0]
     total = sum(v['frames'] for v in viewer['videos'])
     blocks = [('scores',t('GT 评分','Ground-truth evaluation'),
-        '<p>'+link('program'+('.en' if language=='en' else '')+'.html#evidence',t('结合程序主线看结果解读与下一阶段实验 →','Review these results with the program map and next experiment →'))+'</p>'+
+        '<p>'+link('program'+('.en' if language=='en' else '')+'.html#evidence',t('结合程序地图解读基线分数 →','Interpret baseline scores with the program map →'))+'</p>'+
         '<p>'+t('A0：YOLO11s-seg 每帧检测 + 按类别 ByteTrack。B0：同一个 YOLO 每 5 步提供框，由 SAM 2.1 Tiny 传播、刷新提示、发现和管理目标；不读取 ByteTrack ID。',
             'A0: YOLO11s-seg on every frame plus per-class ByteTrack. B0: the same YOLO supplies boxes every five exported steps; SAM 2.1 Tiny propagates, refreshes prompts, discovers and manages targets, without ByteTrack IDs.')+'</p>'+score_table(manifest['metrics'],language)+
         '<p class="small">'+t('质量指标显示为 0–100 分。HOTA / DetA / AssA 平均 mask IoU 0.05–0.95 的 19 个阈值；IDF1、FP、FN、IDSW 使用 mask IoU 0.5。先按官方规则合并同类视频，再对五类等权平均质量指标，计数求和。',
@@ -131,7 +154,7 @@ def content(manifest, language):
     options = ''.join(f'<option value="{v["id"]}">{v["id"]} · {escape(v["focus"])}</option>' for v in viewer['videos'])
     payload = {**viewer,'prefix':prefix,'language':language}
     encoded = json.dumps(payload,ensure_ascii=False).replace('<','\\u003c')
-    blocks.append(('viewer',t('逐帧错误检查','Frame-by-frame error inspection'),f'''
+    blocks.append(('viewer',t('逐帧错误检查','Frame-by-frame error inspection'),frame_guide(manifest, language) + f'''
 <div id="viewer-controls" hidden><div class="controls"><label>{t('视频','Video')} <select id="video-select">{options}</select></label><button id="prev">{t('上一帧','Previous')}</button><button id="next">{t('下一帧','Next')}</button><output id="position">0</output></div><label for="frame-range">{t('导出帧索引（从 0 开始）','Exported frame index (zero-based)')}</label><input id="frame-range" type="range" min="0" max="{first['frames']-1}" value="0"></div>
 <p class="results-legend"><span style="--color:#3c964b">{t('同类前景覆盖','Covered class foreground')}</span><span style="--color:#2d7df5">{t('漏掉的 GT 前景','Missing GT foreground')}</span><span style="--color:#f04632">{t('额外 / 错类前景','Extra / wrong-class foreground')}</span></p>
 <p class="small">{t('上排：原图 / GT；中排：A0 预测 / 像素错误；下排：B0 预测 / 像素错误。GT 身份为 channel+1，预测 ID 独立编号，不必数值相等。像素图比较类别并集，不检查同类实例的 ID 互换；身份问题需结合标签、下表和跟踪指标判断。', 'Top: RGB / GT; middle: A0 / pixel errors; bottom: B0 / pixel errors. GT IDs are channel+1; predicted IDs are independently assigned and need not match numerically. Pixel maps compare class unions, not same-class identity swaps: inspect labels, the table and tracking metrics for identity errors.')}</p>
@@ -144,12 +167,13 @@ def content(manifest, language):
         key = str(v['id'])
         buttons = ' · '.join(f'<button data-jump-video="{key}" data-jump-frame="{f}">{t("帧","Frame")} {f}</button>' for f in v['worst_frames'])
         clips.append(f'<div id="video-{key}" class="results-video"><h3>{t("视频","Video")} {key} · {escape(v["focus"])}</h3><p>{v["frames"]} {t("帧","frames")} · {buttons}</p><img src="{prefix}{key}/iou-curve.png" loading="lazy" alt="{t("逐帧定位 IoU 曲线","Frame-level localization IoU curves")}"><details><summary>{t("播放六格对比视频（浏览速度 5 fps）","Play six-panel video (browse speed: 5 fps)")}</summary><video controls preload="none" src="{prefix}{key}/comparison.mp4" poster="{prefix}{key}/visuals/00000.jpg"></video></details></div>')
-    blocks.append(('curves',t('曲线与完整视频','Curves and full videos'),'<p class="small">'+t('曲线是忽略身份的定位诊断。复查按钮按漏检、误检和 ID 变化标记选取；全部帧均保留。5 fps 仅为浏览速度，原始时间戳未知。',
+    blocks.append(('curves',t('五段对比视频与曲线','Five comparison clips and curves'),'<p class="small">'+t('曲线是忽略身份的定位诊断。复查按钮按漏检、误检和 ID 变化标记选取；全部帧均保留。5 fps 仅为浏览速度，原始时间戳未知。',
         'Curves diagnose localization and ignore identity. Review buttons use missed/extra outputs and ID-change flags; all frames are retained. Five fps is browsing speed only; source timestamps are unavailable.')+'</p>'+''.join(clips)))
     code_links = ' · '.join(link(prefix+'code/'+name+'.txt',name) for name in summary['source_files'])
     blocks.append(('code',t('代码与运行记录','Code and run records'),'<p>'+link(prefix+'code/README.md.txt',t('中文代码导读','Code reading guide (Chinese)'))+'</p><p>'+t('从 run.py 开始，按数据、YOLO、ByteTrack、SAM、评分、诊断的顺序查阅。下面是本次推理实际使用的源码快照，不是重新运行的结果。',
         'Start with run.py, then follow data, YOLO, ByteTrack, SAM, evaluation and diagnostics. These are source snapshots from the actual inference run; no model was rerun for this page.')+'</p><p>'+code_links+'</p><p>'+link(prefix+'config.json',t('固定参数','Fixed configuration'))+' · '+link(prefix+'summary.json',t('环境与模型哈希','Environment and checkpoint hashes'))+' · '+link(prefix+'input-manifest.json',t('输入来源与哈希','Input provenance and hashes'))+'</p>'))
-    return blocks
+    order = ('curves', 'scores', 'viewer', 'revision', 'code')
+    return sorted(blocks, key=lambda block: order.index(block[0]))
 
 
 def write_results_pages(output):
@@ -163,22 +187,26 @@ def write_results_pages(output):
     for language,name in zip(('zh','en'),PAGES):
         t = lambda zh,en: pick(language,zh,en)
         blocks = content(manifest,language)
-        hr_link = recovery_link(output, language)
-        if hr_link:
-            body = '<p>' + t('基线告诉我们哪里出了问题；下一步用相同纠正框，把历史处理与整体系统差异分开。骑手失败与猫稳定对照已完成 16 个 H/R 分支。', 'Baselines reveal failures; same-box H/R then separates history handling from whole-system differences. Sixteen rider/cat branches are complete.') + '</p><p>' + hr_link + '</p>'
-            blocks.insert(2 if manifest and manifest.get('correction') else 1, ('recovery', t('下一步：已完成的 H/R 对照', 'Next: completed H/R comparisons'), body))
-        extension = long_link(output,language)
-        if extension:
-            position = next(i for i,b in enumerate(blocks) if b[0]=='recovery')
-            key,title,body = blocks[position]
-            body += '<p>'+t('同一事件已继续跟随30步，新增提示刷新消融；请区分延迟恢复、关联失败与生命周期删除。', 'The same events now have 30-step follow-up and a refresh ablation. Distinguish delayed recovery, association failure and lifecycle removal.')+' '+extension+'</p>'
-            blocks[position] = (key,title,body)
+        saved = [item for item in (recovery_link(output, language), long_link(output, language)) if item]
+        blocks.append(('recovery', t('读完基线：为什么要做 H/R？', 'After the baselines: why compare H/R?'),
+                       '<p>' + t('基线说明哪里出错。A0/B0 同时改变检测频率、掩码生成和关联；要判断历史处理的作用，下一步在各自系统内固定纠正框和前史，只比较保留与重置。',
+                                'The baselines locate errors. A0/B0 differ in detection frequency, mask generation and association. To study history handling, the next step fixes the prior state and corrective box within each pipeline and compares retention with reset.')
+                       + '</p>' + ('<p>' + t('已保存实测：', 'Saved follow-ups: ') + ' · '.join(saved) + '</p>' if saved else '')))
         count = len(manifest['viewer']['videos']) if manifest else 0
         frames = sum(v['frames'] for v in manifest['viewer']['videos']) if manifest else 0
-        intro = t(f'第一阶段 · 本地 RTX 3080 · {count} 段真实视频，{frames} 个导出帧。',f'Stage 1 · Local RTX 3080 · {count} real videos, {frames} exported frames.') if manifest else ''
-        values = {'LANG':t('zh-CN','en'),'TITLE':t('真实数据实验结果','Real-data experiment results'),
-            'INTRO':'<p>'+intro+'</p><p class="notice">'+t('开发预实验，不是最终模型排名。推理不使用 GT 提示或身份；标注只用于事后评分。B0 的宏平均分更高，但误检也更多；不能据此认定某种记忆机制更优。',
-                'Development pilot, not a final ranking. Inference uses no GT prompts or IDs; annotations are for offline scoring. B0 has higher macro scores but more false positives; this does not establish a superior memory mechanism.')+'</p>',
+        intro = ''
+        if manifest:
+            intro = '<p>' + t(f'{count} 段真实视频，{frames} 个导出帧。开发预实验；GT 只用于事后评分。', f'{count} real clips and {frames} exported frames. Development pilot; GT is used only for offline scoring.') + '</p>'
+            intro += '<div class="baseline-entry-links">' + ''.join(
+                link('#'+key,label).replace('<a ', '<a class="button secondary" ', 1) for key,label in (
+                    ('curves',t('看五段对比视频 ↓', 'Watch the comparison clips ↓')),
+                    ('scores',t('看 GT 评分 ↓', 'See GT scores ↓')),
+                    ('viewer',t('查逐帧错误 ↓', 'Inspect frame errors ↓')),
+                )) + '</div>'
+            if manifest.get('correction'):
+                intro += '<p class="small">' + link('#revision',t('同步修订、复核与归因说明', 'Synchronization correction, verification and attribution')) + '</p>'
+        values = {'LANG':t('zh-CN','en'),'TITLE':t('阶段 1：五段 A0/B0 基线','Phase 1: five-clip A0/B0 baselines'),
+            'INTRO':intro,
             'HOME':t('index.html','index.en.html'),'OTHER':t('results.en.html','results.html'),
             'CSS':css,'JS':script,'NAV':''.join(link('#'+key,label) for key,label,_ in blocks),
             'BODY':''.join(section(key,label,body) for key,label,body in blocks),
@@ -186,7 +214,7 @@ def write_results_pages(output):
             'MENU':t('本页目录','On this page'),'THEME':t('切换主题','Theme'),
             'SKIP':t('跳到正文','Skip to content'),'TRAIL':t('研究与实验 · 实际结果','Research and experiments · Actual results'),
             'FOOT':t('默认展示最新验证运行；旧版存档保留，不再用旧 B0 异常推断记忆机制。','The latest verified run is shown by default; legacy artifacts are preserved and legacy B0 anomalies are not evidence about memory.')}
-        (output/name).write_text(decorate_page(re.sub(r'@@([A-Z_]+)@@',lambda m:values[m[1]],template),language,'results'),encoding='utf-8')
+        (output/name).write_text(decorate_page(re.sub(r'@@([A-Z_]+)@@',lambda m:values[m[1]],template),language,'results', output),encoding='utf-8')
 
 
 if __name__ == '__main__':

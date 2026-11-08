@@ -4,6 +4,8 @@ from html import escape
 from pathlib import Path
 import re
 
+from . import journey
+
 WEB = Path(__file__).with_name("web")
 
 
@@ -206,27 +208,26 @@ def render_navigation_groups(
 
 PROJECT_OUTLINES = {
     "index": [
-        ("项目起点", "Getting started", ("overview", "pathways")),
+        ("实验主线", "Experiment route", ("overview", "experiment-route", "pathways")),
         (
             "结果与进展",
             "Results & progress",
-            ("results", "recovery-results", "runs", "next"),
+            ("results", "recovery-results", "independent-cohort", "natural-followup", "next", "runs"),
         ),
         (
             "实现与资料",
             "Implementation & resources",
-            ("pipeline", "dataset", "proposal", "resources"),
+            ("team-resource-entry", "pipeline", "dataset", "proposal", "resources"),
         ),
     ],
     "runs": [
         ("过程与进展", "Process & progress", ("start", "process")),
-        ("已验证记录", "Verified records", ("hr-long-run", "hr-run", "baseline")),
+        ("已验证记录", "Verified records", ("baseline", "hr-run", "hr-long-run", "independent-cohort", "natural-followup")),
         ("后续工作", "Next steps", ("pending",)),
     ],
     "results": [
-        ("基线与评分", "Baselines & scores", ("start", "revision", "scores")),
-        ("结果回看", "Review results", ("recovery", "viewer", "curves")),
-        ("代码与记录", "Code & records", ("code",)),
+        ("五段基线", "Five-clip baselines", ("start", "curves", "scores", "viewer")),
+        ("查证与下一步", "Verification & next step", ("revision", "code", "recovery")),
     ],
     "recovery": [
         ("对照与设计", "Controls & design", ("start", "design")),
@@ -243,6 +244,11 @@ PROJECT_OUTLINES = {
         ("机制与逐段证据", "Mechanisms & event evidence", ("findings", "events")),
         ("代码与边界", "Code & limits", ("code", "verification", "next")),
     ],
+    "recovery-natural": [
+        ("设计与主要发现", "Design & findings", ("start", "design", "findings", "scores")),
+        ("事件与覆盖", "Events & coverage", ("events", "coverage")),
+        ("实现与边界", "Implementation & limits", ("code", "limits")),
+    ],
     "experiments": [
         ("研究与基线", "Research & baselines", ("start", "logic", "baselines")),
         ("受控对照", "Controlled comparisons", ("walkthrough", "matrix", "readouts")),
@@ -258,8 +264,8 @@ PROJECT_OUTLINES = {
         ("覆盖与使用", "Coverage & usage", ("coverage", "usage")),
     ],
     "documents": [
-        ("方案与文档", "Design & documents", ("start", "downloads", "approved-design")),
-        ("实现与参考", "Implementation & references", ("references",)),
+        ("研究问题与方案", "Question & proposal", ("start", "approved-design")),
+        ("下载与参考", "Downloads & references", ("downloads", "team-assets", "references")),
     ],
 }
 
@@ -320,7 +326,7 @@ def fold_course_navigation(text, language, current="handbook"):
     )
 
 
-def decorate_page(text, language, current):
+def decorate_page(text, language, current, output=None):
     if 'id="project-navigation"' in text:
         return text
     en = language == "en"
@@ -358,53 +364,29 @@ def decorate_page(text, language, current):
         text,
         count=1,
     )
-    entries = [
-        ("index", "实验总览", "Project overview"),
-        ("runs", "过程与运行记录", "Process & run records"),
-        ("results", "评分与错误回看", "Scores & error review"),
-        ("recovery", "H/R 恢复实测", "H/R recovery results"),
-        ("recovery-cohort", "16段独立事件", "16-event cohort"),
-        ("experiments", "对照实验方案", "Controlled protocol"),
-        ("program", "程序与调用地图", "Program & call map"),
-        ("dataset", "数据与标注", "Data & annotations"),
-        ("documents", "Proposal 与项目文档", "Proposal & documents"),
-    ]
     if learning:
         entries = [
             ("handbook", "课程手册", "Course handbook"),
             ("math", "数学与实现", "Math & implementation"),
             ("research", "技术脉络与来源", "History & sources"),
         ]
-    items = {}
-    for slug, zh, english in entries:
-        active = (
-            ' aria-current="page"'
-            if ("recovery" if current == "recovery-long" else current) == slug
-            else ""
+        destinations = "".join(
+            f'<a href="{journey.href(slug, language)}"'
+            + (' aria-current="page"' if current == slug else '')
+            + f'>{escape(english if en else zh)}</a>'
+            for slug, zh, english in entries
         )
-        items[slug] = (
-            f'<a href="{slug}{suffix}.html"{active}>{escape(english if en else zh)}</a>'
-        )
-    if learning:
-        destinations = "".join(items.values())
     else:
-        groups = [
-            ("项目与进展", "Project & progress", ("index", "runs")),
-            (
-                "结果与研究",
-                "Results & research",
-                ("results", "recovery", "recovery-cohort", "experiments"),
-            ),
-            (
-                "实现与资料",
-                "Implementation & resources",
-                ("program", "dataset", "documents"),
-            ),
-        ]
+        def stage_link(slug):
+            active = ' aria-current="page"' if current == slug else ""
+            # Keep the current-page link at the page root, without a forced scroll.
+            target = journey.stage_href(journey.BY_PAGE[slug], language) if slug != "index" and not active else journey.href(slug, language)
+            return f'<a href="{target}" data-route-page="{slug}"{active}>{escape(journey.label(slug, language))}</a>'
+
         destinations = render_navigation_groups(
             [
-                (f"{i} · {english if en else zh}", "".join(items[key] for key in keys))
-                for i, (zh, english, keys) in enumerate(groups, 1)
+                (journey.tr(language, title), "".join(stage_link(key) for key in keys))
+                for title, keys in journey.GROUPS
             ],
             language,
             prefix="project-group",
@@ -481,6 +463,9 @@ def decorate_page(text, language, current):
         )
         text = fold_course_navigation(text, language)
     else:
+        if current in journey.BY_PAGE:
+            text = text.replace("</section>", journey.stage_brief(current, output, language) + "</section>", 1)
+            text = text.replace("<footer>", journey.stage_turns(current, language) + "<footer>", 1)
         text = text.replace(
             "</section>", contextual_links(language, current) + "</section>", 1
         )

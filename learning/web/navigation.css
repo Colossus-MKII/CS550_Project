@@ -72,3 +72,21 @@ body[data-workspace=learning]{--accent:var(--blue);--accent-ink:#0d2437;--worksp
 .context-links,.lesson-connection{margin:22px 0;padding:14px 18px;border-left:3px solid var(--accent);background:var(--surface);font-size:14px;line-height:1.8}.context-links p,.lesson-connection p{margin:0 0 8px}.lesson-connection strong{font-size:12px;color:var(--muted)}.lesson-connection p{margin-top:4px}.context-links a,.lesson-connection a{font-size:13px}
 /* Keep the full link box clickable when a label moves onto another line. */
 .context-links a,.lesson-connection a,.pathway-links a{display:inline-block;max-width:100%;vertical-align:top}
+.journey-map{list-style:none;margin:20px 0 0;padding:0}
+.journey-row{display:grid;grid-template-columns:2.5rem minmax(0,1fr);gap:12px;margin:0;padding:15px 0;border-top:1px solid var(--line)}
+.journey-number{color:var(--accent);font:600 1rem/1.8 Consolas,monospace}
+.journey-row-title{display:flex;align-items:center;flex-wrap:wrap;gap:5px 12px}
+.journey-row-title a{font-weight:650;text-underline-offset:.2em}
+.journey-row p,.journey-brief p{margin:5px 0 0;line-height:1.65;font-size:14px}
+.journey-takeaway{color:var(--muted)}
+.journey-state{color:var(--muted);font-size:11px;line-height:1.45;padding:3px 8px;border-radius:5px;border:1px solid var(--line)}
+.journey-state.done{color:var(--accent)}.journey-state.pending{color:var(--warm)}
+.journey-brief{padding:12px 15px;margin:18px 0 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.journey-turns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:28px 0 18px}
+.journey-turn{display:flex;flex-direction:column;gap:4px;padding:13px 16px;border:1px solid var(--line);border-radius:7px;background:var(--surface);text-decoration:none}
+.journey-turn:hover{border-color:var(--accent)}.journey-turn span{font-size:12px;color:var(--muted)}
+.journey-turn.next{grid-column:2;border-color:var(--accent)}
+.baseline-entry-links{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.baseline-case-guide{margin:16px 0;padding:13px 16px;background:var(--surface);border-left:3px solid var(--accent)}
+.baseline-case-guide p{margin:5px 0}
+@media(max-width:480px){.journey-row{grid-template-columns:1.6rem minmax(0,1fr);gap:8px}.journey-turns{grid-template-columns:minmax(0,1fr);gap:8px}.journey-turn.next{grid-column:auto}.journey-turn{padding:11px 13px}}

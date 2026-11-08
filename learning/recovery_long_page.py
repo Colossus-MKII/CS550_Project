@@ -763,6 +763,7 @@ def write_long_pages(output):
                 re.sub(r"@@([A-Z_]+)@@", lambda m: values[m[1]], template),
                 language,
                 "recovery-long",
+                output,
             ),
             encoding="utf-8",
         )

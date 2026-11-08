@@ -39,7 +39,7 @@ def progress_block(output, language):
     suffix = ".en" if language == "en" else ""
     return (
         "independent-cohort",
-        t("最新：16段独立开发事件", "Latest: 16 independent development events"),
+        t("此前：16段独立开发事件", "Earlier: 16 independent development events"),
         "<p>"
         + t(
             "稳定对照、运动突变、检测竞争、遮挡各4段；128个主分支、32段四组视频。2967边界案例未跑。多数事件H/R持平，主要差异涉及关联门槛、纠正框质量与目标生命周期，不能概括为一种记忆总是更好。",
@@ -401,10 +401,10 @@ def content(plan, data, language):
         )
         + "</p><p>"
         + t(
-            "下一步先预注册历史可靠性×纠正框质量的受控实验，单独检查目标TTL与后续实际提示；不能根据本批赢家重选样本或直接宣布永远保留。延迟恢复、关联失败、活跃时mask失败和生命周期删除继续分开统计。新实验尚未运行。",
-            "Next, preregister a controlled history-reliability × corrective-box-quality experiment, separately checking target TTL and actual future prompts. Do not reselect samples based on current winners or declare that retention is always best. Keep delayed recovery, association failure, active-mask failure and lifecycle removal separate. This follow-up has not been run.",
+            "多数事件不是持续失败后的恢复：纠正当步A有13/16、B有14/16已正确。按截至纠正时刻连续3步检查，A有3段持续失败，B没有。后续自然失败补充完成52主分支；人为污染实验已从当前工作区删除，不要求完整可靠性×框质量矩阵。新增分支必须先人工确认。延迟恢复、关联失败、活跃mask失败和删除继续分开解释。",
+            "Most events are not recovery from persistent failure: A is already correct at correction in 13/16 and B in 14/16. Checking three steps ending at correction yields three persistent failures for A and none for B. The natural-failure follow-up completed 52 main branches. Artificial-pollution experiments have been deleted from the current workspace; no full reliability × box-quality matrix is required. New branches require prior human confirmation. Keep delayed recovery, association failure, active-mask failure and removal distinct.",
         )
-        + "</p>",
+        + "</p><p>" + link("recovery-natural" + suffix + ".html", t("继续：自然失败后的恢复与维持 →", "Continue: recovery and maintenance after natural failures →")) + "</p>",
     )
     return blocks
 
@@ -492,9 +492,13 @@ def write_cohort_pages(output, import_assets=False):
                 "Saved results only; this page does not run inference.",
             ),
         }
+        from .team_downloads import download_link as resource_link
+        resources = resource_link(output, language)
+        if resources:
+            values["INTRO"] += '<p class="notice">' + resources + '</p>'
         text = re.sub(r"@@([A-Z_]+)@@", lambda m: values[m[1]], template)
         (output / filename).write_text(
-            decorate_page(text, language, "recovery-cohort"), encoding="utf-8"
+            decorate_page(text, language, "recovery-cohort", output), encoding="utf-8"
         )
 
 

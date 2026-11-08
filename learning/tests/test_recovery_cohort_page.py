@@ -83,4 +83,5 @@ def test_actual_bilingual_cohort_and_assets():
         home = (SITE / ("index.en.html" if ".en." in name else "index.html")).read_text(
             encoding="utf-8"
         )
-        assert f'id="latest-results-link" class="button primary" href="{name}"' in home
+        latest = ("recovery-natural.en.html" if ".en." in name else "recovery-natural.html") if (SITE/"natural-recovery-results/manifest.json").exists() else name
+        assert f'id="latest-results-link" class="button secondary" href="{latest}"' in home

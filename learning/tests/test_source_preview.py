@@ -61,6 +61,7 @@ build_preview(Path(sys.argv[1]))
         "recovery",
         "recovery-long",
         "recovery-cohort",
+        "recovery-natural",
     )
     for slug in families:
         for suffix in ("", ".en"):
@@ -74,6 +75,7 @@ build_preview(Path(sys.argv[1]))
         "recovery-results",
         "recovery-long-results",
         "recovery-cohort-results",
+        "natural-recovery-results",
     ):
         assert not (output / folder).exists()
     pages = {path.resolve(): References(path) for path in output.rglob("*.html")}

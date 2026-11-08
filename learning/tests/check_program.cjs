@@ -21,7 +21,6 @@ const { chromium } = require(modulePath);
       await page.goto(new URL(`index${suffix}.html`, url).href);
       assert.equal(await page.locator(`#project-navigation a[href="program${suffix}.html"]`).count(), 1);
       if (await page.locator('#menu-toggle').isVisible()) await page.locator('#menu-toggle').click();
-      await page.locator('#project-group-3 > summary').click();
       await page.locator(`#project-navigation a[href="program${suffix}.html"]`).click();
       await page.waitForURL(destination => destination.pathname.endsWith(`program${suffix}.html`));
       assert.equal(await page.locator('[data-program-panel]:visible').count(), 1);

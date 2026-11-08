@@ -83,4 +83,4 @@ def write_study_pages(output):
                 "FOOT": pick(language, "内容更新：2026-10-15。正式实验以锁定版本、配置和统一评估器为准。", "Updated 2026-10-15. Formal experiments must pin versions, configurations and the evaluator."),
             }
             rendered = re.sub(r"@@([A-Z_]+)@@", lambda m: values[m[1]], template)
-            (output / f"{slug}{suffix}.html").write_text(decorate_page(rendered, language, slug), encoding="utf-8")
+            (output / f"{slug}{suffix}.html").write_text(decorate_page(rendered, language, slug, output), encoding="utf-8")
